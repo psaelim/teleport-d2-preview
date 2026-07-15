@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teleport MD — patient redesign status map</title>
+<style>
+  :root {
+    --canvas: #F3F7FA;
+    --card: #FFFFFF;
+    --ink: #16293A;
+    --slate: #52708A;
+    --line: #DCE7EF;
+    --accent: #0F6FBE;
+    --built-bg: #DDF3E4;  --built-fg: #1B6B30;
+    --d3-bg: #E3EEFB;     --d3-fg: #0B5A9C;
+    --stub-bg: #FFF1CC;   --stub-fg: #6E4B00;
+    --miss-bg: #FBE3E0;   --miss-fg: #B02318;
+    --tint: #F4F8FB;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas: #0E1B26; --card: #152535; --ink: #E8F0F7; --slate: #9DB4C8; --line: #27415A;
+      --accent: #5FA9EC;
+      --built-bg: #14331E; --built-fg: #7ED09A;
+      --d3-bg: #12293F;    --d3-fg: #8CC0F0;
+      --stub-bg: #33280C;  --stub-fg: #E4B95B;
+      --miss-bg: #38191C;  --miss-fg: #EF9A94;
+      --tint: #1A2E42;
+    }
+  }
+  :root[data-theme="dark"] {
+    --canvas: #0E1B26; --card: #152535; --ink: #E8F0F7; --slate: #9DB4C8; --line: #27415A;
+    --accent: #5FA9EC;
+    --built-bg: #14331E; --built-fg: #7ED09A;
+    --d3-bg: #12293F;    --d3-fg: #8CC0F0;
+    --stub-bg: #33280C;  --stub-fg: #E4B95B;
+    --miss-bg: #38191C;  --miss-fg: #EF9A94;
+    --tint: #1A2E42;
+  }
+  :root[data-theme="light"] {
+    --canvas: #F3F7FA; --card: #FFFFFF; --ink: #16293A; --slate: #52708A; --line: #DCE7EF;
+    --accent: #0F6FBE;
+    --built-bg: #DDF3E4; --built-fg: #1B6B30;
+    --d3-bg: #E3EEFB;    --d3-fg: #0B5A9C;
+    --stub-bg: #FFF1CC;  --stub-fg: #6E4B00;
+    --miss-bg: #FBE3E0;  --miss-fg: #B02318;
+    --tint: #F4F8FB;
+  }
+  body {
+    background: var(--canvas); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    line-height: 1.55; margin: 0; padding: 48px 24px 96px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+  h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 750; letter-spacing: -.025em; line-height: 1.08; margin: 0 0 12px; text-wrap: balance; }
+  .lede { color: var(--slate); max-width: 62ch; margin: 0 0 28px; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -.015em; margin: 56px 0 6px; }
+  h2 + p.sub { color: var(--slate); margin: 0 0 18px; max-width: 70ch; font-size: 15px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 650; padding: 3px 10px; border-radius: 7px; white-space: nowrap; }
+  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .chip.built { background: var(--built-bg); color: var(--built-fg); }
+  .chip.d3   { background: var(--d3-bg);   color: var(--d3-fg); }
+  .chip.stub { background: var(--stub-bg); color: var(--stub-fg); }
+  .chip.miss { background: var(--miss-bg); color: var(--miss-fg); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 0; }
+
+  .personas { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 18px; }
+  .persona { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .persona h3 { margin: 0 0 4px; font-size: 17px; letter-spacing: -.01em; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .persona p { margin: 10px 0 0; font-size: 14px; color: var(--slate); }
+  .persona ul { margin: 10px 0 0; padding-left: 18px; font-size: 14px; color: var(--slate); }
+  .persona li { margin: 3px 0; }
+  .persona li b { color: var(--ink); font-weight: 600; }
+
+  .diagram { background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; margin-top: 16px; }
+  :root[data-theme="dark"] .diagram { border-color: #3A5570; }
+
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; font-size: 14.5px; margin-top: 16px; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--slate); font-weight: 650; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.rt { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; color: var(--accent); white-space: nowrap; }
+  td.note { color: var(--slate); }
+  .tablewrap { overflow-x: auto; }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 16px; }
+  .col { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .col h3 { margin: 0 0 12px; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+  .col ul { list-style: none; margin: 0; padding: 0; font-size: 14.5px; }
+  .col li { padding: 7px 0; border-top: 1px solid var(--line); }
+  .col li:first-child { border-top: 0; }
+  .col li span { display: block; font-size: 13px; color: var(--slate); }
+  footer { margin-top: 56px; font-size: 13px; color: var(--slate); border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Teleport MD · patient app redesign · status as of 15 July 2026</p>
+  <h1>Every screen and flow, and the gaps between them</h1>
+  <p class="lede">
+    The complete architecture of the redesigned patient experience &mdash; 19 working screens,
+    what is stubbed behind a button, and the full inventory of what a shippable patient app
+    still needs, from the sign-up form to offline states. Statuses reflect the working
+    prototype, not intentions. A second visual direction is in progress and will be shared
+    separately.
+  </p>
+  <div class="legend">
+    <span class="chip built">Built</span>
+    <span class="chip d3">In progress · second direction</span>
+    <span class="chip stub">Stub · button exists, no screen</span>
+    <span class="chip miss">Not designed yet</span>
+  </div>
+
+  <h2>The product is three personas. One is designed.</h2>
+  <p class="sub">The old Figma file covers Patient, Provider, and Crew. The redesign has only entered the first.</p>
+  <div class="personas">
+    <div class="persona">
+      <h3>Patient <span class="chip built">In progress · deep</span></h3>
+      <p>Re-architected and built as a clickable prototype &mdash; 19 screens, all passing an automated accessibility gate (44px targets, AA contrast, 13px type floor). Everything below this row is patient scope.</p>
+      <p><span class="chip d3">Second visual direction · in progress</span></p>
+    </div>
+    <div class="persona">
+      <h3>Provider <span class="chip miss">Not started</span></h3>
+      <p>Next per the approved plan. Known problems to solve:</p>
+      <ul>
+        <li>Kill the <b>8-step onboarding funnel</b></li>
+        <li>Probably needs a <b>desktop portal</b>, not mobile-first</li>
+        <li>Worth keeping from the old file: <b>Call Preview</b>, <b>Eligibility Checks</b></li>
+      </ul>
+    </div>
+    <div class="persona">
+      <h3>Crew <span class="chip miss">Not started</span></h3>
+      <p>The product's differentiator (mobile phlebotomists) and its hardest UX:</p>
+      <ul>
+        <li><b>Navigation handoff</b> and outdoor glanceability</li>
+        <li><b>Offline queue</b> for dead zones</li>
+        <li><b>Chain of custody</b> — unsolved even in the old file's own sticky note</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Patient flows</h2>
+  <p class="sub">Solid nodes are real screens; colors follow the legend. Arrows are actual navigation in the prototypes.</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+  subgraph TABS["Tab bar"]
+    HOME["Home"]:::built
+    VISITS["Visits"]:::built
+    MSGS["Messages<br/>(thread list)"]:::built
+    YOU["You"]:::built
+  end
+
+  subgraph CARE["Get care &amp; booking"]
+    GETCARE["Get care<br/>(need-first triage)"]:::built
+    BOOK["Book<br/>(availability-first)"]:::built
+    CONF["Booked"]:::built
+    RX["Rx refill flow"]:::stub
+    DIR["Directory search<br/>('find someone new')"]:::stub
+  end
+
+  subgraph VIDEO["Video visit"]
+    PRECALL["Pre-call check"]:::built
+    WAIT["Waiting room"]:::built
+    CALL["In-call"]:::built
+    POST["Post-call"]:::built
+  end
+
+  subgraph DRAW["At-home blood draw"]
+    COLLECT["Pick a window"]:::built
+    PRICE["Locked price"]:::built
+    TRACK["Live tracking +<br/>door code"]:::built
+    CANCEL["Cancel flow"]:::stub
+  end
+
+  WELCOME["Sign in / welcome"]:::built
+  RESULTS["Lab results"]:::built
+  THREAD["Message thread"]:::built
+  SUMMARY["Visit summary"]:::built
+  NOTIFS["Notifications"]:::built
+  SIGNUP["Sign-up form +<br/>verification code"]:::miss
+  INTAKE["Medical intake +<br/>consents"]:::miss
+  INS["Insurance card capture"]:::stub
+  PAY["Payment management"]:::stub
+  FAM["Family / dependents"]:::stub
+
+  HOME --> GETCARE
+  GETCARE -->|"Talk to a doctor /<br/>Mental health"| BOOK --> CONF
+  GETCARE -.-> RX
+  GETCARE -.-> DIR
+  HOME --> PRECALL
+  VISITS --> PRECALL
+  PRECALL --> WAIT --> CALL --> POST
+  POST -->|"Schedule the draw"| COLLECT
+  GETCARE -->|"Blood draw at home"| COLLECT
+  COLLECT --> PRICE --> TRACK
+  TRACK -.-> CANCEL
+  HOME --> TRACK
+  VISITS --> TRACK
+  WELCOME --> HOME
+  WELCOME -.->|"new patient"| SIGNUP -.-> INTAKE
+  YOU --> RESULTS
+  YOU --> NOTIFS
+  YOU -->|"sign out"| WELCOME
+  VISITS -->|"past visit"| SUMMARY --> RESULTS
+  RESULTS -->|"Read her message"| THREAD
+  MSGS --> THREAD
+  NOTIFS --> TRACK
+  YOU -.-> INS
+  YOU -.-> PAY
+  YOU -.-> FAM
+
+  classDef built fill:#DDF3E4,stroke:#1B6B30,color:#0F3D1C
+  classDef d3 fill:#E3EEFB,stroke:#0B5A9C,color:#0B3B66
+  classDef stub fill:#FFF1CC,stroke:#B98A00,color:#5C3E00
+  classDef miss fill:#FBE3E0,stroke:#C0271C,color:#7A1812
+  classDef default fill:#F4F8FB,stroke:#8AA5BE,color:#16293A
+</pre>
+  </div>
+
+  <h2>Screen inventory</h2>
+  <p class="sub">Every routed screen in the prototypes today.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Screen</th><th>Route</th><th>D2</th><th>D3</th><th>What it fixes / notes</th></tr>
+    <tr><td>Home</td><td class="rt">#home</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">One live thing, one next action. A home-screen redesign is being explored.</td></tr>
+    <tr><td>Get care</td><td class="rt">#getcare</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Need-first triage; replaced the 7-field NPI provider search.</td></tr>
+    <tr><td>Book</td><td class="rt">#book</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Availability-first. Dependent switcher is a stub.</td></tr>
+    <tr><td>Booked</td><td class="rt">#confirmed</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">"Add to calendar" is a stub.</td></tr>
+    <tr><td>Pre-call check</td><td class="rt">#precall</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Net new — the old file had no in-call UI in 25k nodes.</td></tr>
+    <tr><td>Waiting room</td><td class="rt">#waiting</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">ETA + pulse; Shows wait time honestly instead of a spinner.</td></tr>
+    <tr><td>In-call</td><td class="rt">#call</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Mute / camera / captions / end, with off-states.</td></tr>
+    <tr><td>Post-call</td><td class="rt">#postcall</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Ends with what happens next; hands off to the draw.</td></tr>
+    <tr><td>Pick a window</td><td class="rt">#collect</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Address change is a stub.</td></tr>
+    <tr><td>Locked price</td><td class="rt">#price</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Kills the "$77.50–$100 estimate" failure the old file shipped.</td></tr>
+    <tr><td>Live tracking</td><td class="rt">#track</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Old status machine + door-code verification. Cancel, call, message are stubs.</td></tr>
+    <tr><td>Visits</td><td class="rt">#visits</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Video visits and draws in one list.</td></tr>
+    <tr><td>Messages</td><td class="rt">#msgs</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">List only — no thread view yet.</td></tr>
+    <tr><td>You</td><td class="rt">#you</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Insurance, family, and payment rows lead to stubs; records opens lab results.</td></tr>
+    <tr><td>Lab results</td><td class="rt">#results</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Value + Normal/High/Low badges; newly added. "All" and "Trends" tabs are stubs.</td></tr>
+    <tr><td>Message thread</td><td class="rt">#thread</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Conversation with Dr. Anand; results ride inside it as a tappable card. Composer is decorative.</td></tr>
+    <tr><td>Visit summary</td><td class="rt">#summary</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Covered / prescribed / ordered / next, with a booking hand-off.</td></tr>
+    <tr><td>Sign in</td><td class="rt">#welcome</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Phone-number front door. The code-entry step and the new-patient path do not exist yet.</td></tr>
+    <tr><td>Notifications</td><td class="rt">#notifs</td><td><span class="chip built">Built</span></td><td><span class="chip d3">In progress</span></td><td class="note">Four notification types, each deep-linking to its screen.</td></tr>
+  </table>
+  </div>
+
+  <h2>What does not exist yet</h2>
+  <p class="sub">The honest distance between a beautiful prototype and a shippable patient app, grouped by journey. Anything amber already has a visible button waiting for it.</p>
+  <div class="cols">
+    <div class="col">
+      <h3><span class="chip miss">Missing</span> Account &amp; onboarding</h3>
+      <ul>
+        <li>Sign-up form <span>name, date of birth, contact &mdash; the new-patient path behind "Continue"</span></li>
+        <li>Verification code entry <span>the sign-in screen promises a texted code</span></li>
+        <li>Identity verification <span>photo ID &mdash; telehealth compliance requires it</span></li>
+        <li>Medical intake <span>history, medications, allergies &mdash; once, not as a nag</span></li>
+        <li>Consents <span>telehealth consent + privacy, in plain language</span></li>
+        <li>Permission priming <span>camera, mic, notifications, location &mdash; asked in context, not at launch</span></li>
+        <li>Account recovery <span>new phone number, lost access</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3><span class="chip stub">Stubbed</span> Insurance &amp; money</h3>
+      <ul>
+        <li>Insurance card capture <span>Home banner + You row both promise it</span></li>
+        <li>Eligibility check result <span>the old app's best flow &mdash; worth carrying over</span></li>
+        <li>Coverage breakdown <span>"$50 or covered" needs a screen that explains which</span></li>
+        <li>Payment methods <span>add / change card; referenced on Price and You</span></li>
+        <li>Billing history <span>receipts &mdash; the notification links to a PDF that isn't there</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3><span class="chip stub">Stubbed</span> Clinical surfaces</h3>
+      <ul>
+        <li>Rx refill flow <span>a quarter of the Get care screen</span></li>
+        <li>Pharmacy selection <span>where the refill goes</span></li>
+        <li>Medication list <span>Atorvastatin exists only inside the visit summary</span></li>
+        <li>Records library <span>documents beyond lab results</span></li>
+        <li>Results trends <span>the "Trends" tab is a stub; needs charts over time</span></li>
+        <li>Pre-visit intake <span>"reason for visit" + photo upload before the call</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3><span class="chip miss">Missing</span> Visit lifecycle</h3>
+      <ul>
+        <li>Cancel / reschedule <span>tracking + booking fine print reference both</span></li>
+        <li>Call-drop recovery <span>reconnecting state; "we'll call you back" fallback</span></li>
+        <li>In-call chat &amp; photo share <span>show the doctor the rash, not describe it</span></li>
+        <li>Interpreter / accessibility <span>language and captions preferences before the call</span></li>
+        <li>Directory search <span>"Find someone new" &mdash; never by NPI</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3><span class="chip miss">Missing</span> Draw logistics</h3>
+      <ul>
+        <li>Prep instructions <span>fasting rules the night before, in the patient's words</span></li>
+        <li>Address book <span>"change address" on Collect is a stub</span></li>
+        <li>Crew contact <span>call / message buttons on Tracking are stubs</span></li>
+        <li>Specimen confirmation <span>"dropped at the lab" &mdash; the patient's end of chain of custody</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3><span class="chip miss">Missing</span> System &amp; states</h3>
+      <ul>
+        <li>Settings <span>notification preferences, language, privacy</span></li>
+        <li>Help &amp; support <span>a human to reach when something breaks</span></li>
+        <li>Loading / error / empty / offline <span>every screen currently assumes success</span></li>
+        <li>Provider persona <span>everything &mdash; next per the plan</span></li>
+        <li>Crew persona <span>everything &mdash; incl. the unsolved chain of custody</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    Statuses are read from the working prototype as of 15 July 2026. Old-app findings come from the
+    14 July audit of the existing product design file. Stub = a control that currently opens a
+    placeholder in the prototype. Prepared by June Saelim; built with the design team's working prototypes.
+  </footer>
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { htmlLabels: true } });
+</script>
+</body>
+</html>
