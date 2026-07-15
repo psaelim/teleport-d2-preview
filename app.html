@@ -162,10 +162,10 @@ function GetCare() {
   /* Palette rule decides the icon variant: electric/ink tiles
      take the WHITE (-w) glyph, volt/coral take the ink glyph. */
   const needs = [
-    ['Talk to a doctor', 'Video visit today', 'need-electric', 'video-w', 'book'],
-    ['Blood draw at home', 'We come to you', 'need-volt', 'drop', 'collect'],
-    ['Refill a prescription', 'Usually same day', 'need-coral', 'rx', null],
-    ['Mental health', 'Book with a therapist', 'need-ink', 'mind-w', 'book'],
+    ['Video visit today', 'need-electric', 'video-w', 'book'],
+    ['Blood draw at home', 'need-volt', 'drop', 'collect'],
+    ['Same-day Rx refill', 'need-coral', 'rx', null],
+    ['Talk to a therapist', 'need-ink', 'mind-w', 'book'],
   ];
   return `
   ${bar('Get care', 'home')}
@@ -173,13 +173,10 @@ function GetCare() {
     <h1 class="display sm">What do you need?</h1>
 
     <div class="needs">
-      ${needs.map(([name, sub, cls, ico, route]) => `
+      ${needs.map(([name, cls, ico, route]) => `
         <button class="need ${cls}" onclick="${route ? `go('${route}')` : `alert('Prescription refill flow')`}">
           <span class="ico"><img src="img/icons/d2-fill/${ico}.png" alt=""></span>
-          <span>
-            <span class="name" style="display:block">${name}</span>
-            <span style="font-size:15px;opacity:.85">${sub}</span>
-          </span>
+          <span class="name">${name}</span>
         </button>`).join('')}
     </div>
 
