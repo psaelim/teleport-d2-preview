@@ -244,6 +244,7 @@ img[src*="dr-bell"]       { object-position: 50% 26%; }  /* 9:16 studio headshot
   border: 0; border-radius: var(--radius-md);
   padding: var(--space-4);
   display: flex; flex-direction: column; justify-content: space-between;
+  gap: var(--space-4);              /* breathing room icon -> label */
   align-items: flex-start;
   cursor: pointer; font: inherit; text-align: left;
   transition: transform .1s ease;
@@ -252,7 +253,7 @@ img[src*="dr-bell"]       { object-position: 50% 26%; }  /* 9:16 studio headshot
 .need:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
 .need .ico  { font-size: 22px; line-height: 1; }
 .need .ico img { width: 38px; height: 38px; object-fit: contain; display: block; }
-.need .name { font-weight: 700; font-size: var(--text-lg); letter-spacing: -.01em; }
+.need .name { font-weight: 700; font-size: var(--text-base); letter-spacing: -.01em; } /* 17px, same as care-team titles */
 .need-electric { background: var(--raw-electric); color: #fff; }
 .need-coral    { background: var(--raw-coral);    color: var(--raw-ink); }
 .need-volt     { background: var(--raw-volt);     color: var(--raw-ink); }
