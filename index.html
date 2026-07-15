@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teleport MD — Patient app, Direction 02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#0B0D10; color:#fff;
+    font-family:Inter,system-ui,sans-serif; font-size:17px;
+    padding:56px 40px 80px;
+  }
+  .head{max-width:1200px;margin:0 auto 48px}
+  .eyebrow{font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#D8FF47;margin:0 0 12px}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-size:52px;line-height:1.05;letter-spacing:-.03em;margin:0 0 16px;font-weight:700}
+  .lede{color:#A7ADB6;max-width:620px;line-height:1.55;margin:0}
+  .swatches{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+  .sw{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600}
+  .grid{
+    display:grid; gap:56px 40px; max-width:1200px; margin:0 auto;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  }
+  figure{margin:0}
+  .phone{
+    width:100%; max-width:320px; aspect-ratio:390/844;
+    border-radius:38px; overflow:hidden;
+    border:8px solid #23262C; background:#000;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  iframe{width:390px;height:844px;border:0;transform-origin:0 0;display:block}
+  figcaption{margin-top:16px;max-width:320px}
+  .cap-t{font-weight:700;font-size:19px;letter-spacing:-.01em}
+  .cap-s{color:#868D97;font-size:15px;line-height:1.5;margin-top:4px}
+  .fix{
+    margin-top:10px;padding:10px 12px;border-radius:10px;
+    background:#16191E;border-left:3px solid #FF6857;
+    font-size:14px;line-height:1.5;color:#C9CCD2;
+  }
+  .fix b{color:#fff}
+  a.open{color:#D8FF47;font-weight:600;text-decoration:none;font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <p class="eyebrow">Teleport MD &middot; Patient app &middot; Direction 02</p>
+  <h1>Care, on demand.</h1>
+  <p class="lede">
+    A re-architecture of the patient experience, not a reskin. Each screen below corrects a specific
+    finding from the audit of the existing Figma file. The video visit is net new: the old file had no
+    in-call UI anywhere in 25,000 nodes.
+  </p>
+  <div class="swatches">
+    <span class="sw" style="background:#111418;color:#fff;border:1px solid #2A2F38">Ink #111418</span>
+    <span class="sw" style="background:#2D5BFF;color:#fff">Electric #2D5BFF</span>
+    <span class="sw" style="background:#FF6857;color:#111418">Coral #FF6857</span>
+    <span class="sw" style="background:#D8FF47;color:#111418">Volt #D8FF47</span>
+    <span class="sw" style="background:#F4F4F0;color:#111418">Paper #F4F4F0</span>
+  </div>
+  <p style="margin-top:24px">
+    <a class="open" href="app.html" target="_blank">Open the live prototype &rarr;</a>
+  </p>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const SCREENS = [
+  ['home','Home','One question, one live thing, one next action.',
+   'Replaces "Hello, Max!" plus a permanent <b>Profile Set Up</b> nag whose 4-step bar was clipped off the right edge, then a stack of cards headed <b>#WO1</b>.'],
+  ['getcare','Get care','Care starts from need, not from a directory.',
+   'The old step 2 was <b>Search Provider</b>: seven fields including an <b>NPI Number</b>, and "Please fill up at least two fields."'],
+  ['book','Book','Availability is the interface.',
+   'The old flow made you pick from <b>44 results</b> first, then discover the times.'],
+  ['confirmed','Booked','A booking is a booking.',
+   'The old flow ended on <b>"Please wait for approval"</b> and a cartoon hourglass.'],
+  ['precall','Pre-call check','Stops a visit failing on a muted mic.',
+   'Net new. Carries the disclosure voice of the provider-side Call Preview, the best-written screen in the old file.'],
+  ['waiting','Waiting room','A wait with an ETA is not a broken app.',
+   'The old file had a provider setting called <b>Customize Waiting Room</b> but never designed the room.'],
+  ['call','Video visit','The core telehealth moment.',
+   'Net new. The old file had <b>no in-call UI at all</b>: no mute, no end call, no camera. "Start Appointment" led nowhere.'],
+  ['postcall','After the visit','Ends with what happens next.',
+   'Net new.'],
+  ['collect','Blood draw at home','Said in plain words.',
+   'The old app showed the patient <b>#WO1</b>, <b>WORK TYPE</b>, <b>WORK STATUS</b> and <b>Pending Crew</b>.'],
+  ['price','The price','Locked before you enter a card.',
+   'The old app quoted <b>"Estimated Total $77.50 - $100"</b> then asked for a card. The file contains the failure state: <i>"cancelled due to the high cost of travel."</i>'],
+  ['track','Tracking','The good status machine, given a screen worth it.',
+   'En Route and Arrived were already right in the old file. They were shown as a grey label on a card called #WO1.'],
+  ['visits','Visits','Video visits and home draws, one list.',
+   'The old list mixed both, with a search box that said "e.g. First Name, Last Name" while every card was titled by an unsearchable ID.'],
+];
+
+const grid = document.getElementById('grid');
+grid.innerHTML = SCREENS.map(([hash,title,sub,fix]) => `
+  <figure>
+    <div class="phone"><iframe src="app.html#${hash}" loading="lazy" title="${title}"></iframe></div>
+    <figcaption>
+      <div class="cap-t">${title}</div>
+      <div class="cap-s">${sub}</div>
+      <div class="fix">${fix}</div>
+    </figcaption>
+  </figure>`).join('');
+
+// scale each 390px iframe down into its phone shell
+function fit(){
+  document.querySelectorAll('.phone').forEach(p=>{
+    const f=p.querySelector('iframe');
+    const s=p.clientWidth/390;
+    f.style.transform=`scale(${s})`;
+    f.style.height=(p.clientHeight/s)+'px';
+  });
+}
+addEventListener('resize',fit); addEventListener('load',fit); fit();
+</script>
+</body>
+</html>

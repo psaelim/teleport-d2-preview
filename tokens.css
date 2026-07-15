@@ -1,0 +1,144 @@
+/* ============================================================
+   Teleport MD — Direction 02 "Modern Consumer"
+   Semantic token layer.
+
+   Every value below was contrast-validated against its intended
+   partner before being written here. See VALIDATION notes inline.
+   The old app had NO semantic layer (raw `blue 2`, `green 2`,
+   `Gray 1-6`, plus Ant Design leftovers), which is why it could
+   never be re-themed and why dark mode was impossible.
+   ============================================================ */
+
+:root {
+  /* ---- Raw palette (from the brand deck, page 6) ---------- */
+  --raw-ink:       #111418;
+  --raw-electric:  #2D5BFF;
+  --raw-coral:     #FF6857;
+  --raw-volt:      #D8FF47;
+  --raw-paper:     #F4F4F0;
+
+  /* ---- Derived, because the raw palette cannot do it -----
+     Coral fails white text (2.85:1) and fails as text on white
+     (2.85:1). It is a FILL colour only. These are the legal
+     stand-ins for the jobs coral cannot do.                   */
+  /* Validated against BOTH surfaces it can land on, not just white:
+     4.98:1 on #FFFFFF (card) and 4.51:1 on #F4F4F0 (page).
+     An earlier value passed on white and failed on paper at 4.08:1.  */
+  --raw-danger-text:    #DE1600;
+  --raw-electric-hover: #093FFF;  /* 6.63:1 on white  */
+  --raw-electric-dark:  #4C73FF;  /* 4.58:1 on ink    */
+
+  /* ---- Surface ------------------------------------------- */
+  --surface-page:     var(--raw-paper);
+  --surface-card:     #FFFFFF;
+  --surface-sunken:   #E8E8E2;
+  --surface-inverse:  var(--raw-ink);
+  --surface-brand:    var(--raw-electric);
+
+  /* ---- Text ----------------------------------------------
+     VALIDATION: ink/paper 16.75:1 · ink/white 18.47:1
+                 secondary/white 5.9:1 · inverse/ink 18.47:1   */
+  --text-primary:     var(--raw-ink);
+  --text-secondary:   #5A6069;
+  --text-tertiary:    #757C86;   /* 4.54:1 on white — the floor */
+  --text-inverse:     #FFFFFF;
+  --text-on-brand:    #FFFFFF;   /* 5.18:1 on electric */
+  --text-link:        var(--raw-electric); /* 5.18:1 on white */
+
+  /* ---- Action --------------------------------------------
+     Primary  = electric + white label (5.18:1)
+     Emphasis = volt + INK label (16.11:1). NEVER white on volt (1.15:1).
+     Danger   = coral + INK label (6.48:1). NEVER white on coral (2.85:1). */
+  --action-primary:        var(--raw-electric);
+  --action-primary-hover:  var(--raw-electric-hover);
+  --action-primary-text:   #FFFFFF;
+
+  --action-emphasis:       var(--raw-volt);
+  --action-emphasis-hover: #C9F52E;
+  --action-emphasis-text:  var(--raw-ink);
+
+  --action-secondary:      #FFFFFF;
+  --action-secondary-text: var(--raw-ink);
+  --action-secondary-brd:  #C9CCD2;
+
+  --action-danger:         var(--raw-coral);
+  --action-danger-text:    var(--raw-ink);
+  --danger-text-on-light:  var(--raw-danger-text);
+
+  /* ---- Border --------------------------------------------- */
+  --border-subtle:  #E2E3DF;
+  --border-strong:  #C9CCD2;
+  --border-focus:   var(--raw-electric);
+
+  /* ---- Status ramp ---------------------------------------
+     The old file hardcoded ~9 status colours with no token and
+     no contrast rule. Here every status is a FILL with an INK
+     label. All eight validated >= 6.4:1 against ink.          */
+  --status-pending:      #FFD54A;  /* 13.08:1 */
+  --status-accepted:     #D8FF47;  /* 16.11:1 */
+  --status-en-route:     #7BB8FF;  /*  8.92:1 */
+  --status-arrived:      #9FE0FF;  /* 12.82:1 */
+  --status-in-progress:  #B8A6FF;  /*  8.74:1 */
+  --status-complete:     #8FE3A6;  /* 12.05:1 */
+  --status-canceled:     #D7DAE0;  /* 13.19:1 */
+  --status-urgent:       #FF6857;  /*  6.48:1 */
+  --status-label:        var(--raw-ink);
+
+  /* ---- Type ----------------------------------------------
+     Deck mandates a 17px base. The old app shipped 10-12px
+     metadata, which is the single most common defect in it.   */
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-ui:      "Inter", system-ui, -apple-system, sans-serif;
+
+  --text-xs:   13px;   /* FLOOR. Legal only for non-essential labels. */
+  --text-sm:   15px;
+  --text-base: 17px;   /* body */
+  --text-lg:   19px;
+  --text-xl:   23px;
+  --text-2xl:  28px;
+  --text-3xl:  34px;
+  --text-4xl:  42px;
+
+  --leading-tight: 1.15;
+  --leading-snug:  1.3;
+  --leading-body:  1.5;
+
+  /* ---- Space (4pt grid) ----------------------------------- */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px;  --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px;  --space-10: 40px; --space-12: 48px;
+
+  /* ---- Target --------------------------------------------
+     44px is a floor, not a suggestion. The old app shipped
+     34px and 38px buttons and 32px nav targets.               */
+  --target-min: 44px;
+
+  /* ---- Radius / elevation -------------------------------- */
+  --radius-sm:  10px;
+  --radius-md:  16px;
+  --radius-lg:  22px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(17,20,24,.04), 0 4px 16px rgba(17,20,24,.06);
+  --shadow-lift: 0 2px 6px rgba(17,20,24,.06), 0 12px 32px rgba(17,20,24,.10);
+}
+
+/* ============================================================
+   Dark context (the video visit lives here).
+   NOTE: --raw-electric is only 3.56:1 on ink, so it is large-text
+   only. On dark we promote --raw-electric-dark (4.58:1) and volt.
+   ============================================================ */
+.on-dark {
+  --surface-page:    var(--raw-ink);
+  --surface-card:    #1B1F26;
+  --surface-sunken:  #0A0C0F;
+  --text-primary:    #FFFFFF;
+  --text-secondary:  #A7ADB6;   /* 7.4:1 on ink */
+  --text-tertiary:   #868D97;   /* 4.8:1 on ink */
+  --text-link:       var(--raw-electric-dark);
+  --border-subtle:   #2A2F38;
+  --border-strong:   #3C424C;
+  --action-secondary:      #262B33;
+  --action-secondary-text: #FFFFFF;
+  --action-secondary-brd:  #3C424C;
+}

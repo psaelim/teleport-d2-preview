@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teleport MD — Patient</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+/* ============================================================
+   Teleport MD — patient prototype
+   Direction 02 "Modern Consumer"
+
+   This is a re-architecture, not a reskin. Every screen below
+   corrects a specific finding from the audit of the existing
+   Figma file (paUdZvi1bJ3nMAkToVT7YW). The correction is noted
+   in a comment above each screen.
+   ============================================================ */
+
+/* All photography is generated in June's Higgsfield account (brand
+   rule: real-photography look, no stock). Each image was opened and
+   looked at before being assigned. Local copies in img/; Higgsfield
+   job ids in img/SOURCES.md. */
+const DR_ANAND      = 'img/dr-anand-avatar.png'; // Priya avatar: same face as the call, generated w/ face reference
+const DR_ANAND_CALL = 'img/dr-anand.png';        // Priya on the call: doctor at desk, electric-blue wall (June's pick)
+const DR_BELL   = 'img/dr-bell.png';       // male cardiologist, clinic corridor
+const SELF      = 'img/maya.png';          // Maya: sofa self-view, front-camera framing
+const CREW_JEN  = 'img/crew-jennifer-face.png'; // headshot crop; full doorstep scene in crew-jennifer.png
+const ROUTE_MAP = 'img/route-map.png';     // flat map, electric route on paper cream
+
+const state = { day: 1, slot: null, need: null, muted: false, camOff: false };
+
+/* ---------- icons ---------- */
+const I = {
+  /* back/chev come from the line set; back is the chevron flipped. */
+  back:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)">',
+  chev:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5">',
+  home:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>',
+  cal:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  chat:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-6.5A8 8 0 1 1 21 12Z"/></svg>',
+  user:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>',
+  mic:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  micOff:'<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M9 9v2a3 3 0 0 0 4.5 2.6M15 11V6a3 3 0 0 0-5.9-.8M5 11a7 7 0 0 0 10.9 5.8M12 18v3"/></svg>',
+  cam:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg>',
+  camOff:'<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M15 10l6-3v10M11 6h2a2 2 0 0 1 2 2v2m0 4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/></svg>',
+  end:   '<svg width="22" height="22" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.7v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .27-.11.52-.29.7l-2.48 2.46c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28a11.27 11.27 0 0 0-2.67-1.85.996.996 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9Z"/></svg>',
+  cc:    '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 10.5a2 2 0 1 0 0 3M17 10.5a2 2 0 1 0 0 3"/></svg>',
+  lock:  '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>',
+  tick:  '<svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>',
+  /* Need-tile icons. Line icons, not emoji: the brand deck's
+     standing rule is real imagery and drawn marks, never cartoon. */
+  nVideo: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="13" rx="3"/><path d="m15 11 7-4v11l-7-4"/></svg>',
+  nDrop:  '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5Z"/></svg>',
+  nRx:    '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h5a3.5 3.5 0 0 1 0 7H5zm0 7 9 9m-.5-4.5 4.5-4.5"/><path d="M5 4v16"/></svg>',
+  nMind:  '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4 3.5 3.5 0 0 0-1 6.8V17a3 3 0 0 0 5 2.2A3 3 0 0 0 17 17v-2.2A3.5 3.5 0 0 0 16 8a4 4 0 0 0-4-4Z"/><path d="M12 4v16"/></svg>',
+};
+
+/* ---------- helpers ---------- */
+const el = (h) => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstElementChild; };
+const go = (r) => { location.hash = r; };
+const app = document.getElementById('app');
+
+/* Tab icons: Higgsfield line set (D2 = sheet fb3ed346 "line-B"
+   base + swaps June circled from ac39f3e2 "line-A"), sliced to
+   transparent PNGs in img/icons/d2-line/. Active tab uses the
+   electric-tinted -e variant; inactive dims via opacity. */
+function tabbar(active) {
+  const t = [
+    ['home',  'Home',   'home'],
+    ['visits','Visits', 'calendar'],
+    ['msgs',  'Messages', 'chat'],
+    ['you',   'You',    'profile'],
+  ];
+  return `<nav class="tabbar">${t.map(([r, label, ico]) => `
+    <button class="tab" ${active === r ? 'aria-current="page"' : ''} onclick="go('${r}')">
+      <span class="ico"><img src="img/icons/${active === r ? 'd2-fill' : 'd2-line'}/${ico}${active === r ? '-e' : ''}.png" alt=""></span><span>${label}</span>
+    </button>`).join('')}</nav>`;
+}
+
+const bar = (title, back) => `
+  <header class="topbar">
+    ${back ? `<button class="back" aria-label="Back" onclick="go('${back}')">${I.back}</button>` : ''}
+    <h1>${title}</h1>
+  </header>`;
+
+/* ============================================================
+   HOME
+   FIXES: the old home was "Hello, Max!" + a persistent
+   "Profile Set Up" nag whose 4-step progress bar was clipped off
+   the right edge, then an undifferentiated stack of cards with
+   two competing CTAs ("Make  An Appointment" / "Request
+   Collection") and a card titled "#WO1".
+   NOW: one question, one live thing, one next action.
+   ============================================================ */
+function Home() {
+  return `
+  <div class="scroll">
+    <p class="greet">Hi Maya.</p>
+    <h1 class="display">How can we help?</h1>
+
+    <div class="card-hero">
+      <p class="kicker">On-demand care</p>
+      <p class="headline">See a doctor in under 10 minutes.</p>
+      <button class="btn btn-emphasis" onclick="go('getcare')">Start a visit</button>
+    </div>
+
+    <h2 class="section">Happening now</h2>
+
+    <!-- The live at-home draw. In the old app this was a card
+         titled "#WO1" with "Work Type:" and "Pending Crew". -->
+    <button class="row" onclick="go('track')" style="align-items:flex-start;padding:16px">
+      <img class="avatar" src="${CREW_JEN}" alt="">
+      <span class="body">
+        <span class="pill pill-en-route" style="margin-bottom:6px">On the way</span>
+        <span class="title">Jennifer is driving to you</span>
+        <span class="sub">Blood draw at home &middot; arrives about 2:40 PM</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <h2 class="section">Next up</h2>
+    <button class="row" onclick="go('precall')" style="padding:16px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Video visit &middot; Tomorrow, 10:15 AM</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <!-- FIXES: the old app nagged about profile completion on every
+         screen, forever. This appears only because insurance is
+         genuinely missing and it will block the next claim. -->
+    <div class="banner" style="margin-top:24px">
+      <div>
+        <div class="t">Add your insurance card</div>
+        <div>We need it before your visit tomorrow, or you will be billed the cash rate of $50.</div>
+        <button class="btn btn-secondary" style="margin-top:12px;width:auto;padding:0 20px" onclick="alert('Card capture flow')">Add card</button>
+      </div>
+    </div>
+  </div>
+  ${tabbar('home')}`;
+}
+
+/* ============================================================
+   GET CARE — need-first triage
+   FIXES: the old booking flow step 2 was "Search Provider" with
+   SEVEN fields (Practice, Specialty, City, State, first name,
+   last name, and NPI NUMBER) and the instruction "Please fill up
+   at least two fields." A patient does not know an NPI number.
+   NOW: start from what is wrong, not from a provider directory.
+   ============================================================ */
+function GetCare() {
+  /* Palette rule decides the icon variant: electric/ink tiles
+     take the WHITE (-w) glyph, volt/coral take the ink glyph. */
+  const needs = [
+    ['Talk to a doctor', 'Video visit today', 'need-electric', 'video-w', 'book'],
+    ['Blood draw at home', 'We come to you', 'need-volt', 'drop', 'collect'],
+    ['Refill a prescription', 'Usually same day', 'need-coral', 'rx', null],
+    ['Mental health', 'Book with a therapist', 'need-ink', 'mind-w', 'book'],
+  ];
+  return `
+  ${bar('Get care', 'home')}
+  <div class="scroll">
+    <h1 class="display sm">What do you need?</h1>
+
+    <div class="needs">
+      ${needs.map(([name, sub, cls, ico, route]) => `
+        <button class="need ${cls}" onclick="${route ? `go('${route}')` : `alert('Prescription refill flow')`}">
+          <span class="ico"><img src="img/icons/d2-fill/${ico}.png" alt=""></span>
+          <span>
+            <span class="name" style="display:block">${name}</span>
+            <span style="font-size:15px;opacity:.85">${sub}</span>
+          </span>
+        </button>`).join('')}
+    </div>
+
+    <h2 class="section">Your care team</h2>
+    <p class="tiny" style="margin:-8px 0 12px">You have seen these clinicians before. No search required.</p>
+
+    <button class="row" onclick="go('book')">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Primary care &middot; next open 10:15 AM tomorrow</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="go('book')">
+      <img class="avatar" src="${DR_BELL}" alt="">
+      <span class="body">
+        <span class="title">Dr. Marcus Bell</span>
+        <span class="sub">Cardiology &middot; next open Thursday</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <button class="btn btn-ghost" style="margin-top:16px" onclick="alert('Directory search, by name or specialty. Never by NPI.')">
+      Find someone new
+    </button>
+  </div>`;
+}
+
+/* ============================================================
+   BOOK — availability-first
+   FIXES: the old flow made you pick a provider from a 44-result
+   list, THEN discover their availability. It also ended on
+   "Please wait for approval" with a cartoon hourglass.
+   NOW: the times are the interface, and a booking is a booking.
+   ============================================================ */
+function Book() {
+  const days = [['Tue','15'],['Wed','16'],['Thu','17'],['Fri','18'],['Sat','19'],['Sun','20']];
+  const slots = ['9:30 AM','10:15 AM','11:00 AM','1:30 PM','2:00 PM','3:45 PM'];
+  return `
+  ${bar('Book a visit', 'getcare')}
+  <div class="scroll">
+    <div class="row" style="cursor:default;margin-bottom:24px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Primary care &middot; video visit &middot; $50 or covered</span>
+      </span>
+    </div>
+
+    <h2 class="section" style="margin-top:0">Pick a time</h2>
+    <div class="days">
+      ${days.map(([dow, num], i) => `
+        <button class="day" aria-pressed="${state.day === i}" onclick="state.day=${i};render()">
+          <span class="dow">${dow}</span><span class="num">${num}</span>
+        </button>`).join('')}
+    </div>
+
+    <div class="slots" style="margin-top:16px">
+      ${slots.map((s, i) => `
+        <button class="slot" aria-pressed="${state.slot === i}" ${i === 5 ? 'disabled' : ''}
+                onclick="state.slot=${i};render()">${s}</button>`).join('')}
+    </div>
+
+    <h2 class="section">Who is this for?</h2>
+    <button class="row" onclick="alert('Switch to a dependent')">
+      <span class="avatar initials">MW</span>
+      <span class="body"><span class="title">Maya Wells</span><span class="sub">That is you</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-primary" ${state.slot === null ? 'disabled style="opacity:.4"' : ''}
+              onclick="${state.slot === null ? '' : `go('confirmed')`}">
+        ${state.slot === null ? 'Choose a time' : 'Confirm booking'}
+      </button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        Free to cancel up to 10 hours before. After that, a $25 fee applies.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   CONFIRMED
+   FIXES: the old app ended booking on "Please wait for approval"
+   with a cartoon hourglass. No ETA, no cancel, no next step.
+   ============================================================ */
+function Confirmed() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">You're booked.</h1>
+    <p class="muted" style="margin-top:-12px">A confirmation is on its way to your phone.</p>
+
+    <div class="card" style="margin-top:24px">
+      <div style="display:flex;gap:16px;align-items:center">
+        <img class="avatar lg" src="${DR_ANAND}" alt="">
+        <div>
+          <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+          <div class="tiny">Primary care</div>
+        </div>
+      </div>
+      <div style="margin:20px 0 4px;font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">
+        Wed 16 July, 10:15 AM
+      </div>
+      <div class="tiny">Video visit &middot; 30 minutes</div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="alert('Added to calendar')">Add to calendar</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Back to home</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">
+      We will text you a link 10 minutes before.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   PRE-CALL DEVICE CHECK — net new
+   FIXES: the old file had NO in-call UI anywhere in 25,000 nodes.
+   "Start Appointment" led nowhere. This is the screen that stops
+   a visit failing because a microphone was muted.
+   The disclosure voice is lifted from the provider-side "Call
+   Preview" screen, the single best-written screen in the old file.
+   ============================================================ */
+function PreCall() {
+  return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <h1 class="display sm">Ready to join?</h1>
+    <p class="muted" style="margin-top:-12px">Dr. Priya Anand is expecting you at 10:15 AM.</p>
+
+    <div style="margin:24px 0">
+      <img src="${SELF}" alt="Your camera preview" style="width:100%;height:220px;object-fit:cover;border-radius:22px;background:#1B1F26">
+    </div>
+
+    <div class="check">
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Camera</span><span class="s">FaceTime HD Camera</span></span>
+      </div>
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Microphone</span><span class="s">We can hear you</span></span>
+      </div>
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Connection</span><span class="s">Strong enough for video</span></span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;background:var(--surface-sunken);box-shadow:none">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="margin-top:2px;display:flex"><img src="img/icons/d2-line/lock.png" alt="" style="width:14px;height:14px;object-fit:contain;opacity:.75"></span>
+        <div class="tiny" style="color:var(--text-primary)">
+          This visit is end-to-end encrypted. It will appear in your visit history,
+          and Dr. Anand can see your shared records during the call.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="go('waiting')">Join video visit</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   WAITING ROOM — net new
+   The old file had a provider setting called "Customize Waiting
+   Room" but no waiting room was ever designed for the patient.
+   A patient waiting with no ETA assumes the app is broken.
+   ============================================================ */
+function Waiting() {
+  return `
+  <div class="scroll on-dark" style="background:var(--raw-ink);color:#fff;display:flex;flex-direction:column;justify-content:center;min-height:100dvh">
+    <div style="text-align:center">
+      <img class="avatar lg" src="${DR_ANAND}" alt="" style="width:96px;height:96px;margin:0 auto 24px">
+      <h1 class="display" style="color:#fff">You're in the room.</h1>
+      <p style="color:#A7ADB6;margin-top:-12px">Dr. Anand has been told you are here.</p>
+
+      <div style="margin:32px auto;max-width:280px;background:#1B1F26;border-radius:22px;padding:24px">
+        <div style="font-family:var(--font-display);font-size:42px;font-weight:700;color:var(--raw-volt);letter-spacing:-.02em">2 min</div>
+        <div style="color:#A7ADB6;font-size:15px">Typical wait right now</div>
+      </div>
+
+      <p style="color:#868D97;font-size:15px;max-width:280px;margin:0 auto">
+        Keep this screen open. We will connect you the moment she joins.
+      </p>
+
+      <div style="margin-top:40px;padding:0 8px">
+        <button class="btn btn-emphasis" onclick="go('call')">Simulate: doctor joins</button>
+        <button class="btn" style="margin-top:12px;background:#262B33;color:#fff" onclick="go('home')">Leave the room</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   IN-CALL — net new. The core telehealth moment.
+   Every control is 56px, well clear of the 44px floor.
+   Electric blue is NOT used for small text here: it is only
+   3.56:1 on ink. Volt and white carry the dark surface.
+   ============================================================ */
+function Call() {
+  return `
+  <div class="app on-dark" style="height:100dvh;display:flex;flex-direction:column">
+    <div class="stage">
+      <img class="remote" src="${DR_ANAND_CALL}" alt="Dr. Priya Anand">
+      <div class="who"><span>Dr. Priya Anand</span></div>
+      <div class="timer">04:12</div>
+      ${state.camOff
+        ? `<div class="self" style="display:grid;place-items:center;color:#868D97;font-size:13px;text-align:center;padding:8px">Camera off</div>`
+        : `<img class="self" src="${SELF}" alt="You">`}
+      <div class="enc"><img src="img/icons/d2-line/lock-w.png" alt="" style="width:13px;height:13px;object-fit:contain"><span>End-to-end encrypted</span></div>
+    </div>
+
+    <!-- Line-set icons. Variant follows the surface: white on the
+         dark chips, ink when pressed (chip turns white) and on the
+         coral end chip. Off-state = pressed style + CSS slash. -->
+    <div class="calltray">
+      <button class="callbtn" aria-pressed="${state.muted}" aria-label="${state.muted ? 'Unmute' : 'Mute'}"
+              onclick="state.muted=!state.muted;render()"><img src="img/icons/d2-fill/mic${state.muted ? '' : '-w'}.png" alt=""></button>
+      <button class="callbtn" aria-pressed="${state.camOff}" aria-label="${state.camOff ? 'Turn camera on' : 'Turn camera off'}"
+              onclick="state.camOff=!state.camOff;render()"><img src="img/icons/d2-fill/camera${state.camOff ? '' : '-w'}.png" alt=""></button>
+      <button class="callbtn" aria-label="Captions" onclick="alert('Captions on')"><img src="img/icons/d2-fill/cc-w.png" alt=""></button>
+      <button class="callbtn end" aria-label="End call" onclick="go('postcall')"><img src="img/icons/d2-fill/end.png" alt=""></button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   POST-CALL — net new
+   A visit that ends in a dead screen teaches the patient nothing.
+   ============================================================ */
+function PostCall() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">Visit complete.</h1>
+    <p class="muted" style="margin-top:-12px">12 minutes with Dr. Priya Anand.</p>
+
+    <div class="card" style="margin-top:24px">
+      <h2 class="section" style="margin:0 0 12px;font-size:17px">What happens next</h2>
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Visit notes written</div><div class="s">Available in your records now</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Blood draw ordered</div><div class="s">Dr. Anand requested a lipid panel at home</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Results in 2 to 3 days</div><div class="s">We will notify you</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('collect')">Schedule the blood draw</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Not now</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   AT-HOME COLLECTION — request
+   FIXES: called a "WORK" everywhere in the old app, shown to the
+   patient as "#WO1" with "WORK TYPE" and "Pending Crew".
+   NOW: it is a blood draw at your house, in those words.
+   ============================================================ */
+function Collect() {
+  return `
+  ${bar('Blood draw at home', 'home')}
+  <div class="scroll">
+    <h1 class="display sm">When suits you?</h1>
+    <p class="muted" style="margin-top:-12px">
+      Dr. Anand ordered a lipid panel and a vitals check. A nurse comes to you.
+    </p>
+
+    <h2 class="section">Pick a window</h2>
+    <div class="days">
+      ${[['Tue','15'],['Wed','16'],['Thu','17'],['Fri','18'],['Sat','19']].map(([d, n], i) => `
+        <button class="day" aria-pressed="${state.day === i}" onclick="state.day=${i};render()">
+          <span class="dow">${d}</span><span class="num">${n}</span>
+        </button>`).join('')}
+    </div>
+    <div class="slots" style="margin-top:16px">
+      ${['8 - 10 AM','10 - 12 PM','12 - 2 PM','2 - 4 PM','4 - 6 PM','6 - 8 PM'].map((s, i) => `
+        <button class="slot" aria-pressed="${state.slot === i}" onclick="state.slot=${i};render()"
+                style="font-size:14px">${s}</button>`).join('')}
+    </div>
+
+    <h2 class="section">Where</h2>
+    <button class="row" onclick="alert('Change address')">
+      <span class="body">
+        <span class="title">122 E 81st St, Apt 4B</span>
+        <span class="sub">New York, NY 10028</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-primary" ${state.slot === null ? 'disabled style="opacity:.4"' : ''}
+              onclick="${state.slot === null ? '' : `go('price')`}">
+        ${state.slot === null ? 'Choose a window' : 'See the price'}
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   AT-HOME COLLECTION — price
+   FIXES: the single worst thing in the old app. It quoted
+   "Travel Cost: NY 0-5 mi ~$10 - $50" and an "Estimated Total
+   $77.50 - $100", then asked for a credit card. The old file
+   literally contains the failure state this produced:
+   "Your patient has canceled this appointment due to the high
+   cost of travel."
+   NOW: travel is one flat, capped line. You know the number
+   before you enter a card, and it cannot move.
+   ============================================================ */
+function Price() {
+  return `
+  ${bar('Confirm', 'collect')}
+  <div class="scroll">
+    <h1 class="display sm">Here is the cost.</h1>
+
+    <div class="card" style="margin-top:20px">
+      <div class="ledger">
+        <div class="line"><span class="k">Lipid panel</span><span class="v">$45.00</span></div>
+        <div class="line"><span class="k">Vitals check</span><span class="v">$20.00</span></div>
+        <div class="line"><span class="k">Travel to your address</span><span class="v">$12.50</span></div>
+        <div class="rule"></div>
+        <div class="total"><span class="k">Total</span><span class="v">$77.50</span></div>
+      </div>
+
+      <div class="capped" style="margin-top:20px">
+        <span style="display:flex;margin-top:2px"><img src="img/icons/d2-line/lock.png" alt="" style="width:16px;height:16px;object-fit:contain"></span>
+        <span><strong>This price is locked.</strong> Travel is capped at $12.50 no matter which nurse
+        takes the job or how far they travel.</span>
+      </div>
+    </div>
+
+    <h2 class="section">Paying with</h2>
+    <button class="row" onclick="alert('Change payment method')">
+      <span class="body">
+        <span class="title">Visa &middot;&middot;&middot;&middot; 0066</span>
+        <span class="sub">Charged after the draw, not now</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-primary" onclick="go('track')">Book for Wed, 10 - 12 PM</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        Free to cancel until a nurse is on the way.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   LIVE TRACKING
+   The old app's status machine was genuinely good: Pending,
+   Accepted, En Route, Arrived, In Progress, Completed. It was
+   the best-modelled thing in the file. It was also shown to the
+   patient as a grey label on a card called "#WO1".
+   NOW: same state machine, given a screen worth the wait.
+   ============================================================ */
+function Track() {
+  return `
+  ${bar('Blood draw at home', 'home')}
+  <div class="scroll">
+    <span class="pill pill-en-route">On the way</span>
+    <h1 class="display" style="margin-top:12px">Jennifer arrives<br>about 2:40 PM.</h1>
+
+    <div class="card" style="display:flex;gap:16px;align-items:center">
+      <img class="avatar lg" src="${CREW_JEN}" alt="">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+        <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="alert('Calling Jennifer')">Call</button>
+      <button class="btn btn-secondary" onclick="alert('Secure message')">Message</button>
+    </div>
+
+    <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+      <img src="${ROUTE_MAP}" alt="Jennifer's route to your address"
+           style="width:100%;height:170px;object-fit:cover;display:block">
+    </div>
+
+    <h2 class="section">Progress</h2>
+    <div class="card">
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Booked</div><div class="s">Yesterday, 4:12 PM</div></div>
+        </div>
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Jennifer accepted</div><div class="s">Yesterday, 5:03 PM</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">On the way</div><div class="s">Left 2:18 PM &middot; 8 minutes out</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Draw</div><div class="s">About 15 minutes</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Results</div><div class="s">2 to 3 days after the lab receives it</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The old app had a QR "public profile" card. It was a good
+         idea buried in a settings screen. It belongs here: it is
+         how you know the person at your door is the right one. -->
+    <div class="card" style="margin-top:12px;background:var(--raw-ink);color:#fff;border:0">
+      <div style="font-weight:700;font-size:17px;margin-bottom:6px">At the door</div>
+      <div style="font-size:15px;color:#A7ADB6">
+        Jennifer will show a code that matches yours: <strong style="color:var(--raw-volt);font-size:19px">4B-7291</strong>.
+        Do not let anyone in who cannot show it.
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" style="margin-top:20px;color:var(--danger-text-on-light)"
+            onclick="alert('Cancel flow')">Cancel this visit</button>
+  </div>`;
+}
+
+/* ============================================================
+   VISITS
+   FIXES: the old list mixed video-visit cards and "#WO1" work
+   cards in the same tabs, with a search box that said "e.g. First
+   Name, Last Name" while every card was titled by an ID you could
+   not search for.
+   ============================================================ */
+function Visits() {
+  return `
+  ${bar('Visits')}
+  <div class="scroll">
+    <h2 class="section" style="margin-top:0">Upcoming</h2>
+
+    <button class="row" onclick="go('track')" style="align-items:flex-start;padding:16px">
+      <img class="avatar" src="${CREW_JEN}" alt="">
+      <span class="body">
+        <span class="pill pill-en-route" style="margin-bottom:6px">On the way</span>
+        <span class="title">Blood draw at home</span>
+        <span class="sub">Today &middot; Jennifer Reyes</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <button class="row" onclick="go('precall')" style="align-items:flex-start;padding:16px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="pill pill-accepted" style="margin-bottom:6px">Confirmed</span>
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Tomorrow, 10:15 AM &middot; video visit</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <h2 class="section">Past</h2>
+    <button class="row" onclick="alert('Visit summary')" style="align-items:flex-start;padding:16px">
+      <img class="avatar" src="${DR_BELL}" alt="">
+      <span class="body">
+        <span class="pill pill-complete" style="margin-bottom:6px">Complete</span>
+        <span class="title">Dr. Marcus Bell</span>
+        <span class="sub">6 June &middot; notes and results ready</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+  </div>
+  ${tabbar('visits')}`;
+}
+
+function Msgs() {
+  return `
+  ${bar('Messages')}
+  <div class="scroll">
+    <button class="row" onclick="alert('Thread')" style="padding:16px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Your results look good overall.</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="alert('Thread')" style="padding:16px">
+      <img class="avatar" src="${CREW_JEN}" alt="">
+      <span class="body">
+        <span class="title">Jennifer Reyes</span>
+        <span class="sub">Running about 10 minutes behind, sorry!</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+  </div>
+  ${tabbar('msgs')}`;
+}
+
+function You() {
+  return `
+  ${bar('You')}
+  <div class="scroll">
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:24px">
+      <span class="avatar lg initials">MW</span>
+      <div>
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">Maya Wells</div>
+        <div class="tiny">Member since 2024</div>
+      </div>
+    </div>
+
+    <button class="row" onclick="alert('Insurance')">
+      <span class="body"><span class="title">Insurance</span><span class="sub">1 card missing</span></span>
+      <span class="pill pill-pending">Needed</span>
+    </button>
+    <button class="row" onclick="alert('Records')">
+      <span class="body"><span class="title">Records and results</span><span class="sub">4 documents</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="alert('Family')">
+      <span class="body"><span class="title">Family</span><span class="sub">Book for someone else</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="alert('Payment')">
+      <span class="body"><span class="title">Payment</span><span class="sub">Visa &middot;&middot;&middot;&middot; 0066</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+  </div>
+  ${tabbar('you')}`;
+}
+
+/* ---------- router ---------- */
+const routes = {
+  home: Home, getcare: GetCare, book: Book, confirmed: Confirmed,
+  precall: PreCall, waiting: Waiting, call: Call, postcall: PostCall,
+  collect: Collect, price: Price, track: Track,
+  visits: Visits, msgs: Msgs, you: You,
+};
+
+function render() {
+  const r = (location.hash || '#home').slice(1);
+  const view = routes[r] || Home;
+  app.className = 'app' + (r === 'call' || r === 'waiting' ? ' on-dark' : '');
+  app.innerHTML = view();
+  const s = app.querySelector('.scroll');
+  if (s) s.scrollTop = 0;
+}
+
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
