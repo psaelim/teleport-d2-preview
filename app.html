@@ -571,7 +571,7 @@ function Track() {
 
     <div class="btn-row" style="margin-top:12px">
       <button class="btn btn-secondary" onclick="alert('Calling Jennifer')">Call</button>
-      <button class="btn btn-secondary" onclick="alert('Secure message')">Message</button>
+      <button class="btn btn-secondary" onclick="state.thread='jen';go('thread')">Message</button>
     </div>
 
     <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
@@ -672,7 +672,7 @@ function Msgs() {
   return `
   ${bar('Messages')}
   <div class="scroll">
-    <button class="row" onclick="alert('Thread')" style="padding:16px">
+    <button class="row" onclick="state.thread='anand';go('thread')" style="padding:16px">
       <img class="avatar" src="${DR_ANAND}" alt="">
       <span class="body">
         <span class="title">Dr. Priya Anand</span>
@@ -680,7 +680,7 @@ function Msgs() {
       </span>
       <span class="chev">${I.chev}</span>
     </button>
-    <button class="row" onclick="alert('Thread')" style="padding:16px">
+    <button class="row" onclick="state.thread='jen';go('thread')" style="padding:16px">
       <img class="avatar" src="${CREW_JEN}" alt="">
       <span class="body">
         <span class="title">Jennifer Reyes</span>
@@ -761,7 +761,7 @@ function Results() {
     <div class="card" style="margin-top:24px">
       <div style="font-weight:700;margin-bottom:4px">Dr. Anand has seen these.</div>
       <div class="tiny">The fasting glucose is worth a conversation, not an alarm. She left you a note.</div>
-      <button class="btn btn-secondary" style="margin-top:14px" onclick="go('thread')">Read her message</button>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="state.thread='anand';go('thread')">Read her message</button>
     </div>
   </div>`;
 }
@@ -770,6 +770,29 @@ function Results() {
    MESSAGE THREAD — net new. The Messages list finally opens.
    ============================================================ */
 function Thread() {
+  if (state.thread === 'jen') return `
+  <div class="app" style="height:100dvh;display:flex;flex-direction:column">
+    ${bar('Jennifer Reyes', 'msgs')}
+    <div class="scroll" style="padding-bottom:24px">
+      <div class="thread">
+        <div class="tstamp">Today, 2:18 PM</div>
+        <div class="bubble them">Hi Maya! I&rsquo;m on my way &mdash; running about 10 minutes behind, sorry!</div>
+        <div class="bubble me">No problem at all. See you soon.</div>
+        <div class="bubble them">Great. I&rsquo;ll show the code <strong>4B-7291</strong> at the door so you know it&rsquo;s me.</div>
+        <button class="row" style="max-width:78%;margin-top:2px" onclick="go('track')">
+          <span class="body">
+            <span class="title">Live tracking</span>
+            <span class="sub">Arrives about 2:40 PM</span>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>
+      </div>
+    </div>
+    <div class="composer">
+      <input type="text" placeholder="Write a message" aria-label="Write a message">
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+    </div>
+  </div>`;
   return `
   <div class="app" style="height:100dvh;display:flex;flex-direction:column">
     ${bar('Dr. Priya Anand', 'msgs')}
