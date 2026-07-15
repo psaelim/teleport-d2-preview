@@ -562,4 +562,9 @@ img[src*="dr-bell"]       { object-position: 50% 26%; }  /* 9:16 studio headshot
   display: grid; place-items: center;
 }
 .nicon img { width: 22px; height: 22px; object-fit: contain; display: block; }
-.ntime { font-size: var(--text-xs); color: var(--text-secondary); flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
+.ntime { font-size: var(--text-xs); color: var(--text-secondary); }
+.nmeta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
+/* Unread: electric edge + dot + heavier title. Read cards stay quiet. */
+.row.unread { border-color: var(--raw-electric); }
+.row.unread .title { font-weight: 700; }
+.udot { width: 9px; height: 9px; border-radius: 50%; background: var(--raw-electric); }

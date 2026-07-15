@@ -713,7 +713,7 @@ function You() {
       <span class="chev">${I.chev}</span>
     </button>
     <button class="row" onclick="go('notifs')">
-      <span class="body"><span class="title">Notifications</span><span class="sub">1 new today</span></span>
+      <span class="body"><span class="title">Notifications</span><span class="sub">2 new today</span></span>
       <span class="chev">${I.chev}</span>
     </button>
     <button class="row" onclick="alert('Family')">
@@ -875,24 +875,28 @@ function Welcome() {
    somewhere real; nothing nags.
    ============================================================ */
 function Notifs() {
-  const items = [
+  const fresh = [
     ['drop',     'Jennifer is on the way',  'Blood draw &middot; arrives about 2:40 PM', 'now',   'track'],
     ['calendar', 'Visit reminder',          'Dr. Priya Anand &middot; tomorrow, 10:15 AM', '9:00 AM', 'precall'],
+  ];
+  const earlier = [
     ['check',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', 'results'],
     ['lock',     'Payment receipt',         '$77.50 &middot; blood draw at home', 'Yesterday', null],
   ];
-  return `
-  ${bar('Notifications', 'you')}
-  <div class="scroll">
-    ${items.map(([ico, t, sub, time, route]) => `
-      <button class="row" onclick="${route ? `go('${route}')` : `alert('Receipt PDF')`}">
+  const row = ([ico, t, sub, time, route], unread) => `
+      <button class="row${unread ? ' unread' : ''}" onclick="${route ? `go('${route}')` : `alert('Receipt PDF')`}">
         <span class="nicon"><img src="img/icons/d2-line/${ico}.png" alt=""></span>
         <span class="body">
           <span class="title">${t}</span>
           <span class="sub">${sub}</span>
         </span>
-        <span class="ntime">${time}</span>
-      </button>`).join('')}
+        <span class="nmeta"><span class="ntime">${time}</span>${unread ? '<span class="udot" aria-label="Unread"></span>' : ''}</span>
+      </button>`;
+  return `
+  ${bar('Notifications', 'you')}
+  <div class="scroll">
+    ${fresh.map(i => row(i, true)).join('')}
+    ${earlier.map(i => row(i, false)).join('')}
     <p class="tiny" style="text-align:center;margin-top:24px">That&rsquo;s everything from the last 7 days.</p>
   </div>`;
 }
