@@ -885,7 +885,7 @@ function Notifs() {
   ];
   const row = ([ico, t, sub, time, route], unread) => `
       <button class="row${unread ? ' unread' : ''}" onclick="${route ? `go('${route}')` : `alert('Receipt PDF')`}">
-        <span class="nicon"><img src="img/icons/d2-line/${ico}.png" alt=""></span>
+        <span class="nicon"><img src="img/icons/d2-${unread ? 'fill' : 'line'}/${ico}.png" alt=""></span>
         <span class="body">
           <span class="title">${t}</span>
           <span class="sub">${sub}</span>
