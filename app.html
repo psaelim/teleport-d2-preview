@@ -655,7 +655,7 @@ function Visits() {
     </button>
 
     <h2 class="section">Past</h2>
-    <button class="row" onclick="alert('Visit summary')" style="align-items:flex-start;padding:16px">
+    <button class="row" onclick="go('summary')" style="align-items:flex-start;padding:16px">
       <img class="avatar" src="${DR_BELL}" alt="">
       <span class="body">
         <span class="pill pill-complete" style="margin-bottom:6px">Complete</span>
@@ -708,8 +708,12 @@ function You() {
       <span class="body"><span class="title">Insurance</span><span class="sub">1 card missing</span></span>
       <span class="pill pill-pending">Needed</span>
     </button>
-    <button class="row" onclick="alert('Records')">
-      <span class="body"><span class="title">Records and results</span><span class="sub">4 documents</span></span>
+    <button class="row" onclick="go('results')">
+      <span class="body"><span class="title">Records and results</span><span class="sub">4 documents &middot; new lab results</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="go('notifs')">
+      <span class="body"><span class="title">Notifications</span><span class="sub">1 new today</span></span>
       <span class="chev">${I.chev}</span>
     </button>
     <button class="row" onclick="alert('Family')">
@@ -720,8 +724,177 @@ function You() {
       <span class="body"><span class="title">Payment</span><span class="sub">Visa &middot;&middot;&middot;&middot; 0066</span></span>
       <span class="chev">${I.chev}</span>
     </button>
+    <button class="btn btn-ghost" style="margin-top:20px" onclick="go('welcome')">Sign out</button>
   </div>
   ${tabbar('you')}`;
+}
+
+/* ============================================================
+   LAB RESULTS — D2 port of the D3 screen (parity, June's pick).
+   Values + status pills in D2's fill+ink grammar.
+   ============================================================ */
+function Results() {
+  const rows = [
+    ['Total cholesterol', 'Ref 125&ndash;200 mg/dL', '182', 'complete', 'Normal'],
+    ['Glucose, fasting',  'Ref 70&ndash;99 mg/dL',   '104', 'urgent',   'High'],
+    ['Vitamin D',         'Ref 30&ndash;100 ng/mL',  '28',  'pending',  'Low'],
+    ['Hemoglobin A1c',    'Ref under 5.7%',          '5.4', 'complete', 'Normal'],
+  ];
+  return `
+  ${bar('', 'you')}
+  <div class="scroll" style="padding-top:0">
+    <p class="greet">Updated today</p>
+    <h1 class="display">Lab results</h1>
+
+    <div class="tabs">
+      <button class="tabx" aria-selected="true">Recent</button>
+      <button class="tabx" aria-selected="false" onclick="alert('All results')">All</button>
+      <button class="tabx" aria-selected="false" onclick="alert('Trends over time')">Trends</button>
+    </div>
+
+    ${rows.map(([n, ref, val, cls, label]) => `
+      <div class="result">
+        <div class="l"><div class="n">${n}</div><div class="ref">${ref}</div></div>
+        <div class="r"><span class="val">${val}</span><span class="pill pill-${cls}">${label}</span></div>
+      </div>`).join('')}
+
+    <div class="card" style="margin-top:24px">
+      <div style="font-weight:700;margin-bottom:4px">Dr. Anand has seen these.</div>
+      <div class="tiny">The fasting glucose is worth a conversation, not an alarm. She left you a note.</div>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="go('thread')">Read her message</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   MESSAGE THREAD — net new. The Messages list finally opens.
+   ============================================================ */
+function Thread() {
+  return `
+  <div class="app" style="height:100dvh;display:flex;flex-direction:column">
+    ${bar('Dr. Priya Anand', 'msgs')}
+    <div class="scroll" style="padding-bottom:24px">
+      <div class="thread">
+        <div class="tstamp">Today, 11:02 AM</div>
+        <div class="bubble them">Hi Maya. Your results are in and they look good overall &mdash; cholesterol and A1c are right where we want them.</div>
+        <div class="bubble them">Your fasting glucose is a touch high. Nothing alarming, but let&rsquo;s talk about it at your visit tomorrow.</div>
+        <button class="row" style="max-width:78%;margin-top:2px" onclick="go('results')">
+          <span class="body">
+            <span class="title">Lipid panel results</span>
+            <span class="sub">4 values &middot; reviewed</span>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>
+        <div class="tstamp">11:14 AM</div>
+        <div class="bubble me">Thank you! Should I keep fasting before tomorrow&rsquo;s visit?</div>
+        <div class="bubble them">No need &mdash; it&rsquo;s a video visit. Eat normally.</div>
+      </div>
+    </div>
+    <div class="composer">
+      <input type="text" placeholder="Write a message" aria-label="Write a message">
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   VISIT SUMMARY — net new. "Notes and results ready" now has a
+   destination instead of a dead end.
+   ============================================================ */
+function Summary() {
+  return `
+  ${bar('Visit summary', 'visits')}
+  <div class="scroll">
+    <div class="row" style="cursor:default;margin-bottom:20px">
+      <img class="avatar" src="${DR_BELL}" alt="">
+      <span class="body">
+        <span class="title">Dr. Marcus Bell</span>
+        <span class="sub">Cardiology &middot; video visit &middot; 6 June</span>
+      </span>
+      <span class="pill pill-complete">Complete</span>
+    </div>
+
+    <h2 class="section" style="margin-top:0">What we covered</h2>
+    <div class="card">
+      Blood pressure is well controlled on the current dose &mdash; no change.
+      We ordered a lipid panel to check cholesterol before considering anything further.
+      Keep up the walking; it is clearly working.
+    </div>
+
+    <h2 class="section">Prescribed</h2>
+    <button class="row" onclick="alert('Prescription details')">
+      <span class="body">
+        <span class="title">Atorvastatin 10 mg</span>
+        <span class="sub">Once daily &middot; 90-day supply</span>
+      </span>
+      <span class="pill pill-complete">Refill ready</span>
+    </button>
+
+    <h2 class="section">Ordered</h2>
+    <button class="row" onclick="go('results')">
+      <span class="body">
+        <span class="title">Lipid panel</span>
+        <span class="sub">Collected at home &middot; results ready</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div class="card" style="margin-top:24px">
+      <div style="font-weight:700;margin-bottom:4px">Next: follow-up in about 3 months.</div>
+      <div class="tiny">Dr. Bell suggested late September, sooner if anything changes.</div>
+      <button class="btn btn-emphasis" style="margin-top:14px" onclick="go('book')">Book the follow-up</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   SIGN IN / WELCOME — net new front door. One step, no funnel:
+   the old app's onboarding ran EIGHT steps before care.
+   ============================================================ */
+function Welcome() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center">
+    <p class="eyebrow" style="letter-spacing:.12em;text-transform:uppercase;font-size:13px">Teleport MD</p>
+    <h1 class="display" style="font-size:42px">Care to anyone,<br>anywhere.</h1>
+    <p class="muted" style="margin-top:-8px">Video visits and at-home blood draws, on your schedule.</p>
+
+    <div style="margin-top:36px">
+      <label class="tiny" for="ph" style="display:block;margin-bottom:8px;font-weight:600">Phone number</label>
+      <input id="ph" type="tel" placeholder="(555) 000-1234"
+             style="width:100%;min-height:52px;border-radius:16px;border:1.5px solid var(--border-strong);padding:0 18px;font:inherit;font-size:17px;background:var(--surface-card);color:var(--text-primary)">
+      <button class="btn btn-emphasis" style="margin-top:12px" onclick="go('home')">Continue</button>
+      <p class="tiny" style="text-align:center;margin-top:16px;max-width:300px;margin-left:auto;margin-right:auto">
+        We will text you a sign-in code. By continuing you agree to the Terms and the Privacy Policy.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   NOTIFICATIONS — net new. A quiet feed where every item goes
+   somewhere real; nothing nags.
+   ============================================================ */
+function Notifs() {
+  const items = [
+    ['drop',     'Jennifer is on the way',  'Blood draw &middot; arrives about 2:40 PM', 'now',   'track'],
+    ['calendar', 'Visit reminder',          'Dr. Priya Anand &middot; tomorrow, 10:15 AM', '9:00 AM', 'precall'],
+    ['check',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', 'results'],
+    ['lock',     'Payment receipt',         '$77.50 &middot; blood draw at home', 'Yesterday', null],
+  ];
+  return `
+  ${bar('Notifications', 'you')}
+  <div class="scroll">
+    ${items.map(([ico, t, sub, time, route]) => `
+      <button class="row" onclick="${route ? `go('${route}')` : `alert('Receipt PDF')`}">
+        <span class="nicon"><img src="img/icons/d2-line/${ico}.png" alt=""></span>
+        <span class="body">
+          <span class="title">${t}</span>
+          <span class="sub">${sub}</span>
+        </span>
+        <span class="ntime">${time}</span>
+      </button>`).join('')}
+    <p class="tiny" style="text-align:center;margin-top:24px">That&rsquo;s everything from the last 7 days.</p>
+  </div>`;
 }
 
 /* ---------- router ---------- */
@@ -730,6 +903,8 @@ const routes = {
   precall: PreCall, waiting: Waiting, call: Call, postcall: PostCall,
   collect: Collect, price: Price, track: Track,
   visits: Visits, msgs: Msgs, you: You,
+  results: Results, thread: Thread, summary: Summary,
+  welcome: Welcome, notifs: Notifs,
 };
 
 function render() {

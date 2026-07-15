@@ -482,3 +482,84 @@ img[src*="dr-bell"]       { object-position: 50% 26%; }  /* 9:16 studio headshot
   color: var(--text-secondary);
 }
 .empty .big { font-size: 36px; margin-bottom: var(--space-3); }
+
+/* ---------- Lab results (D2 port of the D3 screen) ------------ */
+.tabs {
+  display: flex; gap: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-2);
+}
+.tabx {
+  min-height: var(--target-min); min-width: var(--target-min);
+  padding: 0 2px;
+  border: 0; background: none; cursor: pointer;
+  font: inherit; font-size: var(--text-sm); font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabx[aria-selected="true"] { color: var(--raw-electric); border-bottom-color: var(--raw-electric); }
+.tabx:focus-visible { outline: 3px solid var(--border-focus); outline-offset: -3px; }
+.result {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 2px;
+}
+.result + .result { border-top: 1px solid var(--border-subtle); }
+.result .n   { font-weight: 600; font-size: var(--text-base); }
+.result .ref { font-size: var(--text-xs); color: var(--text-secondary); margin-top: 2px; }
+.result .r   { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+.result .val {
+  font-family: var(--font-display);
+  font-size: var(--text-xl); font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Message thread ------------------------------------ */
+.thread { display: flex; flex-direction: column; gap: 10px; }
+.bubble {
+  max-width: 78%;
+  padding: 12px 16px;
+  border-radius: 20px;
+  font-size: 16px; line-height: 1.45;
+}
+.bubble.them {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-bottom-left-radius: 6px;
+  align-self: flex-start;
+}
+.bubble.me {
+  background: var(--raw-electric); color: #fff;   /* 5.18:1 */
+  border-bottom-right-radius: 6px;
+  align-self: flex-end;
+}
+.tstamp { font-size: var(--text-xs); color: var(--text-secondary); text-align: center; margin: 10px 0 2px; }
+.composer {
+  display: flex; gap: var(--space-2); align-items: center;
+  padding: var(--space-3) var(--space-4) var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+}
+.composer input {
+  flex: 1; min-height: var(--target-min);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-strong);
+  padding: 0 18px; font: inherit; font-size: 16px;
+  background: var(--surface-page); color: var(--text-primary);
+}
+.composer .send {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  border: 0; background: var(--raw-electric); cursor: pointer;
+  display: grid; place-items: center;
+}
+.composer .send img { width: 18px; height: 18px; object-fit: contain; display: block; }
+
+/* ---------- Notification rows --------------------------------- */
+.nicon {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface-sunken);
+  display: grid; place-items: center;
+}
+.nicon img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.ntime { font-size: var(--text-xs); color: var(--text-secondary); flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
