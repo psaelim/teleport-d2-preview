@@ -106,6 +106,7 @@ const FLOWS = [
    SECTIONS as real screens; only planned/parked work remains. */
 const BACKLOG = [
   ['Sign in & sign up', [
+    ['Onboarding intro screens', 'planned'],
     ['Wrong-code error', 'planned'],
     ['Under-18 path', 'planned'],
     ['Terms & privacy', 'planned'],
@@ -122,6 +123,7 @@ const BACKLOG = [
     ['Visits search', 'parked'],
   ]],
   ['System states', [
+    ['App launch loading (splash)', 'planned'],
     ['Loading / error / offline', 'planned'],
     ['Empty states (visits, notifs)', 'planned'],
   ]],
