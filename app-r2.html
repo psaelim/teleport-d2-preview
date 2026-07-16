@@ -1,0 +1,1962 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teleport MD — Patient (R2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-r2.css">
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+/* ============================================================
+   Teleport MD — patient prototype
+   Direction 02 "Modern Consumer" — REVISION 2 (2026-07-16)
+
+   A copy of app.html revised to the coworker feedback on the
+   shared D2: keep the old app's stages but make each as simple
+   as possible; lead with the Crew at-home service, not the
+   provider-patient video call; add sign up / login. The original
+   app.html is untouched.
+
+   R2 changes:
+   - Home hero = the at-home crew visit; video visit is secondary
+   - Get care reordered: blood draw at home first
+   - Sign up (identity only) + text-code verify screens are new
+   - At-home booking ends in an honest "Requested" state (the real
+     Pending Crew stage); video visits still confirm instantly
+   ============================================================ */
+
+/* All photography is generated in June's Higgsfield account (brand
+   rule: real-photography look, no stock). Each image was opened and
+   looked at before being assigned. Local copies in img/; Higgsfield
+   job ids in img/SOURCES.md. */
+const DR_ANAND      = 'img/dr-anand-avatar.png'; // Priya avatar: same face as the call, generated w/ face reference
+const DR_ANAND_CALL = 'img/dr-anand.png';        // Priya on the call: doctor at desk, electric-blue wall (June's pick)
+const DR_BELL   = 'img/dr-bell.png';       // male cardiologist, clinic corridor
+const SELF      = 'img/maya.png';          // Maya: sofa self-view, front-camera framing
+const CREW_JEN  = 'img/crew-jennifer-face.png'; // headshot crop; full doorstep scene in crew-jennifer.png
+const CREW_HERO = 'img/hero-nurse-tree.png';    // R2 home hero: nurse at the door + foreground branches (June's pick B, job ad3c037f; base scene 916667d1)
+const ROUTE_MAP = 'img/route-map.png';     // flat map, electric route on paper cream
+
+const state = {
+  day: 1, slot: null, need: null, muted: false, camOff: false, npi: false, vtab: 0, photo: null,
+  /* R2.1 — the ten former stubs are real screens now, so the app
+     carries real (in-page) state for all of them: */
+  fields: {                                  // Personal info, editable one at a time
+    name: 'Maya Wells', dob: 'March 14, 1992', phone: '(555) 000-1234',
+    email: 'maya.wells@gmail.com', addr: '122 E 81st St, Apt 4B, New York, NY 10028',
+    lang: 'English',
+  },
+  efield: 0,                                 // which field the editor shows
+  insFront: null, insBack: null, insured: false,   // insurance card capture
+  family: [], frel: 0, addfam: false,        // family & dependents
+  cards: [['Visa', '0066']], card: 0, addcard: false, pb: 'you',  // payment methods
+  tests: { lipid: true, vitals: true, cbc: false, a1c: false, vitd: false },  // the draw order
+  addrs: [], addri: 0, addaddr: false,       // extra saved addresses (index 0 = home)
+  spec: null,                                // doctor-search specialty filter
+  bookfor: 0, fb: 'you',                     // who a booking is for; family back target
+  cx: false, creason: null,                  // the live draw, cancelled
+};
+
+/* At-home draw catalogue: key, name, what it covers, price, and
+   whether Dr. Anand ordered it. Collect and Price both read the
+   selection, so the ledger can never disagree with the order. */
+const TESTS = [
+  ['lipid', 'Lipid panel', 'Cholesterol, HDL, LDL and triglycerides', 45, true],
+  ['vitals', 'Vitals check', 'Blood pressure, pulse, oxygen, temperature', 20, false],
+  ['cbc', 'Complete blood count', 'Red cells, white cells, platelets', 35, false],
+  ['a1c', 'Hemoglobin A1c', 'Three-month blood sugar average', 30, false],
+  ['vitd', 'Vitamin D', '25-hydroxy vitamin D level', 40, false],
+];
+const selTests = () => TESTS.filter(t => state.tests[t[0]]);
+const testsTotal = () => selTests().reduce((a, t) => a + t[3], 0);
+
+/* Personal info fields: key, label, input type, where the value is
+   used (shown in the editor so an edit never feels consequence-free). */
+const PFIELDS = [
+  ['name', 'Legal name', 'text', 'Exactly as it appears on your ID or insurance card. It also sets your initials and the home-screen greeting.'],
+  ['dob', 'Date of birth', 'text', 'Used to match you at the lab and with your insurer.'],
+  ['phone', 'Phone', 'tel', 'We text sign-in codes, visit reminders and the nurse&rsquo;s updates here.'],
+  ['email', 'Email', 'email', 'Receipts and visit summaries go here.'],
+  ['addr', 'Home address', 'text', 'Where the nurse comes for at-home visits.'],
+  ['lang', 'Preferred language', 'text', 'Your care team sees this before every visit.'],
+];
+const firstName = () => state.fields.name.trim().split(/\s+/)[0] || 'there';
+const initials = () => (state.fields.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('') || 'MW').toUpperCase();
+
+/* Saved addresses: home always mirrors Personal info (one source of
+   truth); anything added on the address screen appends after it. */
+const addrList = () => {
+  const a = state.fields.addr;
+  const cut = a.indexOf(', New York');
+  return [['Home', cut > 0 ? a.slice(0, cut) : a, cut > 0 ? a.slice(cut + 2) : ''], ...state.addrs];
+};
+const cardLabel = () => state.cards[state.card].join(' ···· ');
+
+/* Photo/card capture: real pickers, even in the prototype. The
+   chosen image never leaves the page (FileReader -> data URL). */
+window.loadShot = (inp, key) => {
+  const f = inp.files && inp.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = (e) => { state[key] = e.target.result; render(); };
+  r.readAsDataURL(f);
+};
+window.loadPhoto = (inp) => loadShot(inp, 'photo');
+const meAvatar = (cls) => state.photo
+  ? `<img class="avatar ${cls}" src="${state.photo}" alt="Your profile photo">`
+  : `<span class="avatar ${cls} initials">${initials()}</span>`;
+
+/* ---------- icons ---------- */
+const I = {
+  /* back/chev come from the line set; back is the chevron flipped. */
+  back:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)">',
+  chev:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5">',
+  home:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>',
+  cal:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  chat:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-6.5A8 8 0 1 1 21 12Z"/></svg>',
+  user:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>',
+  mic:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  micOff:'<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M9 9v2a3 3 0 0 0 4.5 2.6M15 11V6a3 3 0 0 0-5.9-.8M5 11a7 7 0 0 0 10.9 5.8M12 18v3"/></svg>',
+  cam:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg>',
+  camOff:'<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M15 10l6-3v10M11 6h2a2 2 0 0 1 2 2v2m0 4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/></svg>',
+  end:   '<svg width="22" height="22" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.7v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .27-.11.52-.29.7l-2.48 2.46c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28a11.27 11.27 0 0 0-2.67-1.85.996.996 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9Z"/></svg>',
+  cc:    '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 10.5a2 2 0 1 0 0 3M17 10.5a2 2 0 1 0 0 3"/></svg>',
+  lock:  '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>',
+  tick:  '<svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>',
+  /* Need-tile icons. Line icons, not emoji: the brand deck's
+     standing rule is real imagery and drawn marks, never cartoon. */
+  nVideo: '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="13" rx="3"/><path d="m15 11 7-4v11l-7-4"/></svg>',
+  nDrop:  '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5Z"/></svg>',
+  nRx:    '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h5a3.5 3.5 0 0 1 0 7H5zm0 7 9 9m-.5-4.5 4.5-4.5"/><path d="M5 4v16"/></svg>',
+  nMind:  '<svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4 3.5 3.5 0 0 0-1 6.8V17a3 3 0 0 0 5 2.2A3 3 0 0 0 17 17v-2.2A3.5 3.5 0 0 0 16 8a4 4 0 0 0-4-4Z"/><path d="M12 4v16"/></svg>',
+};
+
+/* ---------- helpers ---------- */
+const el = (h) => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstElementChild; };
+const go = (r) => { location.hash = r; };
+const app = document.getElementById('app');
+
+/* Standalone only (app-r2.html opened directly): on wide screens the
+   app sits in a phone bezel like the gallery, scaled to FIT the
+   viewport height (June: it was cut off on shorter desktops).
+   Inside the review board's live frame #app is nested, so none of
+   this fires there. */
+if (app.parentElement === document.body) {
+  document.body.classList.add('standalone');
+  const fitFrame = () => {
+    const wide = window.matchMedia('(min-width: 500px)').matches;
+    const s = Math.min(1, (innerHeight - 40) / 860, (innerWidth - 40) / 406);
+    app.style.transform = wide ? `translate(-50%, -50%) scale(${s})` : '';
+  };
+  addEventListener('resize', fitFrame);
+  fitFrame();
+}
+
+/* Icon cache-buster: Safari on the phone kept serving stale icon
+   PNGs after we edited them in place (June caught the old bell).
+   BUMP THIS whenever any img/icons file changes. */
+const ICONS_V = '2';
+
+/* Tab icons: Higgsfield line set (D2 = sheet fb3ed346 "line-B"
+   base + swaps June circled from ac39f3e2 "line-A"), sliced to
+   transparent PNGs in img/icons/d2-line/. Active tab uses the
+   electric-tinted -e variant; inactive dims via opacity. */
+function tabbar(active) {
+  /* R2 round 2 (June, old design as ref): the Messages tab becomes
+     a NOTIFICATIONS tab — one feed for everything (messages, lab
+     results, crew, reminders). Messages live under You now. */
+  const t = [
+    ['home',  'Home',   'home'],
+    ['visits','Visits', 'calendar'],
+    ['notifs','Notifications', 'bell'],
+    ['you',   'You',    'profile'],
+  ];
+  return `<nav class="tabbar">${t.map(([r, label, ico]) => `
+    <button class="tab" ${active === r ? 'aria-current="page"' : ''} onclick="go('${r}')">
+      <span class="ico">
+        <img src="img/icons/${active === r ? 'd2-fill' : 'd2-line'}/${ico}${active === r ? '-e' : ''}.png" alt="">
+        ${r === 'notifs' ? '<span class="tbadge" aria-label="3 unread notifications">3</span>' : ''}
+      </span><span>${label}</span>
+    </button>`).join('')}</nav>`;
+}
+
+const bar = (title, back) => `
+  <header class="topbar">
+    ${back ? `<button class="back" aria-label="Back" onclick="go('${back}')">${I.back}</button>` : ''}
+    <h1>${title}</h1>
+  </header>`;
+
+/* ============================================================
+   HOME
+   FIXES: the old home was "Hello, Max!" + a persistent
+   "Profile Set Up" nag whose 4-step progress bar was clipped off
+   the right edge, then an undifferentiated stack of cards with
+   two competing CTAs ("Make  An Appointment" / "Request
+   Collection") and a card titled "#WO1".
+   NOW: one question, one live thing, one next action.
+   ============================================================ */
+function Home() {
+  return `
+  <div class="scroll">
+    <p class="greet">Hi ${firstName()}.</p>
+    <h1 class="display">How can we help?</h1>
+
+    <!-- R2: the coworker asked us to highlight the crew service
+         over the provider-patient video call. The hero is now the
+         thing only Teleport does: a licensed nurse at your door. -->
+    <div class="card-hero" style="padding:0;overflow:hidden">
+      <img class="hero-img" src="${CREW_HERO}" alt="A Teleport nurse arriving at a front door">
+      <div style="padding:20px 24px 24px">
+        <p class="kicker">Care that comes to you</p>
+        <p class="headline">A licensed nurse, at your door.</p>
+        <button class="btn btn-emphasis" onclick="go('collect')">Book an at-home visit</button>
+      </div>
+    </div>
+
+    <!-- Ink second-act card (June's pick B), now the GET CARE door:
+         one entry to all four care paths. Copy = June's pick. -->
+    <button class="row video-ink" style="margin-top:12px;padding:16px" onclick="go('getcare')">
+      <span class="vdisc"><img src="img/icons/d2-fill/vitals-w.png" alt=""></span>
+      <span class="body">
+        <span class="title">Get care, your way</span>
+        <span class="sub">Video visit, at your home, or your results</span>
+      </span>
+      <span class="chev"><img src="img/icons/d2-line/chevron-w.png" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.7"></span>
+    </button>
+
+    ${state.cx ? '' : `
+    <h2 class="section">Happening now</h2>
+
+    <!-- The live at-home draw. In the old app this was a card
+         titled "#WO1" with "Work Type:" and "Pending Crew".
+         Cancelling the visit removes it here, not just on Track. -->
+    <button class="row" onclick="go('track')" style="align-items:flex-start;padding:16px">
+      <img class="avatar" src="${CREW_JEN}" alt="">
+      <span class="body">
+        <span class="pill pill-en-route" style="margin-bottom:6px">On the way</span>
+        <span class="title">Jennifer is driving to you</span>
+        <span class="sub">Blood draw at home &middot; arrives about 2:40 PM</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>`}
+
+    <h2 class="section">Next up</h2>
+    <button class="row" onclick="go('precall')" style="padding:16px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Video visit &middot; Tomorrow, 10:15 AM</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <!-- FIXES: the old app nagged about profile completion on every
+         screen, forever. This appears only because insurance is
+         genuinely missing and it will block the next claim; the
+         moment the card is captured it is gone for good. -->
+    ${state.insured ? '' : `
+    <div class="banner" style="margin-top:24px">
+      <div>
+        <div class="t">Add your insurance card</div>
+        <div>We need it before your visit tomorrow, or you will be billed the cash rate of $50.</div>
+        <button class="btn btn-secondary" style="margin-top:12px;width:auto;padding:0 20px" onclick="go('insurance')">Add card</button>
+      </div>
+    </div>`}
+  </div>
+  ${tabbar('home')}`;
+}
+
+/* ============================================================
+   GET CARE — need-first triage
+   FIXES: the old booking flow step 2 was "Search Provider" with
+   SEVEN fields (Practice, Specialty, City, State, first name,
+   last name, and NPI NUMBER) and the instruction "Please fill up
+   at least two fields." A patient does not know an NPI number.
+   NOW: start from what is wrong, not from a provider directory.
+   ============================================================ */
+function GetCare() {
+  /* Palette rule decides the icon variant: electric/ink tiles
+     take the WHITE (-w) glyph, volt/coral take the ink glyph. */
+  /* R2 round 2 (team feedback via June, 2026-07-16): Rx refill and
+     therapist are OUT (not real features). The two crew services +
+     video + results make the four. Doctor choice now lives INSIDE
+     the video flow ('doctors'), so the care-team list moved there
+     and this screen is just the four doors. */
+  /* June's re-cut (2026-07-16 v3): one at-home door (the chooser
+     screen picks the service), video, visits, results. */
+  const needs = [
+    ['Get care at home', 'need-electric', 'homecare-w', 'collect'],
+    ['Video visit', 'need-volt', 'video', 'doctors'],
+    ['My visits', 'need-coral', 'calendar', 'visits'],
+    ['Lab results', 'need-ink', 'flask-w', 'results'],
+  ];
+  return `
+  ${bar('Get care', 'home')}
+  <div class="scroll">
+    <h1 class="display sm">What do you need?</h1>
+
+    <div class="needs">
+      ${needs.map(([name, cls, ico, route]) => `
+        <button class="need ${cls}" onclick="go('${route}')">
+          <span class="ico"><img src="img/icons/d2-fill/${ico}.png" alt=""></span>
+          <span class="name">${name}</span>
+        </button>`).join('')}
+    </div>
+
+    <!-- Back by June's request: the care team also lives here for
+         one-tap rebooking. -->
+    <h2 class="section">Your care team</h2>
+    <p class="tiny" style="margin:-8px 0 12px">You have seen these clinicians before. No search required.</p>
+    <button class="row" onclick="go('book')">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Primary care &middot; next open 10:15 AM tomorrow</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="go('book')">
+      <img class="avatar" src="${DR_BELL}" alt="">
+      <span class="body">
+        <span class="title">Dr. Marcus Bell</span>
+        <span class="sub">Cardiology &middot; next open Thursday</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="btn btn-ghost" style="margin-top:16px" onclick="go('doctors')">
+      Find someone new
+    </button>
+  </div>`;
+}
+
+/* ============================================================
+   CHOOSE / FIND A DOCTOR — the searching step, restored.
+   The old app's Search Provider form had SEVEN fields (Practice,
+   Specialty, City, State, first name, last name, NPI) and made
+   you fill "at least two" before you could see anyone. R2 first
+   cut search entirely, which broke the flow's logic (team
+   feedback). NOW: care team first (instant), one smart search
+   box + specialty chips for everyone else, and the NPI lookup
+   kept as a collapsed referral option, June's call.
+   ============================================================ */
+function Doctors() {
+  /* The chips genuinely filter now (was a stub). Tap toggles;
+     every specialty has at least one doctor, so no dead ends. */
+  const pool = [
+    ['SO', 'Dr. Sarah Okafor', 'Dermatology', 'Thu, 2:30 PM'],
+    ['JL', 'Dr. James Liu', 'Primary care', 'today, 4:15 PM'],
+    ['ES', 'Dr. Elena Sousa', 'Pediatrics', 'Fri, 9:00 AM'],
+    ['AF', 'Dr. Ana Ferreira', 'Cardiology', 'Mon, 11:00 AM'],
+  ];
+  const found = state.spec ? pool.filter(d => d[2] === state.spec) : pool;
+  return `
+  ${bar('Video visit', 'getcare')}
+  <div class="scroll">
+    <h1 class="display sm">Who do you want to see?</h1>
+
+    <!-- Care team lives on Get care (June); this screen is purely
+         the search. One box does everything, including NPI: no
+         separate field, the hint under the heading teaches it. -->
+    <h2 class="section" style="margin-top:0">Find a doctor</h2>
+    <p class="tiny" style="margin:-8px 0 12px">
+      Have a referral? Type its 10-digit NPI number and we will match the exact clinician.
+    </p>
+    <input class="input" placeholder="Name, specialty, clinic, or NPI" aria-label="Search by name, specialty, clinic, or NPI number">
+    <div class="chips">
+      ${['Primary care', 'Dermatology', 'Cardiology', 'Pediatrics'].map(c => `
+        <button class="chip" aria-pressed="${state.spec === c}"
+                onclick="state.spec = state.spec === '${c}' ? null : '${c}'; render()">${c}</button>`).join('')}
+    </div>
+
+    <h2 class="section">${state.spec ? `${state.spec}, taking new patients` : 'Taking new patients this week'}</h2>
+    ${found.map(([ini, name, spec, avail]) => `
+      <button class="row" onclick="go('docprofile')">
+        <span class="avatar initials">${ini}</span>
+        <span class="body">
+          <span class="title">${name}</span>
+          <span class="sub">${spec} &middot; next open ${avail}</span>
+        </span>
+        <span class="chev">${I.chev}</span>
+      </button>`).join('')}
+
+  </div>`;
+}
+
+/* ============================================================
+   DOCTOR PROFILE — a searched doctor, before you commit.
+   The old flow jumped from a 44-result list to a request form.
+   ============================================================ */
+function DocProfile() {
+  const days = [['Thu','17'],['Fri','18'],['Sat','19'],['Mon','21'],['Tue','22']];
+  const slots = ['9:00 AM','11:30 AM','2:30 PM','3:15 PM','4:00 PM','5:45 PM'];
+  return `
+  ${bar('', 'doctors')}
+  <div class="scroll" style="padding-top:0;padding-bottom:170px">
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:8px">
+      <span class="avatar lg initials">SO</span>
+      <div>
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">Dr. Sarah Okafor</div>
+        <div class="tiny">Dermatology &middot; board certified &middot; 12 years</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <span class="pill pill-accepted">Taking new patients</span>
+      <span class="pill pill-en-route">Video visits</span>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      Focuses on everyday skin problems: rashes, acne, moles worth checking.
+      Patients describe her as direct and unhurried.
+      <div class="tiny" style="margin-top:10px">Speaks English and Yoruba.</div>
+    </div>
+
+    <h2 class="section">Pick a time</h2>
+    <div class="days">
+      ${days.map(([dow, num], i) => `
+        <button class="day" aria-pressed="${state.day === i}" onclick="state.day=${i};render()">
+          <span class="dow">${dow}</span><span class="num">${num}</span>
+        </button>`).join('')}
+    </div>
+    <div class="slots" style="margin-top:16px">
+      ${slots.map((s, i) => `
+        <button class="slot" aria-pressed="${state.slot === i}" ${i === 1 ? 'disabled' : ''}
+                onclick="state.slot=${i};render()">${s}</button>`).join('')}
+    </div>
+
+    <!-- Payment + note, back from the old app's request form (June).
+         The note is optional; payment is a selector, not card entry.
+         The row tells the truth about the missing insurance card:
+         until it is captured, the visit bills to the card on file. -->
+    <h2 class="section">Payment</h2>
+    <button class="row" onclick="state.pb='docprofile';go('payment')">
+      <span class="body">
+        ${state.insured
+          ? `<span class="title">Insurance &middot; BlueCross PPO</span>
+             <span class="sub">Or ${cardLabel()} &middot; charged only if not covered</span>`
+          : `<span class="title">${cardLabel()}</span>
+             <span class="sub">Add your insurance card on You to use your plan instead</span>`}
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
+    <textarea class="input" rows="3" placeholder="What would you like Dr. Okafor to know before the visit?"
+              aria-label="Optional note to the doctor"></textarea>
+  </div>
+
+  <!-- Floating CTA (June): always visible, like the tab bar -->
+  <div class="ctabar">
+    <button class="btn btn-primary" ${state.slot === null ? 'disabled style="opacity:.4"' : ''}
+            onclick="${state.slot === null ? '' : `go('vrequested')`}">
+      ${state.slot === null ? 'Choose a time' : 'Request appointment'}
+    </button>
+    <p class="tiny">
+      New patients need the practice's confirmation, usually within a few hours.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   VIDEO VISIT REQUESTED — the honest version of the old
+   "Please wait for approval" hourglass, for NEW doctors only.
+   Care-team bookings stay instant; a practice accepting a new
+   patient genuinely takes time, so we say so and show what
+   happens next. Same pattern as the at-home Requested screen.
+   ============================================================ */
+function VRequested() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">Request sent.</h1>
+    <p class="muted" style="margin-top:-12px">Thursday, 2:30 PM with Dr. Sarah Okafor.</p>
+
+    <div class="card" style="margin-top:24px">
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Requested</div><div class="s">Just now</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Practice confirms</div><div class="s">Usually within a few hours; we will notify you</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Join from Visits</div><div class="s">We will remind you 10 minutes before</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('home')">Back to home</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">
+      Free to cancel any time before the visit.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   BOOK — availability-first
+   FIXES: the old flow made you pick a provider from a 44-result
+   list, THEN discover their availability. It also ended on
+   "Please wait for approval" with a cartoon hourglass.
+   NOW: the times are the interface, and a booking is a booking.
+   ============================================================ */
+function Book() {
+  const days = [['Tue','15'],['Wed','16'],['Thu','17'],['Fri','18'],['Sat','19'],['Sun','20']];
+  const slots = ['9:30 AM','10:15 AM','11:00 AM','1:30 PM','2:00 PM','3:45 PM'];
+  return `
+  ${bar('Book a visit', 'doctors')}
+  <div class="scroll" style="padding-bottom:170px">
+    <div class="row" style="cursor:default;margin-bottom:24px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Primary care &middot; video visit &middot; $50 or covered</span>
+      </span>
+    </div>
+
+    <h2 class="section" style="margin-top:0">Pick a time</h2>
+    <div class="days">
+      ${days.map(([dow, num], i) => `
+        <button class="day" aria-pressed="${state.day === i}" onclick="state.day=${i};render()">
+          <span class="dow">${dow}</span><span class="num">${num}</span>
+        </button>`).join('')}
+    </div>
+
+    <div class="slots" style="margin-top:16px">
+      ${slots.map((s, i) => `
+        <button class="slot" aria-pressed="${state.slot === i}" ${i === 5 ? 'disabled' : ''}
+                onclick="state.slot=${i};render()">${s}</button>`).join('')}
+    </div>
+
+    <h2 class="section">Who is this for?</h2>
+    <!-- Family members from You > Family are bookable here (was a
+         stub). Rows select; the ghost adds someone mid-booking. -->
+    ${[[state.fields.name, 'That is you'], ...state.family.map(f => [f.name, f.rel])].map(([nm, sub], i) => `
+    <button class="row" aria-pressed="${state.bookfor === i}" onclick="state.bookfor=${i};render()">
+      <span class="avatar initials">${nm.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+      <span class="body"><span class="title">${nm}</span><span class="sub">${sub}</span></span>
+      <span class="radio"></span>
+    </button>`).join('')}
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="state.fb='book';go('family')">Add a family member</button>
+
+    <!-- Payment + optional note, same grammar as the doctor profile
+         (June, 2026-07-16): the row reads live payment state. -->
+    <h2 class="section">Payment</h2>
+    <button class="row" onclick="state.pb='book';go('payment')">
+      <span class="body">
+        ${state.insured
+          ? `<span class="title">Insurance &middot; BlueCross PPO</span>
+             <span class="sub">Or ${cardLabel()} &middot; charged only if not covered</span>`
+          : `<span class="title">${cardLabel()}</span>
+             <span class="sub">Add your insurance card on You to use your plan instead</span>`}
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
+    <textarea class="input" rows="3" placeholder="What would you like Dr. Anand to know before the visit?"
+              aria-label="Optional note to the doctor"></textarea>
+  </div>
+
+  <!-- Floating CTA (June): always visible, like the tab bar -->
+  <div class="ctabar">
+    <button class="btn btn-primary" ${state.slot === null ? 'disabled style="opacity:.4"' : ''}
+            onclick="${state.slot === null ? '' : `go('confirmed')`}">
+      ${state.slot === null ? 'Choose a time' : 'Confirm booking'}
+    </button>
+    <p class="tiny">
+      Free to cancel up to 10 hours before. After that, a $25 fee applies.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   CONFIRMED
+   FIXES: the old app ended booking on "Please wait for approval"
+   with a cartoon hourglass. No ETA, no cancel, no next step.
+   ============================================================ */
+function Confirmed() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">You're booked.</h1>
+    <p class="muted" style="margin-top:-12px">A confirmation is on its way to your phone.</p>
+
+    <div class="card" style="margin-top:24px">
+      <div style="display:flex;gap:16px;align-items:center">
+        <img class="avatar lg" src="${DR_ANAND}" alt="">
+        <div>
+          <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+          <div class="tiny">Primary care</div>
+        </div>
+      </div>
+      <div style="margin:20px 0 4px;font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">
+        Wed 16 July, 10:15 AM
+      </div>
+      <div class="tiny">Video visit &middot; 30 minutes</div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="alert('Added to calendar')">Add to calendar</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Back to home</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">
+      We will text you a link 10 minutes before.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   PRE-CALL DEVICE CHECK — net new
+   FIXES: the old file had NO in-call UI anywhere in 25,000 nodes.
+   "Start Appointment" led nowhere. This is the screen that stops
+   a visit failing because a microphone was muted.
+   The disclosure voice is lifted from the provider-side "Call
+   Preview" screen, the single best-written screen in the old file.
+   ============================================================ */
+function PreCall() {
+  return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <h1 class="display sm">Ready to join?</h1>
+    <p class="muted" style="margin-top:-12px">Dr. Priya Anand is expecting you at 10:15 AM.</p>
+
+    <div style="margin:24px 0">
+      <img src="${SELF}" alt="Your camera preview" style="width:100%;height:220px;object-fit:cover;border-radius:22px;background:#1B1F26">
+    </div>
+
+    <div class="check">
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Camera</span><span class="s">FaceTime HD Camera</span></span>
+      </div>
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Microphone</span><span class="s">We can hear you</span></span>
+      </div>
+      <div class="item">
+        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="body"><span class="t">Connection</span><span class="s">Strong enough for video</span></span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;background:var(--surface-sunken);box-shadow:none">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span style="margin-top:2px;display:flex"><img src="img/icons/d2-line/lock.png" alt="" style="width:14px;height:14px;object-fit:contain;opacity:.75"></span>
+        <div class="tiny" style="color:var(--text-primary)">
+          This visit is end-to-end encrypted. It will appear in your visit history,
+          and Dr. Anand can see your shared records during the call.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="go('waiting')">Join video visit</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   WAITING ROOM — net new
+   The old file had a provider setting called "Customize Waiting
+   Room" but no waiting room was ever designed for the patient.
+   A patient waiting with no ETA assumes the app is broken.
+   ============================================================ */
+function Waiting() {
+  return `
+  <div class="scroll on-dark" style="background:var(--raw-ink);color:#fff;display:flex;flex-direction:column;justify-content:center;min-height:100dvh">
+    <div style="text-align:center">
+      <img class="avatar lg" src="${DR_ANAND}" alt="" style="width:96px;height:96px;margin:0 auto 24px">
+      <h1 class="display" style="color:#fff">You're in the room.</h1>
+      <p style="color:#A7ADB6;margin-top:-12px">Dr. Anand has been told you are here.</p>
+
+      <div style="margin:32px auto;max-width:280px;background:#1B1F26;border-radius:22px;padding:24px">
+        <div style="font-family:var(--font-display);font-size:42px;font-weight:700;color:var(--raw-volt);letter-spacing:-.02em">2 min</div>
+        <div style="color:#A7ADB6;font-size:15px">Typical wait right now</div>
+      </div>
+
+      <p style="color:#868D97;font-size:15px;max-width:280px;margin:0 auto">
+        Keep this screen open. We will connect you the moment she joins.
+      </p>
+
+      <div style="margin-top:40px;padding:0 8px">
+        <button class="btn btn-emphasis" onclick="go('call')">Simulate: doctor joins</button>
+        <button class="btn" style="margin-top:12px;background:#262B33;color:#fff" onclick="go('home')">Leave the room</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   IN-CALL — net new. The core telehealth moment.
+   Every control is 56px, well clear of the 44px floor.
+   Electric blue is NOT used for small text here: it is only
+   3.56:1 on ink. Volt and white carry the dark surface.
+   ============================================================ */
+function Call() {
+  return `
+  <div class="app on-dark" style="height:100dvh;display:flex;flex-direction:column">
+    <div class="stage">
+      <img class="remote" src="${DR_ANAND_CALL}" alt="Dr. Priya Anand">
+      <div class="who"><span>Dr. Priya Anand</span></div>
+      <div class="timer">04:12</div>
+      ${state.camOff
+        ? `<div class="self" style="display:grid;place-items:center;color:#868D97;font-size:13px;text-align:center;padding:8px">Camera off</div>`
+        : `<img class="self" src="${SELF}" alt="You">`}
+      <div class="enc"><img src="img/icons/d2-line/lock-w.png" alt="" style="width:13px;height:13px;object-fit:contain"><span>End-to-end encrypted</span></div>
+    </div>
+
+    <!-- Line-set icons. Variant follows the surface: white on the
+         dark chips, ink when pressed (chip turns white) and on the
+         coral end chip. Off-state = pressed style + CSS slash. -->
+    <div class="calltray">
+      <button class="callbtn" aria-pressed="${state.muted}" aria-label="${state.muted ? 'Unmute' : 'Mute'}"
+              onclick="state.muted=!state.muted;render()"><img src="img/icons/d2-fill/mic${state.muted ? '' : '-w'}.png" alt=""></button>
+      <button class="callbtn" aria-pressed="${state.camOff}" aria-label="${state.camOff ? 'Turn camera on' : 'Turn camera off'}"
+              onclick="state.camOff=!state.camOff;render()"><img src="img/icons/d2-fill/camera${state.camOff ? '' : '-w'}.png" alt=""></button>
+      <button class="callbtn" aria-label="Captions" onclick="alert('Captions on')"><img src="img/icons/d2-fill/cc-w.png" alt=""></button>
+      <button class="callbtn end" aria-label="End call" onclick="go('postcall')"><img src="img/icons/d2-fill/end.png" alt=""></button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   POST-CALL — net new
+   A visit that ends in a dead screen teaches the patient nothing.
+   ============================================================ */
+function PostCall() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">Visit complete.</h1>
+    <p class="muted" style="margin-top:-12px">12 minutes with Dr. Priya Anand.</p>
+
+    <div class="card" style="margin-top:24px">
+      <h2 class="section" style="margin:0 0 12px;font-size:17px">What happens next</h2>
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Visit notes written</div><div class="s">Available in your records now</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Blood draw ordered</div><div class="s">Dr. Anand requested a lipid panel at home</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Results in 2 to 3 days</div><div class="s">We will notify you</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('collect')">Schedule the blood draw</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Not now</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   AT-HOME COLLECTION — request
+   FIXES: called a "WORK" everywhere in the old app, shown to the
+   patient as "#WO1" with "WORK TYPE" and "Pending Crew".
+   NOW: it is a blood draw at your house, in those words.
+   ============================================================ */
+function Collect() {
+  return `
+  ${bar('Blood draw at home', 'getcare')}
+  <div class="scroll">
+    <h1 class="display sm">When suits you?</h1>
+    <p class="muted" style="margin-top:-12px">
+      A licensed nurse comes to you, draws, and drops it at the lab.
+    </p>
+
+    <!-- R2: patients reach this screen directly from Home now, not
+         only from a doctor's order, so the order is a row, not the
+         premise. Provider-dispatched draws land here prefilled. -->
+    <h2 class="section">What you need</h2>
+    <!-- The order is editable now (was a stub): this row and the
+         price ledger both read the same selection. -->
+    <button class="row" onclick="go('tests')">
+      <span class="body">
+        <span class="title">${selTests().map(t => t[1]).join(' + ') || 'No tests chosen'}</span>
+        <span class="sub">${state.tests.lipid
+          ? 'Lipid panel ordered by Dr. Anand &middot; tap to change'
+          : 'Tap to change the tests'}</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <h2 class="section">Pick a window</h2>
+    <div class="days">
+      ${[['Tue','15'],['Wed','16'],['Thu','17'],['Fri','18'],['Sat','19']].map(([d, n], i) => `
+        <button class="day" aria-pressed="${state.day === i}" onclick="state.day=${i};render()">
+          <span class="dow">${d}</span><span class="num">${n}</span>
+        </button>`).join('')}
+    </div>
+    <div class="slots" style="margin-top:16px">
+      ${['8 - 10 AM','10 - 12 PM','12 - 2 PM','2 - 4 PM','4 - 6 PM','6 - 8 PM'].map((s, i) => `
+        <button class="slot" aria-pressed="${state.slot === i}" onclick="state.slot=${i};render()"
+                style="font-size:14px">${s}</button>`).join('')}
+    </div>
+
+    <h2 class="section">Where</h2>
+    <!-- Saved addresses are real now (was a stub); home mirrors
+         Personal info so the two can never disagree. -->
+    <button class="row" onclick="go('address')">
+      <span class="body">
+        <span class="title">${addrList()[state.addri][1]}</span>
+        <span class="sub">${addrList()[state.addri][0]} &middot; ${addrList()[state.addri][2] || 'New York, NY'}</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-primary" ${state.slot === null || !selTests().length ? 'disabled style="opacity:.4"' : ''}
+              onclick="${state.slot === null || !selTests().length ? '' : `go('price')`}">
+        ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window' : 'See the price'}
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   AT-HOME COLLECTION — price
+   FIXES: the single worst thing in the old app. It quoted
+   "Travel Cost: NY 0-5 mi ~$10 - $50" and an "Estimated Total
+   $77.50 - $100", then asked for a credit card. The old file
+   literally contains the failure state this produced:
+   "Your patient has canceled this appointment due to the high
+   cost of travel."
+   NOW: travel is one flat, capped line. You know the number
+   before you enter a card, and it cannot move.
+   ============================================================ */
+function Price() {
+  return `
+  ${bar('Confirm', 'collect')}
+  <div class="scroll">
+    <h1 class="display sm">Here is the cost.</h1>
+
+    <!-- The ledger is computed from the order (the tests screen),
+         so a changed order can never show a stale price. -->
+    <div class="card" style="margin-top:20px">
+      <div class="ledger">
+        ${selTests().map(t => `
+        <div class="line"><span class="k">${t[1]}</span><span class="v">$${t[3].toFixed(2)}</span></div>`).join('')}
+        <div class="line"><span class="k">Travel to your address</span><span class="v">$12.50</span></div>
+        <div class="rule"></div>
+        <div class="total"><span class="k">Total</span><span class="v">$${(testsTotal() + 12.5).toFixed(2)}</span></div>
+      </div>
+
+      <div class="capped" style="margin-top:20px">
+        <span style="display:flex;margin-top:2px"><img src="img/icons/d2-line/lock.png" alt="" style="width:16px;height:16px;object-fit:contain"></span>
+        <span><strong>This price is locked.</strong> Travel is capped at $12.50 no matter which nurse
+        takes the job or how far they travel.</span>
+      </div>
+    </div>
+
+    <h2 class="section">Paying with</h2>
+    <button class="row" onclick="state.pb='price';go('payment')">
+      <span class="body">
+        <span class="title">${cardLabel()}</span>
+        <span class="sub">Charged after the draw, not now</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div style="margin-top:32px">
+      <!-- R2: this now goes to the honest "Requested" state, not
+           straight to a live nurse. Dispatch genuinely takes time
+           (the real machine starts at Pending Crew); we say so
+           instead of pretending, and the price cannot move. -->
+      <button class="btn btn-primary" onclick="go('requested')">Request for Wed, 10 - 12 PM</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        Free to cancel until a nurse is on the way.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   REQUESTED — net new in R2.
+   The old app ended EVERY booking on "Please wait for approval"
+   with a cartoon hourglass: no ETA, no next step, no cancel.
+   The video visit no longer waits at all (it confirms), but the
+   at-home draw honestly IS a request until a nurse accepts.
+   Same Pending Crew stage, told like a person would tell it.
+   ============================================================ */
+function Requested() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
+    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <h1 class="display">Request sent.</h1>
+    <p class="muted" style="margin-top:-12px">We are matching you with a licensed nurse near you.</p>
+
+    <div class="card" style="margin-top:24px">
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Requested</div><div class="s">Wed, 10 AM - 12 PM &middot; just now</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Finding your nurse</div><div class="s">Usually accepted within the hour</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">On the way</div><div class="s">You will track them live, by name</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">The draw</div><div class="s">About 15 minutes at your home</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('home')">Back to home</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">
+      We will notify you the moment a nurse accepts.<br>Nothing is charged until after the draw.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   LIVE TRACKING
+   The old app's status machine was genuinely good: Pending,
+   Accepted, En Route, Arrived, In Progress, Completed. It was
+   the best-modelled thing in the file. It was also shown to the
+   patient as a grey label on a card called "#WO1".
+   NOW: same state machine, given a screen worth the wait.
+   ============================================================ */
+function Track() {
+  /* Once the visit is cancelled there is nothing to track: any
+     surface that still points here lands on the cancel receipt. */
+  if (state.cx) return Cancel();
+  return `
+  ${bar('Blood draw at home', 'home')}
+  <div class="scroll">
+    <span class="pill pill-en-route">On the way</span>
+    <h1 class="display" style="margin-top:12px">Jennifer arrives<br>about 2:40 PM.</h1>
+
+    <div class="card" style="display:flex;gap:16px;align-items:center">
+      <img class="avatar lg" src="${CREW_JEN}" alt="">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+        <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="alert('Calling Jennifer')">Call</button>
+      <button class="btn btn-secondary" onclick="state.thread='jen';go('thread')">Message</button>
+    </div>
+
+    <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+      <img src="${ROUTE_MAP}" alt="Jennifer's route to your address"
+           style="width:100%;height:170px;object-fit:cover;display:block">
+    </div>
+
+    <h2 class="section">Progress</h2>
+    <div class="card">
+      <div class="track">
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Booked</div><div class="s">Yesterday, 4:12 PM</div></div>
+        </div>
+        <div class="step done">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Jennifer accepted</div><div class="s">Yesterday, 5:03 PM</div></div>
+        </div>
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">On the way</div><div class="s">Left 2:18 PM &middot; 8 minutes out</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">Draw</div><div class="s">About 15 minutes</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Results</div><div class="s">2 to 3 days after the lab receives it</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The old app had a QR "public profile" card. It was a good
+         idea buried in a settings screen. It belongs here: it is
+         how you know the person at your door is the right one. -->
+    <div class="card" style="margin-top:12px;background:var(--raw-ink);color:#fff;border:0">
+      <div style="font-weight:700;font-size:17px;margin-bottom:6px">At the door</div>
+      <div style="font-size:15px;color:#A7ADB6">
+        Jennifer will show a code that matches yours: <strong style="color:var(--raw-volt);font-size:19px">4B-7291</strong>.
+        Do not let anyone in who cannot show it.
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" style="margin-top:20px;color:var(--danger-text-on-light)"
+            onclick="go('cancel')">Cancel this visit</button>
+  </div>`;
+}
+
+/* ============================================================
+   VISITS
+   FIXES: the old list mixed video-visit cards and "#WO1" work
+   cards in the same tabs, with a search box that said "e.g. First
+   Name, Last Name" while every card was titled by an ID you could
+   not search for.
+   ============================================================ */
+/* ============================================================
+   VISITS — tab strip per June (old app's Appointments tabs:
+   Pending / Upcoming / In Progress / Previous), in the same
+   component as Lab results. Our states, plain words: a request
+   is a request, and nothing is called a #WO1.
+   ============================================================ */
+function Visits() {
+  /* Requested + Upcoming share one tab (June): the status pill
+     already says which is which, so soonest-first in one list. */
+  const vtabs = ['Upcoming', 'In progress', 'Past'];
+  const t = state.vtab;
+  const vrow = (act, avatar, pillCls, pillTxt, title, sub) => `
+    <button class="row" onclick="${act}" style="align-items:flex-start;padding:16px">
+      ${avatar}
+      <span class="body">
+        <span class="pill ${pillCls}" style="margin-bottom:6px">${pillTxt}</span>
+        <span class="title">${title}</span>
+        <span class="sub">${sub}</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>`;
+  const panels = [
+    /* Upcoming: confirmed visits and pending requests, soonest
+       first; the pill carries the status */
+    vrow(`go('precall')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
+         'pill-accepted', 'Confirmed', 'Dr. Priya Anand', 'Tomorrow, 10:15 AM &middot; video visit') +
+    vrow(`go('requested')`, `<span class="nicon"><img src="img/icons/d2-fill/drop.png" alt=""></span>`,
+         'pill-pending', 'Finding your nurse', 'Blood draw at home', 'Wed, 10 AM - 12 PM &middot; requested today') +
+    vrow(`go('vrequested')`, `<span class="avatar initials">SO</span>`,
+         'pill-pending', 'Awaiting practice', 'Dr. Sarah Okafor', 'Thu, 2:30 PM &middot; video visit'),
+    /* In progress: the live crew visit — unless it was cancelled,
+       in which case the truth is that nothing is happening */
+    state.cx
+      ? '<div class="empty">Nothing in progress right now.</div>'
+      : vrow(`go('track')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
+             'pill-en-route', 'On the way', 'Blood draw at home', 'Today &middot; Jennifer Reyes'),
+    /* Past: a cancelled visit is history, not a live card */
+    (state.cx
+      ? vrow(`go('cancel')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
+             'pill-canceled', 'Cancelled', 'Blood draw at home', 'Today &middot; cancelled before arrival')
+      : '') +
+    vrow(`go('summary')`, `<img class="avatar" src="${DR_BELL}" alt="">`,
+         'pill-complete', 'Complete', 'Dr. Marcus Bell', '6 June &middot; notes and results ready'),
+  ];
+  return `
+  ${bar('Visits')}
+  <div class="scroll">
+    <div class="tabs">
+      ${vtabs.map((n, i) => `
+        <button class="tabx" aria-selected="${t === i}" onclick="state.vtab=${i};render()">${n}</button>`).join('')}
+    </div>
+    ${panels[t]}
+  </div>
+  ${tabbar('visits')}`;
+}
+
+function Msgs() {
+  /* No longer a tab (the Notifications tab replaced it); message
+     notis land in the feed, and this list lives under You. */
+  return `
+  ${bar('Messages', 'you')}
+  <div class="scroll">
+    <button class="row" onclick="state.thread='anand';go('thread')" style="padding:16px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Your results look good overall.</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="state.thread='jen';go('thread')" style="padding:16px">
+      <img class="avatar" src="${CREW_JEN}" alt="">
+      <span class="body">
+        <span class="title">Jennifer Reyes</span>
+        <span class="sub">Running about 10 minutes behind, sorry!</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+  </div>`;
+}
+
+function You() {
+  return `
+  ${bar('You')}
+  <div class="scroll">
+    <!-- Identity block opens Personal info (photo + details), June -->
+    <button class="idblock" onclick="go('profile')">
+      ${meAvatar('lg')}
+      <span class="body">
+        <span style="font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">${state.fields.name}</span>
+        <span class="tiny">Personal info and photo</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <!-- Every row below opens a real screen now (all four were
+         stubs); the subs read live state, so a captured card or an
+         added family member shows here without ceremony. -->
+    <button class="row" onclick="go('insurance')">
+      <span class="body"><span class="title">Insurance</span>
+        <span class="sub">${state.insured ? 'BlueCross PPO &middot; on file' : '1 card missing'}</span></span>
+      ${state.insured ? `<span class="chev">${I.chev}</span>` : '<span class="pill pill-pending">Needed</span>'}
+    </button>
+    <button class="row" onclick="go('results')">
+      <span class="body"><span class="title">Records and results</span><span class="sub">4 documents &middot; new lab results</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="go('msgs')">
+      <span class="body"><span class="title">Messages</span><span class="sub">Dr. Anand, Jennifer Reyes</span></span>
+      <span class="count" aria-label="2 unread">2</span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="state.fb='you';go('family')">
+      <span class="body"><span class="title">Family</span>
+        <span class="sub">${state.family.length ? state.family.map(f => f.name).join(', ') : 'Book for someone else'}</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="row" onclick="state.pb='you';go('payment')">
+      <span class="body"><span class="title">Payment</span>
+        <span class="sub">${cardLabel()}${state.cards.length > 1 ? ` &middot; ${state.cards.length} cards` : ''}</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>
+    <button class="btn btn-ghost" style="margin-top:20px" onclick="go('welcome')">Sign out</button>
+  </div>
+  ${tabbar('you')}`;
+}
+
+/* ============================================================
+   PERSONAL INFO — net new (June: profile was missing personal
+   info and a profile photo). The photo picker actually works:
+   choose an image and it appears here and on You. Fields are
+   value-first rows; each edit is one field, never a funnel.
+   ============================================================ */
+function Profile() {
+  return `
+  ${bar('Personal info', 'you')}
+  <div class="scroll">
+    <div class="photoblock">
+      ${meAvatar('xl')}
+      <div style="flex:1">
+        <button class="btn btn-secondary" style="width:auto;padding:0 20px"
+                onclick="document.getElementById('photoin').click()">
+          ${state.photo ? 'Change photo' : 'Add photo'}
+        </button>
+        <p class="tiny" style="margin:10px 0 0">
+          Your care team and nurse see this photo. It helps them know you at the door.
+        </p>
+      </div>
+      <input type="file" accept="image/*" id="photoin" style="display:none" onchange="loadPhoto(this)">
+    </div>
+
+    <h2 class="section">Details</h2>
+    <!-- Each row opens the one-field editor (was a stub). Values
+         live in state, so an edit lands everywhere it is used:
+         name -> greeting, initials, You; phone -> the code screen. -->
+    ${PFIELDS.map(([k, label], i) => `
+      <button class="row" onclick="state.efield=${i};go('editfield')">
+        <span class="body">
+          <span class="sub">${label}</span>
+          <span class="title">${state.fields[k]}</span>
+        </span>
+        <span class="chev">${I.chev}</span>
+      </button>`).join('')}
+
+    <p class="tiny" style="margin-top:20px">
+      The home address is where the nurse comes for at-home visits. Insurance and
+      payment live in their own sections on You.
+    </p>
+  </div>`;
+}
+
+/* ============================================================
+   LAB RESULTS — D2 port of the D3 screen (parity, June's pick).
+   Values + status pills in D2's fill+ink grammar.
+   ============================================================ */
+function Results(tab = 0) {
+  /* All three tabs are real now (All + Trends were stubs). Each
+     tab is its own route so the back button and the gallery both
+     behave; the data below is one history, told three ways. */
+  const rows = [
+    ['Total cholesterol', 'Ref 125&ndash;200 mg/dL', '182', 'complete', 'Normal'],
+    ['Glucose, fasting',  'Ref 70&ndash;99 mg/dL',   '104', 'urgent',   'High'],
+    ['Vitamin D',         'Ref 30&ndash;100 ng/mL',  '28',  'pending',  'Low'],
+    ['Hemoglobin A1c',    'Ref under 5.7%',          '5.4', 'complete', 'Normal'],
+  ];
+  const resultRow = ([n, ref, val, cls, label]) => `
+      <div class="result">
+        <div class="l"><div class="n">${n}</div><div class="ref">${ref}</div></div>
+        <div class="r"><span class="val">${val}</span><span class="pill pill-${cls}">${label}</span></div>
+      </div>`;
+  /* Six months of history: the same three draws feed All and Trends. */
+  const draws = [
+    ['July 14, 2026', 'Blood draw at home &middot; Jennifer Reyes', rows],
+    ['April 2, 2026', 'Annual physical &middot; Dr. Priya Anand', [
+      ['Total cholesterol', 'Ref 125&ndash;200 mg/dL', '188', 'complete', 'Normal'],
+      ['Glucose, fasting',  'Ref 70&ndash;99 mg/dL',   '99',  'complete', 'Normal'],
+      ['Vitamin D',         'Ref 30&ndash;100 ng/mL',  '24',  'pending',  'Low'],
+      ['Hemoglobin A1c',    'Ref under 5.7%',          '5.5', 'complete', 'Normal'],
+    ]],
+    ['January 20, 2026', 'Blood draw at home', [
+      ['Total cholesterol', 'Ref 125&ndash;200 mg/dL', '195', 'complete', 'Normal'],
+      ['Glucose, fasting',  'Ref 70&ndash;99 mg/dL',   '96',  'complete', 'Normal'],
+      ['Vitamin D',         'Ref 30&ndash;100 ng/mL',  '22',  'pending',  'Low'],
+      ['Hemoglobin A1c',    'Ref under 5.7%',          '5.6', 'complete', 'Normal'],
+    ]],
+  ];
+  /* Sparkline in the D2 grammar: ink line, colored endpoint. */
+  const spark = (pts, lo, hi, end) => {
+    const W = 280, H = 56, P = 7;
+    const x = i => P + i * (W - 2 * P) / (pts.length - 1);
+    const y = v => H - P - (v - lo) / (hi - lo) * (H - 2 * P);
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+      <polyline points="${pts.map((v, i) => `${x(i)},${y(v)}`).join(' ')}" fill="none"
+        stroke="var(--raw-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"/>
+      <circle cx="${x(pts.length - 1)}" cy="${y(pts.at(-1))}" r="5" fill="${end}"/></svg>`;
+  };
+  const trends = [
+    ['Total cholesterol', '182 mg/dL', [195, 188, 182], 178, 199, 'var(--raw-electric)', 'complete', 'Improving',
+     'Down 13 points since January. Whatever you are doing, keep doing it.'],
+    ['Glucose, fasting', '104 mg/dL', [96, 99, 104], 94, 107, 'var(--raw-coral)', 'urgent', 'Rising',
+     'Crossed the reference line this month. Dr. Anand left you a note about it.'],
+    ['Vitamin D', '28 ng/mL', [22, 24, 28], 20, 30, 'var(--raw-electric)', 'pending', 'Below range',
+     'Climbing since the winter, still under the 30 floor.'],
+  ];
+  const panels = [
+    /* Recent */
+    rows.map(resultRow).join('') + `
+    <div class="card" style="margin-top:24px">
+      <div style="font-weight:700;margin-bottom:4px">Dr. Anand has seen these.</div>
+      <div class="tiny">The fasting glucose is worth a conversation, not an alarm. She left you a note.</div>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="state.thread='anand';go('thread')">Read her message</button>
+    </div>`,
+    /* All: every draw, grouped by date */
+    draws.map(([date, src, list]) => `
+      <h2 class="section" style="margin-top:28px;margin-bottom:0">${date}</h2>
+      <p class="tiny" style="margin:2px 0 4px">${src}</p>
+      ${list.map(resultRow).join('')}`).join('') + `
+    <p class="tiny" style="text-align:center;margin-top:24px">That&rsquo;s your full six months with Teleport.</p>`,
+    /* Trends: three numbers over six months */
+    trends.map(([n, val, pts, lo, hi, end, cls, verdict, note]) => `
+      <div class="card" style="margin-top:12px">
+        <div class="trend-head">
+          <div><div style="font-weight:600">${n}</div><div class="val">${val}</div></div>
+          <span class="pill pill-${cls}">${verdict}</span>
+        </div>
+        ${spark(pts, lo, hi, end)}
+        <div class="spark-x"><span>Jan 20</span><span>Apr 2</span><span>Jul 14</span></div>
+        <p class="tiny" style="margin:10px 0 0">${note}</p>
+      </div>`).join(''),
+  ];
+  return `
+  ${bar('', 'you')}
+  <div class="scroll" style="padding-top:0">
+    <p class="greet">Updated today</p>
+    <h1 class="display">Lab results</h1>
+
+    <div class="tabs">
+      ${[['Recent', 'results'], ['All', 'resultsall'], ['Trends', 'trends']].map(([n, r], i) => `
+      <button class="tabx" aria-selected="${tab === i}" onclick="go('${r}')">${n}</button>`).join('')}
+    </div>
+
+    ${panels[tab]}
+  </div>`;
+}
+
+/* ============================================================
+   MESSAGE THREAD — net new. The Messages list finally opens.
+   ============================================================ */
+function Thread() {
+  if (state.thread === 'jen') return `
+  <div class="app" style="height:100dvh;display:flex;flex-direction:column">
+    ${bar('Jennifer Reyes', 'msgs')}
+    <div class="scroll" style="padding-bottom:24px">
+      <div class="thread">
+        <div class="tstamp">Today, 2:18 PM</div>
+        <div class="bubble them">Hi Maya! I&rsquo;m on my way &mdash; running about 10 minutes behind, sorry!</div>
+        <div class="bubble me">No problem at all. See you soon.</div>
+        <div class="bubble them">Great. I&rsquo;ll show the code <strong>4B-7291</strong> at the door so you know it&rsquo;s me.</div>
+        <button class="row" style="max-width:78%;margin-top:2px" onclick="go('track')">
+          <span class="body">
+            <span class="title">Live tracking</span>
+            <span class="sub">Arrives about 2:40 PM</span>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>
+      </div>
+    </div>
+    <div class="composer">
+      <input type="text" placeholder="Write a message" aria-label="Write a message">
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+    </div>
+  </div>`;
+  return `
+  <div class="app" style="height:100dvh;display:flex;flex-direction:column">
+    ${bar('Dr. Priya Anand', 'msgs')}
+    <div class="scroll" style="padding-bottom:24px">
+      <div class="thread">
+        <div class="tstamp">Today, 11:02 AM</div>
+        <div class="bubble them">Hi Maya. Your results are in and they look good overall &mdash; cholesterol and A1c are right where we want them.</div>
+        <div class="bubble them">Your fasting glucose is a touch high. Nothing alarming, but let&rsquo;s talk about it at your visit tomorrow.</div>
+        <button class="row" style="max-width:78%;margin-top:2px" onclick="go('results')">
+          <span class="body">
+            <span class="title">Lipid panel results</span>
+            <span class="sub">4 values &middot; reviewed</span>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>
+        <div class="tstamp">11:14 AM</div>
+        <div class="bubble me">Thank you! Should I keep fasting before tomorrow&rsquo;s visit?</div>
+        <div class="bubble them">No need &mdash; it&rsquo;s a video visit. Eat normally.</div>
+      </div>
+    </div>
+    <div class="composer">
+      <input type="text" placeholder="Write a message" aria-label="Write a message">
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   VISIT SUMMARY — net new. "Notes and results ready" now has a
+   destination instead of a dead end.
+   ============================================================ */
+function Summary() {
+  return `
+  ${bar('Visit summary', 'visits')}
+  <div class="scroll">
+    <div class="row" style="cursor:default;margin-bottom:20px">
+      <img class="avatar" src="${DR_BELL}" alt="">
+      <span class="body">
+        <span class="title">Dr. Marcus Bell</span>
+        <span class="sub">Cardiology &middot; video visit &middot; 6 June</span>
+      </span>
+      <span class="pill pill-complete">Complete</span>
+    </div>
+
+    <h2 class="section" style="margin-top:0">What we covered</h2>
+    <div class="card">
+      Blood pressure is well controlled on the current dose &mdash; no change.
+      We ordered a lipid panel to check cholesterol before considering anything further.
+      Keep up the walking; it is clearly working.
+    </div>
+
+    <h2 class="section">Prescribed</h2>
+    <button class="row" onclick="alert('Prescription details')">
+      <span class="body">
+        <span class="title">Atorvastatin 10 mg</span>
+        <span class="sub">Once daily &middot; 90-day supply</span>
+      </span>
+      <span class="pill pill-complete">Refill ready</span>
+    </button>
+
+    <h2 class="section">Ordered</h2>
+    <button class="row" onclick="go('results')">
+      <span class="body">
+        <span class="title">Lipid panel</span>
+        <span class="sub">Collected at home &middot; results ready</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>
+
+    <div class="card" style="margin-top:24px">
+      <div style="font-weight:700;margin-bottom:4px">Next: follow-up in about 3 months.</div>
+      <div class="tiny">Dr. Bell suggested late September, sooner if anything changes.</div>
+      <button class="btn btn-emphasis" style="margin-top:14px" onclick="go('book')">Book the follow-up</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   SIGN IN / WELCOME — the front door. One step, no funnel:
+   the old app's onboarding ran EIGHT steps before care.
+   R2: the coworker's list starts at "Sign up / login", so the
+   door now leads somewhere real: sign in goes through the text
+   code, and there is a visible way to create an account.
+   The subline leads with the crew service, per the feedback.
+   ============================================================ */
+function Welcome() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center">
+    <p class="eyebrow" style="letter-spacing:.12em;text-transform:uppercase;font-size:13px">Teleport MD</p>
+    <h1 class="display" style="font-size:42px">Care to anyone,<br>anywhere.</h1>
+    <p class="muted" style="margin-top:-8px">At-home blood draws and video visits, on your schedule.</p>
+
+    <div style="margin-top:36px">
+      <label class="flabel" for="ph">Phone number</label>
+      <input id="ph" class="input" type="tel" placeholder="(555) 000-1234">
+      <button class="btn btn-emphasis" style="margin-top:12px" onclick="go('verify')">Continue</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="go('signup')">New to Teleport? Create an account</button>
+      <p class="tiny" style="text-align:center;margin-top:12px;max-width:300px;margin-left:auto;margin-right:auto">
+        We will text you a sign-in code. By continuing you agree to the Terms and the Privacy Policy.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   SIGN UP — net new in R2, identity only.
+   The old app's patient sign-up was a funnel of documents,
+   dependents and insurance before any care. Here it is four
+   fields; everything else moves to the moment it is needed.
+   ============================================================ */
+function Signup() {
+  return `
+  ${bar('Create account', 'welcome')}
+  <div class="scroll">
+    <h1 class="display sm">Tell us who you are.</h1>
+    <p class="muted" style="margin-top:-12px">
+      Just the basics. Insurance and records can wait until a visit needs them.
+    </p>
+
+    <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label class="flabel" for="fn">First name</label>
+        <input id="fn" class="input" type="text" autocomplete="given-name" placeholder="Maya">
+      </div>
+      <div>
+        <label class="flabel" for="ln">Last name</label>
+        <input id="ln" class="input" type="text" autocomplete="family-name" placeholder="Wells">
+      </div>
+      <div>
+        <label class="flabel" for="dob">Date of birth</label>
+        <input id="dob" class="input" type="text" inputmode="numeric" placeholder="MM / DD / YYYY">
+      </div>
+      <div>
+        <label class="flabel" for="ph2">Phone number</label>
+        <input id="ph2" class="input" type="tel" autocomplete="tel" placeholder="(555) 000-1234">
+      </div>
+    </div>
+
+    <div style="margin-top:28px">
+      <button class="btn btn-emphasis" onclick="go('verify')">Continue</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        That is the whole form. No insurance cards, no documents, no photos today.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   VERIFY — net new in R2. One text code serves both sign-in
+   and sign-up, so there is exactly one door into the app.
+   Each digit box is its own 46x56 target, above the 44px floor.
+   ============================================================ */
+function Verify() {
+  return `
+  ${bar('', 'welcome')}
+  <div class="scroll" style="padding-top:0">
+    <h1 class="display sm">Enter the code.</h1>
+    <p class="muted" style="margin-top:-12px">We texted a 6-digit code to ${state.fields.phone}.</p>
+
+    <div class="code-row" style="margin-top:28px">
+      ${[1,2,3,4,5,6].map(n => `
+        <input class="code" type="text" inputmode="numeric" maxlength="1" aria-label="Digit ${n}"
+               ${n <= 4 ? `value="${[8,2,4,1][n-1]}"` : ''}>`).join('')}
+    </div>
+
+    <div style="margin-top:28px">
+      <button class="btn btn-primary" onclick="go('home')">Verify and continue</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="alert('Code re-sent')">Text me a new code</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   NOTIFICATIONS — now a TAB (June, 2026-07-16, old design as
+   ref): one feed for every kind of event — messages, lab
+   results, crew, reminders, receipts. Every item goes somewhere
+   real; nothing nags.
+   ============================================================ */
+function Notifs() {
+  const fresh = [
+    state.cx
+      ? ['drop',   'Visit cancelled',         'Blood draw at home &middot; only the $12.50 travel charge', 'now', `go('cancel')`]
+      : ['drop',   'Jennifer is on the way',  'Blood draw &middot; arrives about 2:40 PM', 'now',   `go('track')`],
+    ['chat',     'New message',             'Dr. Anand: &ldquo;Your results look good overall.&rdquo;', '11:02 AM', `state.thread='anand';go('thread')`],
+    ['calendar', 'Visit reminder',          'Dr. Priya Anand &middot; tomorrow, 10:15 AM', '9:00 AM', `go('precall')`],
+  ];
+  const earlier = [
+    ['flask',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', `go('results')`],
+    ['lock',     'Payment receipt',         '$77.50 &middot; blood draw at home', 'Yesterday', `go('receipt')`],
+  ];
+  const row = ([ico, t, sub, time, act], unread) => `
+      <button class="row${unread ? ' unread' : ''}" onclick="${act}">
+        <span class="nicon"><img src="img/icons/d2-${unread ? 'fill' : 'line'}/${ico}.png" alt=""></span>
+        <span class="body">
+          <span class="title">${t}</span>
+          <span class="sub">${sub}</span>
+        </span>
+        <span class="nmeta"><span class="ntime">${time}</span>${unread ? '<span class="udot" aria-label="Unread"></span>' : ''}</span>
+      </button>`;
+  return `
+  ${bar('Notifications')}
+  <div class="scroll">
+    ${fresh.map(i => row(i, true)).join('')}
+    ${earlier.map(i => row(i, false)).join('')}
+    <p class="tiny" style="text-align:center;margin-top:24px">That&rsquo;s everything from the last 7 days.</p>
+  </div>
+  ${tabbar('notifs')}`;
+}
+
+/* ============================================================
+   R2.1 — THE TEN FORMER STUBS, BUILT (2026-07-16).
+   Everything below existed only as a toast until now. Shared
+   rules: one screen, one job; state cascades to every surface
+   that mentions it; nothing asks for information before the
+   moment it is needed.
+   ============================================================ */
+
+/* INSURANCE CARD — two photos, we do the typing. The captures are
+   real pickers (FileReader, in-page only). Saving clears the home
+   banner, fills the You row and flips the doctor-profile payment
+   line — the nag genuinely dies. */
+function Insurance() {
+  const tile = (key, label) => `
+    <button class="capture${state[key] ? ' has' : ''}" onclick="document.getElementById('${key}in').click()">
+      ${state[key]
+        ? `<img class="shotimg" src="${state[key]}" alt="${label} of your insurance card">
+           <span class="retake">Retake</span>`
+        : `<img class="capico" src="img/icons/d2-fill/camera.png" alt="">
+           <span class="cap-label">${label}</span>`}
+    </button>
+    <input type="file" accept="image/*" capture="environment" id="${key}in"
+           style="display:none" onchange="loadShot(this, '${key}')">`;
+  if (state.insured) return `
+  ${bar('Insurance', 'you')}
+  <div class="scroll">
+    <h1 class="display sm">You&rsquo;re covered.</h1>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div>
+          <div style="font-weight:700;font-size:19px">BlueCross PPO</div>
+          <div class="tiny" style="margin-top:2px">Member MW 4821 993 &middot; Group 20114</div>
+        </div>
+        <span class="pill pill-accepted">On file</span>
+      </div>
+      <div class="tiny" style="margin-top:14px">
+        We bill your plan first for every visit. The card on file is only charged for what the plan does not cover.
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:16px"
+            onclick="state.insured=false;state.insFront=null;state.insBack=null;render()">Replace the card</button>
+  </div>`;
+  return `
+  ${bar('Insurance', 'you')}
+  <div class="scroll">
+    <h1 class="display sm">Two photos.<br>We do the typing.</h1>
+    <p class="muted" style="margin-top:-12px">
+      Snap the front and back of your card. We read the plan, member ID and group for you.
+    </p>
+
+    <div class="captures" style="margin-top:24px">
+      ${tile('insFront', 'Front of card')}
+      ${tile('insBack', 'Back of card')}
+    </div>
+
+    <div style="margin-top:28px">
+      <button class="btn btn-primary" ${state.insFront && state.insBack ? '' : 'disabled style="opacity:.4"'}
+              onclick="${state.insFront && state.insBack ? 'state.insured=true;render()' : ''}">
+        ${state.insFront && state.insBack ? 'Save my card' : 'Add both sides first'}
+      </button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        No typing, no forms. If we cannot read something, a person checks it, not you.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* FAMILY & DEPENDENTS — the people you can book for. Adding one
+   takes a name and a relationship; they immediately become a
+   bookable person under "Who is this for?" on Book. */
+function Family() {
+  const rels = ['Child', 'Partner', 'Parent', 'Other'];
+  const back = state.fb === 'book' ? 'book' : 'you';
+  return `
+  ${bar('Family', back)}
+  <div class="scroll">
+    <h1 class="display sm">Who do you care for?</h1>
+    <p class="muted" style="margin-top:-12px">
+      Anyone here can be booked for a visit under your account, with their own records kept separate.
+    </p>
+
+    <div style="margin-top:20px">
+      <div class="row" style="cursor:default">
+        ${meAvatar('')}
+        <span class="body"><span class="title">${state.fields.name}</span><span class="sub">That is you &middot; account owner</span></span>
+      </div>
+      ${state.family.map((f, i) => `
+      <div class="row" style="cursor:default">
+        <span class="avatar initials">${f.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+        <span class="body"><span class="title">${f.name}</span><span class="sub">${f.rel} &middot; you book and pay for their visits</span></span>
+      </div>`).join('')}
+    </div>
+
+    ${state.addfam ? `
+    <h2 class="section">Add a family member</h2>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label class="flabel" for="ffn">First name</label>
+        <input id="ffn" class="input" type="text" placeholder="Noah">
+      </div>
+      <div>
+        <label class="flabel" for="fln">Last name</label>
+        <input id="fln" class="input" type="text" placeholder="Wells">
+      </div>
+      <div>
+        <label class="flabel" for="fdob">Date of birth</label>
+        <input id="fdob" class="input" type="text" inputmode="numeric" placeholder="MM / DD / YYYY">
+      </div>
+      <div>
+        <label class="flabel">Relationship</label>
+        <div class="chips" style="margin-top:0">
+          ${rels.map((r, i) => `
+          <button class="chip" aria-pressed="${state.frel === i}" onclick="state.frel=${i};render()">${r}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="
+        state.family.push({
+          name: ((document.getElementById('ffn').value || 'Noah') + ' ' + (document.getElementById('fln').value || 'Wells')).trim(),
+          rel: '${rels[state.frel]}',
+        });
+        state.addfam = false; render()">Add them</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="state.addfam=false;render()">Cancel</button>
+    </div>` : `
+    <button class="btn btn-emphasis" style="margin-top:20px" onclick="state.addfam=true;render()">Add a family member</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">
+      Under-18s always need a parent or guardian on the account.
+    </p>`}
+  </div>`;
+}
+
+/* PAYMENT METHODS — cards on file, charged only after care. The
+   price screen and the doctor profile follow whatever is selected
+   here; the brand is read from the number, never asked. */
+function Payment() {
+  const back = ['you', 'price', 'docprofile', 'book'].includes(state.pb) ? state.pb : 'you';
+  return `
+  ${bar('Payment', back)}
+  <div class="scroll">
+    <h1 class="display sm">How you pay.</h1>
+    <p class="muted" style="margin-top:-12px">
+      Nothing is ever charged before care happens. Insurance is billed first when you have a card on file.
+    </p>
+
+    <div style="margin-top:20px">
+      ${state.cards.map(([brand, last4], i) => `
+      <button class="row" aria-pressed="${state.card === i}" onclick="state.card=${i};render()">
+        <span class="body">
+          <span class="title">${brand} &middot;&middot;&middot;&middot; ${last4}</span>
+          <span class="sub">${state.card === i ? 'Default &middot; charged only after care' : 'Tap to make default'}</span>
+        </span>
+        <span class="radio"></span>
+      </button>`).join('')}
+    </div>
+
+    ${state.addcard ? `
+    <h2 class="section">Add a card</h2>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label class="flabel" for="cnum">Card number</label>
+        <input id="cnum" class="input" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="5407 0000 0000 4821">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <label class="flabel" for="cexp">Expires</label>
+          <input id="cexp" class="input" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY">
+        </div>
+        <div>
+          <label class="flabel" for="ccvc">CVC</label>
+          <input id="ccvc" class="input" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123">
+        </div>
+        <div>
+          <label class="flabel" for="czip">ZIP</label>
+          <input id="czip" class="input" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="10028">
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="
+        const n = (document.getElementById('cnum').value || '5407').replace(/\\D/g, '');
+        state.cards.push([n[0] === '4' ? 'Visa' : n[0] === '3' ? 'Amex' : 'Mastercard', (n.slice(-4) || '4821').padStart(4, '0')]);
+        state.card = state.cards.length - 1; state.addcard = false; render()">Save card</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="state.addcard=false;render()">Cancel</button>
+    </div>` : `
+    <button class="btn btn-emphasis" style="margin-top:20px" onclick="state.addcard=true;render()">Add a card</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">
+      Cards are stored by our payment processor, never on your phone or our servers.
+    </p>`}
+  </div>`;
+}
+
+/* EDIT A FIELD — one field, one screen, save and back. The editor
+   says where the value is used, because an edit that lands in
+   three places should say so before you make it. */
+function EditField() {
+  const [k, label, type, note] = PFIELDS[state.efield] || PFIELDS[0];
+  return `
+  ${bar(label, 'profile')}
+  <div class="scroll">
+    <label class="flabel" for="efin" style="margin-top:8px">${label}</label>
+    <input id="efin" class="input" type="${type}" value="${state.fields[k].replace(/"/g, '&quot;')}"
+           aria-describedby="efnote">
+    <p class="tiny" id="efnote" style="margin-top:12px">${note}</p>
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="
+        const v = document.getElementById('efin').value.trim();
+        if (v) state.fields['${k}'] = v;
+        go('profile')">Save</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="go('profile')">Cancel</button>
+    </div>
+  </div>`;
+}
+
+/* CHANGE THE TESTS — the draw order, editable with live prices.
+   Collect's summary row and Price's ledger read this selection,
+   so the number you approve is always the order you chose. */
+function Tests() {
+  return `
+  ${bar('Your tests', 'collect')}
+  <div class="scroll">
+    <h1 class="display sm">What we draw for.</h1>
+    <p class="muted" style="margin-top:-12px">
+      One visit covers everything you check. Prices are flat; travel stays one capped line.
+    </p>
+
+    <div style="margin-top:20px">
+      ${TESTS.map(([key, name, what, price, ordered]) => `
+      <button class="row" aria-pressed="${state.tests[key]}" onclick="state.tests.${key}=!state.tests.${key};render()">
+        <span class="cbox"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 8 3.2 3L12.5 4"/></svg></span>
+        <span class="body">
+          <span class="title">${name}${ordered ? ' <span class="pill pill-accepted" style="height:22px;font-size:13px;padding:0 10px;vertical-align:2px">Ordered</span>' : ''}</span>
+          <span class="sub">${what}</span>
+        </span>
+        <span style="font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0">$${price}</span>
+      </button>`).join('')}
+    </div>
+
+    ${state.tests.lipid ? '' : `
+    <div class="banner" style="margin-top:16px">
+      <div><div class="t">Dr. Anand ordered the lipid panel.</div>
+      Dropping it is fine, but she asked for it after your last visit; you may want to tell her why.</div>
+    </div>`}
+
+    <div style="margin-top:28px">
+      <button class="btn btn-primary" ${selTests().length ? '' : 'disabled style="opacity:.4"'}
+              onclick="${selTests().length ? `go('collect')` : ''}">
+        ${selTests().length
+          ? `Done &middot; ${selTests().length} test${selTests().length > 1 ? 's' : ''}, $${testsTotal().toFixed(2)} + travel`
+          : 'Choose at least one test'}
+      </button>
+    </div>
+  </div>`;
+}
+
+/* WHERE WE COME — saved addresses. Home mirrors Personal info
+   (one source of truth); adding one takes three fields and it
+   becomes the draw destination immediately. */
+function Address() {
+  return `
+  ${bar('Address', 'collect')}
+  <div class="scroll">
+    <h1 class="display sm">Where we come.</h1>
+    <p class="muted" style="margin-top:-12px">
+      The nurse drives to whichever address you pick. Travel stays capped at $12.50 regardless.
+    </p>
+
+    <div style="margin-top:20px">
+      ${addrList().map(([label, line1, line2], i) => `
+      <button class="row" aria-pressed="${state.addri === i}" onclick="state.addri=${i};render()">
+        <span class="body">
+          <span class="title">${line1}</span>
+          <span class="sub">${label}${line2 ? ' &middot; ' + line2 : ''}</span>
+        </span>
+        <span class="radio"></span>
+      </button>`).join('')}
+    </div>
+
+    ${state.addaddr ? `
+    <h2 class="section">Add an address</h2>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label class="flabel" for="alab">Label</label>
+        <input id="alab" class="input" type="text" placeholder="Work">
+      </div>
+      <div>
+        <label class="flabel" for="ast">Street and apartment</label>
+        <input id="ast" class="input" type="text" autocomplete="street-address" placeholder="450 Park Ave, Fl 12">
+      </div>
+      <div>
+        <label class="flabel" for="acz">City and ZIP</label>
+        <input id="acz" class="input" type="text" placeholder="New York, NY 10022">
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="
+        state.addrs.push([
+          document.getElementById('alab').value || 'Work',
+          document.getElementById('ast').value || '450 Park Ave, Fl 12',
+          document.getElementById('acz').value || 'New York, NY 10022']);
+        state.addri = state.addrs.length; state.addaddr = false; render()">Save and use it</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="state.addaddr=false;render()">Cancel</button>
+    </div>` : `
+    <button class="btn btn-emphasis" style="margin-top:20px" onclick="state.addaddr=true;render()">Add an address</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">
+      Buzzer codes and door notes go in the booking, so the nurse sees them on the day.
+    </p>`}
+  </div>`;
+}
+
+/* CANCEL THE VISIT — honest about the one cost that stands.
+   Jennifer is en route, so the capped travel applies and the
+   tests do not. Confirming cascades everywhere: home card gone,
+   In progress empty, a Past entry, a notification. */
+function Cancel() {
+  if (state.cx) return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-canceled">Cancelled</span>
+    <h1 class="display" style="margin-top:12px">This draw is off.</h1>
+    <p class="muted" style="margin-top:-12px">Jennifer has been turned around and knows why.</p>
+
+    <div class="card" style="margin-top:8px">
+      <div class="ledger">
+        <div class="line"><span class="k">Tests (${selTests().map(t => t[1]).join(', ') || 'none'})</span><span class="v">$0.00</span></div>
+        <div class="line"><span class="k">Travel already driven</span><span class="v">$12.50</span></div>
+        <div class="rule"></div>
+        <div class="total"><span class="k">Charged</span><span class="v">$12.50</span></div>
+      </div>
+      <div class="tiny" style="margin-top:14px">
+        That is the capped travel line from your locked price, nothing else. A receipt is in Notifications.
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('collect')">Book another time</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Back to home</button>
+    </div>
+  </div>`;
+  const reasons = ['Feeling better', 'Bad timing', 'Cost', 'Something else'];
+  return `
+  ${bar('Cancel', 'track')}
+  <div class="scroll">
+    <h1 class="display sm">Cancel this draw?</h1>
+    <p class="muted" style="margin-top:-12px">
+      Jennifer is already driving, so the capped $12.50 travel line still applies.
+      The $${testsTotal().toFixed(2)} in tests is not charged.
+    </p>
+
+    <h2 class="section">Tell us why <span class="tiny" style="font-weight:400">(optional)</span></h2>
+    <div class="chips" style="margin-top:0">
+      ${reasons.map(r => `
+      <button class="chip" aria-pressed="${state.creason === r}"
+              onclick="state.creason = state.creason === '${r}' ? null : '${r}'; render()">${r}</button>`).join('')}
+    </div>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-secondary" onclick="go('track')">Keep my visit</button>
+      <button class="btn btn-danger" style="margin-top:12px" onclick="state.cx=true;render()">Cancel the visit</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        Next time, cancelling is free any time before a nurse is on the way.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* RECEIPT — a receipt that looks like a receipt: the ledger, the
+   card, the reference, from the notification feed. */
+function Receipt() {
+  return `
+  ${bar('Receipt', 'notifs')}
+  <div class="scroll">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+        <div>
+          <div class="eyebrow" style="letter-spacing:.12em;text-transform:uppercase;font-size:13px">Teleport MD</div>
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-.02em">Paid in full</div>
+        </div>
+        <span class="pill pill-complete">Paid</span>
+      </div>
+
+      <div class="ledger">
+        <div class="line"><span class="k">Lipid panel</span><span class="v">$45.00</span></div>
+        <div class="line"><span class="k">Vitals check</span><span class="v">$20.00</span></div>
+        <div class="line"><span class="k">Travel to your address</span><span class="v">$12.50</span></div>
+        <div class="rule"></div>
+        <div class="total"><span class="k">Total</span><span class="v">$77.50</span></div>
+      </div>
+
+      <div class="rule" style="height:1px;background:var(--border-subtle);margin:20px 0"></div>
+      <div class="tiny" style="display:flex;flex-direction:column;gap:6px">
+        <span>Paid with ${cardLabel()} &middot; Tuesday, July 15, 7:41 PM</span>
+        <span>Blood draw at home &middot; Jennifer Reyes, licensed phlebotomist</span>
+        <span>122 E 81st St, Apt 4B, New York, NY 10028</span>
+        <span>Reference TP-77419 &middot; for your insurer or HSA</span>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-secondary" onclick="alert('Receipt saved to your Files')">Save as PDF</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:12px">
+      Receipts also go to ${state.fields.email} the moment you are charged.
+    </p>
+  </div>`;
+}
+
+/* ---------- router ---------- */
+const routes = {
+  home: Home, getcare: GetCare, doctors: Doctors, docprofile: DocProfile,
+  vrequested: VRequested, book: Book, confirmed: Confirmed,
+  precall: PreCall, waiting: Waiting, call: Call, postcall: PostCall,
+  collect: Collect, price: Price, requested: Requested, track: Track,
+  visits: Visits, msgs: Msgs, you: You, profile: Profile,
+  results: () => Results(0), resultsall: () => Results(1), trends: () => Results(2),
+  thread: Thread, summary: Summary,
+  welcome: Welcome, signup: Signup, verify: Verify, notifs: Notifs,
+  /* R2.1 — the former stubs */
+  insurance: Insurance, family: Family, payment: Payment, editfield: EditField,
+  tests: Tests, address: Address, cancel: Cancel, receipt: Receipt,
+};
+
+function render() {
+  const r = (location.hash || '#home').slice(1);
+  const view = routes[r] || Home;
+  app.className = 'app' + (r === 'call' || r === 'waiting' ? ' on-dark' : '');
+  app.innerHTML = view();
+  /* bust icon cache on http; in the artifact these are data: URIs
+     and the selector matches nothing */
+  app.querySelectorAll('img[src^="img/icons/"]').forEach(im =>
+    im.src = im.getAttribute('src') + '?v=' + ICONS_V);
+  const s = app.querySelector('.scroll');
+  if (s) s.scrollTop = 0;
+}
+
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
