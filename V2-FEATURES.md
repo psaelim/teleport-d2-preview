@@ -15,6 +15,8 @@ All decisions below were made by June on 2026-07-17 and applied to the prototype
 - **Gallery**: the three screens sit in their HOME categories (Main navigation / At-home visit /
   Records & messages) grayed under a "Hidden in V1 · View design" veil — June's call 2026-07-17:
   keep them where they belong, the veil is the signifier. Same on the artifact and GitHub Pages.
+  The index column marks each with a muted **V2** chip (planned-gray field, dim olive text,
+  deliberately quiet per June); legend explains it.
 - **The `?v2` flag**: opening any screen as `app-r2.html?v2#<screen>` renders its V2 variant
   (pricing elements restored) — Book, Doctor profile, You, Tests, Cancel, Notifications, Collect.
 - **The V2 stack (LOCAL ONLY, never pushed visible to GitHub)**: in the local gallery, the six
