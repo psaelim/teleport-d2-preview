@@ -45,6 +45,12 @@ const CREW_JEN  = 'img/crew-jennifer-face.png'; // headshot crop; full doorstep 
 const CREW_HERO = 'img/hero-nurse-tree.png';    // R2 home hero: nurse at the door + foreground branches (June's pick B, job ad3c037f; base scene 916667d1)
 const ROUTE_MAP = 'img/route-map.png';     // flat map, electric route on paper cream
 
+/* V2 view flag (June, 2026-07-17): open any screen with ?v2 in the
+   URL to render the V2 variant (pricing elements restored). The
+   local gallery stacks these behind the V1 phones as a reminder;
+   without the flag everything below renders pure V1. */
+const V2VIEW = new URLSearchParams(location.search).has('v2');
+
 const state = {
   day: 1, slot: null, need: null, muted: false, camOff: false, npi: false, vtab: 0, photo: null,
   /* R2.1 — the ten former stubs are real screens now, so the app
@@ -99,6 +105,27 @@ const addrList = () => {
   return [['Home', cut > 0 ? a.slice(0, cut) : a, cut > 0 ? a.slice(cut + 2) : ''], ...state.addrs];
 };
 const cardLabel = () => state.cards[state.card].join(' ···· ');
+
+/* Booking payment row, both eras: V1 = static cash truth; V2 = the
+   live selector (insurance-first once captured). Book and the
+   doctor profile share this. */
+const payRow = (from) => V2VIEW ? `
+    <button class="row" onclick="state.pb='${from}';go('payment')">
+      <span class="body">
+        ${state.insured
+          ? `<span class="title">Insurance &middot; BlueCross PPO</span>
+             <span class="sub">Or ${cardLabel()} &middot; charged only if not covered</span>`
+          : `<span class="title">${cardLabel()}</span>
+             <span class="sub">Add your insurance card on You to use your plan instead</span>`}
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>` : `
+    <div class="row" style="cursor:default">
+      <span class="body">
+        <span class="title">Cash</span>
+        <span class="sub">You pay at the visit; the app never takes a card.</span>
+      </span>
+    </div>`;
 
 /* Photo/card capture: real pickers, even in the prototype. The
    chosen image never leaves the page (FileReader -> data URL). */
@@ -432,15 +459,9 @@ function DocProfile() {
     </div>
 
     <!-- V1 (team, 2026-07-17): payment selection and card billing are
-         V2. The row states the V1 truth: you pay cash at the visit.
-         The V2 selector row is preserved in git history + Payment(). -->
+         V2; payRow() renders whichever era this view is in. -->
     <h2 class="section">Payment</h2>
-    <div class="row" style="cursor:default">
-      <span class="body">
-        <span class="title">Cash</span>
-        <span class="sub">You pay at the visit; the app never takes a card.</span>
-      </span>
-    </div>
+    ${payRow('docprofile')}
 
     <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
     <textarea class="input" rows="3" placeholder="What would you like Dr. Okafor to know before the visit?"
@@ -516,7 +537,7 @@ function Book() {
       <img class="avatar" src="${DR_ANAND}" alt="">
       <span class="body">
         <span class="title">Dr. Priya Anand</span>
-        <span class="sub">Primary care &middot; video visit</span>
+        <span class="sub">Primary care &middot; video visit${V2VIEW ? ' &middot; $50 or covered' : ''}</span>
       </span>
     </div>
 
@@ -548,12 +569,7 @@ function Book() {
     <!-- V1 (team, 2026-07-17): cash only; card/insurance billing at
          booking is V2, same as the doctor profile. -->
     <h2 class="section">Payment</h2>
-    <div class="row" style="cursor:default">
-      <span class="body">
-        <span class="title">Cash</span>
-        <span class="sub">You pay at the visit; the app never takes a card.</span>
-      </span>
-    </div>
+    ${payRow('book')}
 
     <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
     <textarea class="input" rows="3" placeholder="What would you like Dr. Anand to know before the visit?"
@@ -567,7 +583,9 @@ function Book() {
       ${state.slot === null ? 'Choose a time' : 'Confirm booking'}
     </button>
     <p class="tiny">
-      Free to cancel up to 10 hours before the visit.
+      ${V2VIEW
+        ? 'Free to cancel up to 10 hours before. After that, a $25 fee applies.'
+        : 'Free to cancel up to 10 hours before the visit.'}
     </p>
   </div>`;
 }
@@ -818,8 +836,9 @@ function Collect() {
          screen and route stay in the file for V2. -->
     <div style="margin-top:32px">
       <button class="btn btn-primary" ${state.slot === null || !selTests().length ? 'disabled style="opacity:.4"' : ''}
-              onclick="${state.slot === null || !selTests().length ? '' : `go('requested')`}">
-        ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window' : 'Request the visit'}
+              onclick="${state.slot === null || !selTests().length ? '' : `go('${V2VIEW ? 'price' : 'requested'}')`}">
+        ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window'
+          : V2VIEW ? 'See the price' : 'Request the visit'}
       </button>
     </div>
   </div>`;
@@ -1130,11 +1149,17 @@ function You() {
       <span class="chev">${I.chev}</span>
     </button>
     <!-- V1 (team, 2026-07-17): payment methods are V2. The row stays
-         as a quiet placeholder (June's call); Payment() is preserved. -->
+         as a quiet placeholder (June's call); ?v2 restores it live. -->
+    ${V2VIEW ? `
+    <button class="row" onclick="state.pb='you';go('payment')">
+      <span class="body"><span class="title">Payment</span>
+        <span class="sub">${cardLabel()}${state.cards.length > 1 ? ` &middot; ${state.cards.length} cards` : ''}</span></span>
+      <span class="chev">${I.chev}</span>
+    </button>` : `
     <div class="row" style="cursor:default">
       <span class="body"><span class="title" style="color:var(--text-secondary)">Payment</span>
         <span class="sub">Coming soon &middot; visits are cash for now</span></span>
-    </div>
+    </div>`}
     <button class="btn btn-ghost" style="margin-top:20px" onclick="go('welcome')">Sign out</button>
   </div>
   ${tabbar('you')}`;
@@ -1496,6 +1521,7 @@ function Notifs() {
   ];
   const earlier = [
     ['flask',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', `go('results')`],
+    ...(V2VIEW ? [['lock', 'Payment receipt', '$77.50 &middot; blood draw at home', 'Yesterday', `go('receipt')`]] : []),
   ];
   const row = ([ico, t, sub, time, act], unread) => `
       <button class="row${unread ? ' unread' : ''}" onclick="${act}">
@@ -1739,7 +1765,7 @@ function Tests() {
   <div class="scroll">
     <h1 class="display sm">What we draw for.</h1>
     <p class="muted" style="margin-top:-12px">
-      One visit covers everything you check.
+      One visit covers everything you check.${V2VIEW ? ' Prices are flat; travel stays one capped line.' : ''}
     </p>
 
     <div style="margin-top:20px">
@@ -1752,6 +1778,7 @@ function Tests() {
           <span class="title">${name}${ordered ? ' <span class="pill pill-accepted" style="height:22px;font-size:13px;padding:0 10px;vertical-align:2px">Ordered</span>' : ''}</span>
           <span class="sub">${what}</span>
         </span>
+        ${V2VIEW ? `<span style="font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0">$${price}</span>` : ''}
       </button>`).join('')}
     </div>
 
@@ -1765,7 +1792,7 @@ function Tests() {
       <button class="btn btn-primary" ${selTests().length ? '' : 'disabled style="opacity:.4"'}
               onclick="${selTests().length ? `go('collect')` : ''}">
         ${selTests().length
-          ? `Done &middot; ${selTests().length} test${selTests().length > 1 ? 's' : ''}`
+          ? `Done &middot; ${selTests().length} test${selTests().length > 1 ? 's' : ''}${V2VIEW ? `, $${testsTotal().toFixed(2)} + travel` : ''}`
           : 'Choose at least one test'}
       </button>
     </div>
@@ -1841,6 +1868,18 @@ function Cancel() {
     <h1 class="display" style="margin-top:12px">This draw is off.</h1>
     <p class="muted" style="margin-top:-12px">Jennifer has been turned around and knows why.</p>
 
+    ${V2VIEW ? `
+    <div class="card" style="margin-top:8px">
+      <div class="ledger">
+        <div class="line"><span class="k">Tests (${selTests().map(t => t[1]).join(', ') || 'none'})</span><span class="v">$0.00</span></div>
+        <div class="line"><span class="k">Travel already driven</span><span class="v">$12.50</span></div>
+        <div class="rule"></div>
+        <div class="total"><span class="k">Charged</span><span class="v">$12.50</span></div>
+      </div>
+      <div class="tiny" style="margin-top:14px">
+        That is the capped travel line from your locked price, nothing else. A receipt is in Notifications.
+      </div>
+    </div>` : `
     <div class="card" style="margin-top:8px">
       <div style="font-weight:700;margin-bottom:4px">What happens now</div>
       <div class="tiny">
@@ -1848,7 +1887,7 @@ function Cancel() {
         (${selTests().map(t => t[1]).join(', ') || 'unchanged'}) is saved, so booking
         another time takes one tap.
       </div>
-    </div>
+    </div>`}
 
     <div style="margin-top:24px">
       <button class="btn btn-emphasis" onclick="go('collect')">Book another time</button>
@@ -1861,8 +1900,11 @@ function Cancel() {
   <div class="scroll">
     <h1 class="display sm">Cancel this draw?</h1>
     <p class="muted" style="margin-top:-12px">
-      Jennifer is already on the way. If today does not work, we will turn her
-      around and let her know.
+      ${V2VIEW
+        ? `Jennifer is already driving, so the capped $12.50 travel line still applies.
+           The $${testsTotal().toFixed(2)} in tests is not charged.`
+        : `Jennifer is already on the way. If today does not work, we will turn her
+           around and let her know.`}
     </p>
 
     <h2 class="section">Tell us why <span class="tiny" style="font-weight:400">(optional)</span></h2>
@@ -1876,7 +1918,9 @@ function Cancel() {
       <button class="btn btn-secondary" onclick="go('track')">Keep my visit</button>
       <button class="btn btn-danger" style="margin-top:12px" onclick="state.cx=true;render()">Cancel the visit</button>
       <p class="tiny" style="text-align:center;margin-top:12px">
-        Your test order is kept either way, ready to rebook.
+        ${V2VIEW
+          ? 'Next time, cancelling is free any time before a nurse is on the way.'
+          : 'Your test order is kept either way, ready to rebook.'}
       </p>
     </div>
   </div>`;

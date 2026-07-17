@@ -1,6 +1,10 @@
 /* Shared screen + flow data for the R2 galleries and flow map.
    Source of truth: edit here; index-r2.html, flowmap-r2.html and
-   the artifact builder all consume this file. */
+   the artifact builder all consume this file.
+   Entry shape: [hash, title, sub, annotation, isNew, hiddenInV1].
+   hiddenInV1 (June, 2026-07-17): the screen stays in its home
+   category but renders grayed under a "View design" veil, because
+   V1 hides it (pricing moved to V2; see V2-FEATURES.md). */
 const SECTIONS = [
   ['Sign in & sign up', [
   ['welcome','Sign in','One step: phone number, code by text.',
@@ -29,6 +33,8 @@ const SECTIONS = [
    'Net new, was a stub. Both capture tiles are working pickers. Saving clears the home-screen banner, fills the You row and switches the booking payment lines to the plan.', true],
   ['family','Family','The people you can book for.',
    'Net new, was a stub. Add a member with three fields and a relationship; they immediately become a bookable person under "Who is this for?" on Book a video visit.', true],
+  ['payment','Payment methods','Cards on file, charged only after care.',
+   'Hidden in V1 (pricing moved to V2, team call 2026-07-17). Fully working: add a card, pick the default, brand read from the number. V1 shows a quiet "coming soon" row on You instead. Tracked in V2-FEATURES.md.', true, true],
   ]],
   ['Video visit', [
   ['doctors','Choose a doctor','The searching step, restored and simplified.',
@@ -57,6 +63,8 @@ const SECTIONS = [
    'Net new, was a stub. Check and uncheck tests; the booking row recomputes. Dropping Dr. Anand\'s ordered panel gets a gentle warning, not a block. (Per-test prices return with pricing in V2.)', true],
   ['address','Where we come','Saved addresses, or add one.',
    'Net new, was a stub. Home mirrors Personal info automatically; a new address takes three fields and becomes the draw destination.', true],
+  ['price','The price','The locked, itemized cost before requesting.',
+   'Hidden in V1 (pricing moved to V2, team call 2026-07-17). Fully designed and working: flat capped travel, computed ledger, price-locked promise. V1 skips from Booking straight to Requested. Tracked in V2-FEATURES.md.', false, true],
   ['requested','Requested','The honest version of "wait for approval".',
    'Net new. The old app ended every booking on a cartoon hourglass. Dispatch takes time, so we say so, show the next three steps, and promise a notification.', true],
   ['track','Tracking','The good status machine, given a screen worth it.',
@@ -77,14 +85,8 @@ const SECTIONS = [
    'No longer a tab: message notifications land in the Notifications feed, and the full list lives under You.', false],
   ['thread','Message thread','A conversation, with results pinned inside.',
    'Kept per June\'s call.', false],
-  ]],
-  ['V2 &middot; built, hidden in V1', [
-  ['price','The price','V2: the locked, itemized cost before requesting.',
-   'Team call 2026-07-17: all pricing ships in V2. Fully designed and working (flat capped travel, computed ledger, price-locked promise); V1 skips from Booking straight to Requested. Tracked in V2-FEATURES.md.', false],
-  ['payment','Payment methods','V2: cards on file, charged only after care.',
-   'Hidden with the rest of pricing (team call 2026-07-17). Fully working: add a card, pick the default, brand read from the number. V1 shows a quiet "coming soon" row on You instead. Tracked in V2-FEATURES.md.', false],
-  ['receipt','Receipt','V2: the paid ledger with card and reference.',
-   'Hidden with pricing (team call 2026-07-17): no charges in V1 means no receipts. The design stays ready, including the notification-feed entry that opens it. Tracked in V2-FEATURES.md.', false],
+  ['receipt','Receipt','The paid ledger with card and reference.',
+   'Hidden in V1 (pricing moved to V2, team call 2026-07-17): no charges in V1 means no receipts. The design stays ready, including the notification-feed entry that opens it. Tracked in V2-FEATURES.md.', true, true],
   ]],
 ];
 const SCREENS = SECTIONS.flatMap(([sec, list]) => list);
