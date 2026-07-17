@@ -36,11 +36,28 @@
   .gtitle:first-child{border-top:0;padding-top:0;margin-top:0}
   figure{margin:0}
   .phone{
+    position:relative;
     width:100%; max-width:320px; aspect-ratio:390/844;
     border-radius:38px; overflow:hidden;
     border:8px solid #23262C; background:#000;
     box-shadow:0 24px 60px rgba(0,0,0,.5);
   }
+  /* V2 screens ship grayed out (June): a veil with a View button;
+     one click lifts it and the screen shows in full color. */
+  .veil{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; gap:12px;
+    align-items:center; justify-content:center;
+    background:rgba(11,13,16,.62);
+    border:0; cursor:pointer; padding:0; width:100%;
+    font:inherit; transition:opacity .25s ease-out;
+  }
+  .veil.off{opacity:0; pointer-events:none}
+  .veil .vlab{color:#C9CCD2; font:600 13px/1 Inter}
+  .veil .vbtn{background:#D8FF47; color:#111418; font:700 14px/1 Inter; padding:12px 24px; border-radius:999px}
+  .veil:hover .vbtn{background:#E7FF7A}
+  .phone:has(.veil:not(.off)) iframe{filter:grayscale(1)}
+  @media (prefers-reduced-motion: reduce){.veil{transition:none}}
   iframe{width:390px;height:844px;border:0;transform-origin:0 0;display:block}
   figcaption{margin-top:16px;max-width:320px}
   .cap-t{font-weight:700;font-size:19px;letter-spacing:-.01em}
@@ -74,14 +91,22 @@
   .fix.new{border-left-color:#D8FF47}
   a.open{color:#D8FF47;font-weight:600;text-decoration:none;font-size:15px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:28px;max-width:820px}
-  .cardbtn{display:flex;flex-direction:column;text-align:left;background:#16191E;border:1px solid #2A2F38;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;color:#fff;font:inherit;text-decoration:none;transition:border-color .15s ease,transform .08s ease}
-  .cardbtn:hover{border-color:#2D5BFF}
+  .cardbtn{display:flex;flex-direction:column;text-align:left;background:#16191E;border:1px solid #2A2F38;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;color:#fff;font:inherit;text-decoration:none;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}
+  /* June 2026-07-17: reviewers missed that these are clickable.
+     Button affordances: lift on hover + an explicit arrow disc. */
+  .cardbtn:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(0,0,0,.4)}
   .cardbtn:active{transform:scale(.99)}
   .cardbtn .art{height:112px;display:grid;place-items:center;background:#101318;width:100%}
   .cardbtn .art img{width:100%;height:112px;object-fit:cover;display:block}
-  .cardbtn .meta{padding:14px 16px 16px;display:block}
+  .cardbtn .meta{padding:14px 16px 16px;display:flex;align-items:center;gap:12px}
+  .cardbtn .mtxt{flex:1;min-width:0}
   .cardbtn .t{display:block;font-weight:700;font-size:17px}
   .cardbtn .s{display:block;color:#868D97;font-size:13.5px;margin-top:3px;line-height:1.4}
+  .cardbtn .go{flex:none;width:38px;height:38px;border-radius:999px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.55);color:#fff;transition:background .15s ease,color .15s ease}
+  .cardbtn:hover .go{background:#fff;color:#111418}
+  .cb-volt .go,.cb-coral .go{border-color:rgba(17,20,24,.5);color:#111418}
+  .cb-volt:hover .go,.cb-coral:hover .go{background:#111418;color:#fff}
+  @media (prefers-reduced-motion: reduce){.cardbtn{transition:none}}
   /* June 2026-07-16: each card gets its own D2 color. The art strip
      stays dark; the base carries the hue. Ink text on volt/coral,
      white on electric, per the deck's contrast rules. */
@@ -121,7 +146,7 @@
   <div class="cards">
     <a class="cardbtn cb-electric" href="app-r2.html" target="_blank">
       <span class="art"><img src="img/card-prototype.jpg" alt=""></span>
-      <span class="meta"><span class="t">Live prototype</span><span class="s">Drive all 36 screens like the real app</span></span>
+      <span class="meta"><span class="mtxt"><span class="t">Live prototype</span><span class="s">Drive all 36 screens like the real app</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
     </a>
     <a class="cardbtn cb-volt" href="flowmap-r2.html">
       <span class="art"><svg viewBox="0 0 176 64" width="176" height="64" fill="none" aria-hidden="true">
@@ -133,7 +158,7 @@
   <path d="M131 32.5l-6.8-1.6 2.4 6.4z" fill="#3C424C"/>
   <rect x="132" y="24" width="42" height="17" rx="8.5" fill="#2D5BFF"/>
 </svg></span>
-      <span class="meta"><span class="t">Flow map</span><span class="s">Every flow, screen by screen, clickable</span></span>
+      <span class="meta"><span class="mtxt"><span class="t">Flow map</span><span class="s">Every flow, screen by screen, clickable</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
     </a>
     <button class="cardbtn cb-coral" onclick="document.querySelector('.grid').scrollIntoView({behavior:'smooth'})">
       <span class="art"><svg viewBox="0 0 150 64" width="150" height="64" fill="none" aria-hidden="true">
@@ -146,7 +171,7 @@
   <rect x="76" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
   <rect x="113" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
 </svg></span>
-      <span class="meta"><span class="t">Screen gallery</span><span class="s">36 built screens with annotations and status</span></span>
+      <span class="meta"><span class="mtxt"><span class="t">Screen gallery</span><span class="s">36 built screens with annotations and status</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
     </button>
   </div>
 </div>
@@ -162,16 +187,22 @@
 
 const grid = document.getElementById('grid');
 let gn = 0;
-grid.innerHTML = SECTIONS.map(([sec, list]) => `
+grid.innerHTML = SECTIONS.map(([sec, list]) => {
+  const isV2 = sec.startsWith('V2');
+  return `
   <h2 class="gtitle">${sec}</h2>` + list.map(([hash,title,sub,fix,isNew]) => { gn++; return `
   <figure id="s-${hash}">
-    <div class="phone"><iframe src="app-r2.html#${hash}" loading="lazy" title="${title}"></iframe></div>
+    <div class="phone"><iframe src="app-r2.html#${hash}" loading="lazy" title="${title}"></iframe>${isV2 ? `
+      <button class="veil" aria-label="Show the ${title} design (hidden in V1)"
+              onclick="this.classList.add('off')">
+        <span class="vlab">Hidden in V1</span><span class="vbtn">View design</span>
+      </button>` : ''}</div>
     <figcaption>
       <div class="cap-t"><span class="num">${String(gn).padStart(2,'0')}</span> ${title}${isNew ? ' <span class="newtag">new</span>' : ''}</div>
       <div class="cap-s">${sub}</div>
       <div class="fix${isNew ? ' new' : ''}">${fix}</div>
     </figcaption>
-  </figure>`; }).join('')).join('');
+  </figure>`; }).join(''); }).join('');
 
 // left index: flow sections as dropdowns, click to jump
 let tn = 0;
