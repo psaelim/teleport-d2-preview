@@ -266,7 +266,7 @@ function Home() {
     <div class="banner" style="margin-top:24px">
       <div>
         <div class="t">Add your insurance card</div>
-        <div>We need it before your visit tomorrow, or you will be billed the cash rate of $50.</div>
+        <div>We need it before your visit tomorrow, or you will be billed at the cash rate.</div>
         <button class="btn btn-secondary" style="margin-top:12px;width:auto;padding:0 20px" onclick="go('insurance')">Add card</button>
       </div>
     </div>`}
@@ -431,21 +431,16 @@ function DocProfile() {
                 onclick="state.slot=${i};render()">${s}</button>`).join('')}
     </div>
 
-    <!-- Payment + note, back from the old app's request form (June).
-         The note is optional; payment is a selector, not card entry.
-         The row tells the truth about the missing insurance card:
-         until it is captured, the visit bills to the card on file. -->
+    <!-- V1 (team, 2026-07-17): payment selection and card billing are
+         V2. The row states the V1 truth: you pay cash at the visit.
+         The V2 selector row is preserved in git history + Payment(). -->
     <h2 class="section">Payment</h2>
-    <button class="row" onclick="state.pb='docprofile';go('payment')">
+    <div class="row" style="cursor:default">
       <span class="body">
-        ${state.insured
-          ? `<span class="title">Insurance &middot; BlueCross PPO</span>
-             <span class="sub">Or ${cardLabel()} &middot; charged only if not covered</span>`
-          : `<span class="title">${cardLabel()}</span>
-             <span class="sub">Add your insurance card on You to use your plan instead</span>`}
+        <span class="title">Cash</span>
+        <span class="sub">You pay at the visit; the app never takes a card.</span>
       </span>
-      <span class="chev">${I.chev}</span>
-    </button>
+    </div>
 
     <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
     <textarea class="input" rows="3" placeholder="What would you like Dr. Okafor to know before the visit?"
@@ -521,7 +516,7 @@ function Book() {
       <img class="avatar" src="${DR_ANAND}" alt="">
       <span class="body">
         <span class="title">Dr. Priya Anand</span>
-        <span class="sub">Primary care &middot; video visit &middot; $50 or covered</span>
+        <span class="sub">Primary care &middot; video visit</span>
       </span>
     </div>
 
@@ -550,19 +545,15 @@ function Book() {
     </button>`).join('')}
     <button class="btn btn-ghost" style="margin-top:8px" onclick="state.fb='book';go('family')">Add a family member</button>
 
-    <!-- Payment + optional note, same grammar as the doctor profile
-         (June, 2026-07-16): the row reads live payment state. -->
+    <!-- V1 (team, 2026-07-17): cash only; card/insurance billing at
+         booking is V2, same as the doctor profile. -->
     <h2 class="section">Payment</h2>
-    <button class="row" onclick="state.pb='book';go('payment')">
+    <div class="row" style="cursor:default">
       <span class="body">
-        ${state.insured
-          ? `<span class="title">Insurance &middot; BlueCross PPO</span>
-             <span class="sub">Or ${cardLabel()} &middot; charged only if not covered</span>`
-          : `<span class="title">${cardLabel()}</span>
-             <span class="sub">Add your insurance card on You to use your plan instead</span>`}
+        <span class="title">Cash</span>
+        <span class="sub">You pay at the visit; the app never takes a card.</span>
       </span>
-      <span class="chev">${I.chev}</span>
-    </button>
+    </div>
 
     <h2 class="section">Note to the doctor <span class="tiny" style="font-weight:400">(optional)</span></h2>
     <textarea class="input" rows="3" placeholder="What would you like Dr. Anand to know before the visit?"
@@ -576,7 +567,7 @@ function Book() {
       ${state.slot === null ? 'Choose a time' : 'Confirm booking'}
     </button>
     <p class="tiny">
-      Free to cancel up to 10 hours before. After that, a $25 fee applies.
+      Free to cancel up to 10 hours before the visit.
     </p>
   </div>`;
 }
@@ -822,10 +813,13 @@ function Collect() {
       <span class="chev">${I.chev}</span>
     </button>
 
+    <!-- V1 (team, 2026-07-17): all pricing is V2, so the price
+         screen is skipped; requesting is the next step. The Price()
+         screen and route stay in the file for V2. -->
     <div style="margin-top:32px">
       <button class="btn btn-primary" ${state.slot === null || !selTests().length ? 'disabled style="opacity:.4"' : ''}
-              onclick="${state.slot === null || !selTests().length ? '' : `go('price')`}">
-        ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window' : 'See the price'}
+              onclick="${state.slot === null || !selTests().length ? '' : `go('requested')`}">
+        ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window' : 'Request the visit'}
       </button>
     </div>
   </div>`;
@@ -928,7 +922,7 @@ function Requested() {
       <button class="btn btn-emphasis" onclick="go('home')">Back to home</button>
     </div>
     <p class="tiny" style="text-align:center;margin-top:16px">
-      We will notify you the moment a nurse accepts.<br>Nothing is charged until after the draw.
+      We will notify you the moment a nurse accepts.
     </p>
   </div>`;
 }
@@ -1135,11 +1129,12 @@ function You() {
         <span class="sub">${state.family.length ? state.family.map(f => f.name).join(', ') : 'Book for someone else'}</span></span>
       <span class="chev">${I.chev}</span>
     </button>
-    <button class="row" onclick="state.pb='you';go('payment')">
-      <span class="body"><span class="title">Payment</span>
-        <span class="sub">${cardLabel()}${state.cards.length > 1 ? ` &middot; ${state.cards.length} cards` : ''}</span></span>
-      <span class="chev">${I.chev}</span>
-    </button>
+    <!-- V1 (team, 2026-07-17): payment methods are V2. The row stays
+         as a quiet placeholder (June's call); Payment() is preserved. -->
+    <div class="row" style="cursor:default">
+      <span class="body"><span class="title" style="color:var(--text-secondary)">Payment</span>
+        <span class="sub">Coming soon &middot; visits are cash for now</span></span>
+    </div>
     <button class="btn btn-ghost" style="margin-top:20px" onclick="go('welcome')">Sign out</button>
   </div>
   ${tabbar('you')}`;
@@ -1490,16 +1485,17 @@ function Verify() {
    real; nothing nags.
    ============================================================ */
 function Notifs() {
+  /* V1 (pricing -> V2): the payment-receipt item is hidden with the
+     receipt screen; restore both together. */
   const fresh = [
     state.cx
-      ? ['drop',   'Visit cancelled',         'Blood draw at home &middot; only the $12.50 travel charge', 'now', `go('cancel')`]
+      ? ['drop',   'Visit cancelled',         'Blood draw at home &middot; cancelled before arrival', 'now', `go('cancel')`]
       : ['drop',   'Jennifer is on the way',  'Blood draw &middot; arrives about 2:40 PM', 'now',   `go('track')`],
     ['chat',     'New message',             'Dr. Anand: &ldquo;Your results look good overall.&rdquo;', '11:02 AM', `state.thread='anand';go('thread')`],
     ['calendar', 'Visit reminder',          'Dr. Priya Anand &middot; tomorrow, 10:15 AM', '9:00 AM', `go('precall')`],
   ];
   const earlier = [
     ['flask',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', `go('results')`],
-    ['lock',     'Payment receipt',         '$77.50 &middot; blood draw at home', 'Yesterday', `go('receipt')`],
   ];
   const row = ([ico, t, sub, time, act], unread) => `
       <button class="row${unread ? ' unread' : ''}" onclick="${act}">
@@ -1556,7 +1552,7 @@ function Insurance() {
         <span class="pill pill-accepted">On file</span>
       </div>
       <div class="tiny" style="margin-top:14px">
-        We bill your plan first for every visit. The card on file is only charged for what the plan does not cover.
+        We bill your plan first for every eligible visit.
       </div>
     </div>
     <button class="btn btn-secondary" style="margin-top:16px"
@@ -1743,10 +1739,12 @@ function Tests() {
   <div class="scroll">
     <h1 class="display sm">What we draw for.</h1>
     <p class="muted" style="margin-top:-12px">
-      One visit covers everything you check. Prices are flat; travel stays one capped line.
+      One visit covers everything you check.
     </p>
 
     <div style="margin-top:20px">
+      <!-- V1: prices hidden (pricing is V2); the dollar column and
+           totals come back with the price screen. -->
       ${TESTS.map(([key, name, what, price, ordered]) => `
       <button class="row" aria-pressed="${state.tests[key]}" onclick="state.tests.${key}=!state.tests.${key};render()">
         <span class="cbox"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 8 3.2 3L12.5 4"/></svg></span>
@@ -1754,7 +1752,6 @@ function Tests() {
           <span class="title">${name}${ordered ? ' <span class="pill pill-accepted" style="height:22px;font-size:13px;padding:0 10px;vertical-align:2px">Ordered</span>' : ''}</span>
           <span class="sub">${what}</span>
         </span>
-        <span style="font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0">$${price}</span>
       </button>`).join('')}
     </div>
 
@@ -1768,7 +1765,7 @@ function Tests() {
       <button class="btn btn-primary" ${selTests().length ? '' : 'disabled style="opacity:.4"'}
               onclick="${selTests().length ? `go('collect')` : ''}">
         ${selTests().length
-          ? `Done &middot; ${selTests().length} test${selTests().length > 1 ? 's' : ''}, $${testsTotal().toFixed(2)} + travel`
+          ? `Done &middot; ${selTests().length} test${selTests().length > 1 ? 's' : ''}`
           : 'Choose at least one test'}
       </button>
     </div>
@@ -1784,7 +1781,7 @@ function Address() {
   <div class="scroll">
     <h1 class="display sm">Where we come.</h1>
     <p class="muted" style="margin-top:-12px">
-      The nurse drives to whichever address you pick. Travel stays capped at $12.50 regardless.
+      The nurse drives to whichever address you pick.
     </p>
 
     <div style="margin-top:20px">
@@ -1835,6 +1832,8 @@ function Address() {
    tests do not. Confirming cascades everywhere: home card gone,
    In progress empty, a Past entry, a notification. */
 function Cancel() {
+  /* V1 (pricing -> V2): no charge ledger, no fee copy; the cancel
+     conversation is about the visit, not the money. */
   if (state.cx) return `
   ${bar('', 'home')}
   <div class="scroll" style="padding-top:0">
@@ -1843,14 +1842,11 @@ function Cancel() {
     <p class="muted" style="margin-top:-12px">Jennifer has been turned around and knows why.</p>
 
     <div class="card" style="margin-top:8px">
-      <div class="ledger">
-        <div class="line"><span class="k">Tests (${selTests().map(t => t[1]).join(', ') || 'none'})</span><span class="v">$0.00</span></div>
-        <div class="line"><span class="k">Travel already driven</span><span class="v">$12.50</span></div>
-        <div class="rule"></div>
-        <div class="total"><span class="k">Charged</span><span class="v">$12.50</span></div>
-      </div>
-      <div class="tiny" style="margin-top:14px">
-        That is the capped travel line from your locked price, nothing else. A receipt is in Notifications.
+      <div style="font-weight:700;margin-bottom:4px">What happens now</div>
+      <div class="tiny">
+        The visit is closed and nothing was drawn. Your test order
+        (${selTests().map(t => t[1]).join(', ') || 'unchanged'}) is saved, so booking
+        another time takes one tap.
       </div>
     </div>
 
@@ -1865,8 +1861,8 @@ function Cancel() {
   <div class="scroll">
     <h1 class="display sm">Cancel this draw?</h1>
     <p class="muted" style="margin-top:-12px">
-      Jennifer is already driving, so the capped $12.50 travel line still applies.
-      The $${testsTotal().toFixed(2)} in tests is not charged.
+      Jennifer is already on the way. If today does not work, we will turn her
+      around and let her know.
     </p>
 
     <h2 class="section">Tell us why <span class="tiny" style="font-weight:400">(optional)</span></h2>
@@ -1880,7 +1876,7 @@ function Cancel() {
       <button class="btn btn-secondary" onclick="go('track')">Keep my visit</button>
       <button class="btn btn-danger" style="margin-top:12px" onclick="state.cx=true;render()">Cancel the visit</button>
       <p class="tiny" style="text-align:center;margin-top:12px">
-        Next time, cancelling is free any time before a nurse is on the way.
+        Your test order is kept either way, ready to rebook.
       </p>
     </div>
   </div>`;

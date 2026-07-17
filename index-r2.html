@@ -183,7 +183,7 @@ const tocSection = (sec, list) => `<details open><summary>${sec}</summary>` +
 document.getElementById('toc').innerHTML = '<p class="toc-t">Screens</p>' +
   SECTIONS.map(([sec, list]) => tocSection(sec, list)).join('') +
   BACKLOG.filter(([sec]) => !SECTIONS.some(([s2]) => s2 === sec)).map(([sec]) => tocSection(sec, [])).join('') +
-  '<p class="toc-leg">planned: not designed yet &middot; parked: deliberately out. All ten former stubs were built July 16 and live in the grid above.</p>';
+  '<p class="toc-leg">planned: not designed yet &middot; parked: deliberately out. The "V2" section holds built screens hidden from V1 flows (pricing, per the July 17 team call); the full deferral list lives in V2-FEATURES.md.</p>';
 const tocObs = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   document.querySelectorAll('.toc a').forEach(a =>
