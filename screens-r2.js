@@ -7,6 +7,10 @@
    V1 hides it (pricing moved to V2; see V2-FEATURES.md). */
 const SECTIONS = [
   ['Sign in & sign up', [
+  ['splash','Launch','The brand moment while the app wakes.',
+   'Net new, was the "App launch loading" chip. The F20 mark (the cross with speed streaks, June\'s pick from 25 logo concepts + 22 developments) teleports in on electric; a tap moves on.', true],
+  ['onboard','Onboarding','Three full-bleed slides before sign-in.',
+   'Net new, was the "Onboarding intro screens" chip. June\'s direction E: the photo fills the screen, an ink scrim keeps the light editorial type readable, volt carries the key phrase. Skip is always one tap; nothing is collected here.', true],
   ['welcome','Sign in','One step: phone number, code by text.',
    'Subline now leads with the at-home service. "Create an account" is finally visible.', false],
   ['signup','Create account','Four fields. That is the whole form.',
@@ -91,8 +95,8 @@ const SECTIONS = [
 ];
 const SCREENS = SECTIONS.flatMap(([sec, list]) => list);
 const FLOWS = [
-  ['Sign in & sign up', [['welcome'], ['signup'], ['verify'], ['home']],
-   'Returning patients skip Create account and go straight to the text code.'],
+  ['Sign in & sign up', [['splash'], ['onboard'], ['welcome'], ['signup'], ['verify'], ['home']],
+   'First launch: the splash and three intro slides (Skip works from any of them). Returning patients skip Create account and go straight to the text code.'],
   ['Video visit', [['getcare'], ['doctors'], ['book', 'docprofile'], ['confirmed', 'vrequested'], ['precall'], ['waiting'], ['call'], ['postcall']],
    'Top path: your care team, instant. Bottom path: a new doctor, the practice confirms. Both continue at Pre-call check on visit day.'],
   ['At-home crew visit', [['home'], ['collect'], ['requested'], ['track'], ['cancel']],
@@ -110,7 +114,6 @@ const FLOWS = [
    SECTIONS as real screens; only planned/parked work remains. */
 const BACKLOG = [
   ['Sign in & sign up', [
-    ['Onboarding intro screens', 'planned'],
     ['Wrong-code error', 'planned'],
     ['Under-18 path', 'planned'],
     ['Terms & privacy', 'planned'],
@@ -127,7 +130,6 @@ const BACKLOG = [
     ['Visits search', 'parked'],
   ]],
   ['System states', [
-    ['App launch loading (splash)', 'planned'],
     ['Loading / error / offline', 'planned'],
     ['Empty states (visits, notifs)', 'planned'],
   ]],

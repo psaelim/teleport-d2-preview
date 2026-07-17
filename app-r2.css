@@ -823,3 +823,97 @@ textarea.input {
      not the desktop viewport */
   body.standalone #app .app { height: 100% !important; }
 }
+
+/* ---------- Launch splash + onboarding (2026-07-17) -----------
+   June's direction "D" from the intro-options mock: A's electric
+   splash + B's editorial numbered slides with a full photo card.
+   Mark = F20 (the cross with speed streaks), white variant on
+   electric, blue on paper. */
+.splash {
+  flex: 1; border: 0; cursor: pointer; width: 100%;
+  background: var(--surface-brand);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-5); font-family: var(--font-ui);
+}
+.splash .mark { width: 148px; }
+@media (prefers-reduced-motion: no-preference) {
+  .splash .mark { animation: splash-in 1.1s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes splash-in { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+}
+.splash .wm {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 30px; letter-spacing: -.02em; color: #fff;
+}
+.splash .bar {
+  width: 104px; height: 4px; border-radius: var(--radius-pill);
+  background: rgba(255,255,255,.28); overflow: hidden;
+}
+.splash .bar i {
+  display: block; height: 100%; width: 40%;
+  border-radius: var(--radius-pill); background: #fff;
+  animation: splash-load 1.4s ease-in-out infinite;
+}
+@keyframes splash-load { 0% { transform: translateX(-110%); } 100% { transform: translateX(290%); } }
+.splash .tap { font-size: var(--text-sm); color: rgba(255,255,255,.85); }
+
+/* Onboarding, direction "E" (June, 2026-07-17 later): the photo IS
+   the screen. Ink base + gradient scrim keep the white type
+   readable; the volt phrase is colored text (an underline drowns
+   white glyphs on photos). All type deliberately LIGHTER: 600
+   display, 500 skip. The solid ink background also keeps the
+   contrast gate honest while the photo loads. */
+.ob {
+  position: relative; flex: 1; display: flex; flex-direction: column;
+  padding: var(--space-6) var(--space-5) var(--space-5); min-height: 0;
+  background: var(--raw-ink); color: #fff;
+}
+.ob-bg { position: absolute; inset: 0; }
+.ob-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ob-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(17,20,24,.62) 0%, rgba(17,20,24,.18) 38%,
+              rgba(17,20,24,.30) 58%, rgba(17,20,24,.88) 100%);
+}
+.ob > *:not(.ob-bg) { position: relative; z-index: 1; }
+.ob-top { display: flex; align-items: center; justify-content: space-between; }
+.ob-top img { width: 46px; filter: drop-shadow(0 1px 5px rgba(17,20,24,.4)); }
+.ob-skip {
+  border: 0; background: none; cursor: pointer; height: 46px; padding: 0 var(--space-2);
+  font: 500 var(--text-base)/1 var(--font-ui); color: #fff;
+  text-shadow: 0 1px 6px rgba(17,20,24,.5);
+}
+.ob-num {
+  font-family: var(--font-display); font-weight: 600; font-size: var(--text-sm);
+  color: rgba(255,255,255,.85); letter-spacing: .1em; margin-top: auto;
+}
+.ob-num b { color: #fff; font-weight: 600; }
+.ob h1 {
+  font-family: var(--font-display); font-weight: 700; font-size: 40px;
+  line-height: 1.1; letter-spacing: -.02em; margin: var(--space-2) 0 0; color: #fff;
+}
+.ob h1 em { font-style: normal; color: var(--raw-volt); }
+.ob .sub { color: rgba(255,255,255,.92); margin: var(--space-3) 0 0; max-width: 270px; }
+.ob-foot { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-5); }
+.ob-dots { display: flex; gap: 7px; color: var(--raw-volt); }
+.ob-dots i { width: 8px; height: 8px; border-radius: var(--radius-pill); background: currentColor; opacity: .3; }
+.ob-dots i.on { opacity: 1; width: 22px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ob-dots i.on { transition: width .3s; }
+  .ob h1, .ob .sub { animation: ob-rise .55s cubic-bezier(.2,.7,.2,1) both; }
+  .ob .sub { animation-delay: .08s; }
+  @keyframes ob-rise { from { transform: translateY(22px); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+.ob-next {
+  width: 56px; height: 56px; border-radius: var(--radius-pill);
+  background: #fff; color: var(--raw-ink); border: 0; cursor: pointer;
+  display: grid; place-items: center;
+}
+.ob-next svg { display: block; }
+
+/* Home brand row (June's pick: placement 1, Home only). */
+.brandrow { display: flex; align-items: center; gap: 9px; margin: 0 0 var(--space-4); }
+.brandrow img { width: 28px; height: 28px; object-fit: contain; }
+.brandrow .bw {
+  font-family: var(--font-display); font-weight: 800; font-size: 17px;
+  letter-spacing: -.01em; color: var(--text-primary);
+}

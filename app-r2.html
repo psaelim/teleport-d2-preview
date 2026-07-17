@@ -53,6 +53,7 @@ const V2VIEW = new URLSearchParams(location.search).has('v2');
 
 const state = {
   day: 1, slot: null, need: null, muted: false, camOff: false, npi: false, vtab: 0, photo: null,
+  ob: 0,                                     // which onboarding slide is showing
   /* R2.1 — the ten former stubs are real screens now, so the app
      carries real (in-page) state for all of them: */
   fields: {                                  // Personal info, editable one at a time
@@ -233,6 +234,9 @@ const bar = (title, back) => `
 function Home() {
   return `
   <div class="scroll">
+    <!-- Brand row (June's pick, placement 1 of 4): the F20 mark +
+         wordmark, HOME ONLY - no other screen carries it. -->
+    <div class="brandrow"><img src="img/logo-f20.png" alt=""><span class="bw">Teleport&nbsp;MD</span></div>
     <p class="greet">Hi ${firstName()}.</p>
     <h1 class="display">How can we help?</h1>
 
@@ -1416,6 +1420,66 @@ function Summary() {
    code, and there is a visible way to create an account.
    The subline leads with the crew service, per the feedback.
    ============================================================ */
+/* ============================================================
+   LAUNCH SPLASH + ONBOARDING — net new (2026-07-17), the two
+   "planned" chips from the backlog. June's direction "D" from the
+   intro-options mock (A's electric splash + B's editorial slides
+   with a full photo card), carrying the F20 mark: the medical
+   cross with speed streaks. A tap moves past the splash, so the
+   gallery's live frames never drift on their own.
+   ============================================================ */
+function Splash() {
+  return `
+  <button class="splash" aria-label="Continue to Teleport MD" onclick="go('onboard')">
+    <img class="mark" src="img/logo-f20-w.png" alt="">
+    <span class="wm">Teleport&nbsp;MD</span>
+    <span class="bar" aria-hidden="true"><i></i></span>
+  </button>`;
+}
+
+/* Three slides before sign-in: the at-home nurse, the video visit,
+   results in plain language. Nothing is collected here; Skip and
+   the last arrow both land on Welcome. */
+const OB = [
+  ['A licensed nurse, <em>at your door.</em>',
+   'Blood draws and vitals checks at home, on your schedule.', 'img/intro-dusk-nurse.png',
+   'A nurse walking up to a warmly lit front door at dusk'],
+  ['See a doctor <em>by video.</em>',
+   'Your care team, minutes away. No waiting room.', DR_ANAND_CALL,
+   'A doctor on a video visit'],
+  ['Results, <em>explained.</em>',
+   'Lab results land in the app, in plain language.', 'img/intro-results-home.png',
+   'A woman at home reading her results on her phone'],
+];
+window.obGo = (d) => {
+  if (state.ob + d > 2) { state.ob = 0; go('welcome'); return; }
+  state.ob = Math.max(0, state.ob + d);
+  render();
+};
+function Onboard() {
+  const i = state.ob;
+  const [h, sub, img, alt] = OB[i];
+  return `
+  <div class="ob">
+    <div class="ob-bg"><img src="${img}" alt="${alt}"></div>
+    <div class="ob-top">
+      <img src="img/logo-f20-w.png" alt="Teleport MD">
+      <button class="ob-skip" onclick="state.ob=0;go('welcome')">Skip</button>
+    </div>
+    <div class="ob-num"><b>0${i + 1}</b> / 03</div>
+    <h1>${h}</h1>
+    <p class="sub">${sub}</p>
+    <div class="ob-foot">
+      <span class="ob-dots" aria-hidden="true">${[0,1,2].map(n =>
+        `<i class="${n === i ? 'on' : ''}"></i>`).join('')}</span>
+      <button class="ob-next" aria-label="${i === 2 ? 'Get started' : 'Next'}" onclick="obGo(1)">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h14m-6-7 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
 function Welcome() {
   return `
   <div class="scroll" style="display:flex;flex-direction:column;justify-content:center">
@@ -1976,6 +2040,7 @@ const routes = {
   visits: Visits, msgs: Msgs, you: You, profile: Profile,
   results: () => Results(0), resultsall: () => Results(1), trends: () => Results(2),
   thread: Thread, summary: Summary,
+  splash: Splash, onboard: Onboard,
   welcome: Welcome, signup: Signup, verify: Verify, notifs: Notifs,
   /* R2.1 — the former stubs */
   insurance: Insurance, family: Family, payment: Payment, editfield: EditField,
