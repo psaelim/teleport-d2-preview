@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teleport MD — Design system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111418; --electric:#2D5BFF; --electric-hover:#093FFF; --electric-dark:#4C73FF;
+  --coral:#FF6857; --volt:#D8FF47; --paper:#F4F4F0; --card:#FFFFFF;
+  --mut:#4C535C; --line:#E3E3DE; --danger:#DE1600;
+  --chip-green:#E2F59B; --chip-blue:#DCE4FF; --chip-coral:#FFDDD8; --chip-gray:#E8E8E3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--paper);font-size:16px;line-height:1.55}
+img{display:block}
+h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 120px}
+
+/* masthead */
+.mast{background:var(--ink);color:#fff;padding:72px 28px 64px;margin-bottom:64px}
+.mast .in{max-width:1080px;margin:0 auto}
+.mast .brand{display:flex;align-items:center;gap:12px;margin-bottom:34px}
+.mast .brand img{width:34px;height:34px;object-fit:contain}
+.mast .brand span{font-family:"Bricolage Grotesque";font-weight:700;font-size:19px}
+.mast .eyebrow{color:var(--volt);font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.mast h1{font-size:56px;font-weight:800;letter-spacing:-.02em;line-height:1.02;margin-bottom:18px}
+.mast p{color:rgba(255,255,255,.72);max-width:620px;font-size:17px}
+.mast .meta{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.mast .meta span{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 15px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.85)}
+
+/* section chrome */
+section{margin-bottom:88px}
+.sec-eyebrow{color:var(--electric);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+h2{font-size:32px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+.sec-lede{color:var(--mut);max-width:640px;margin-bottom:30px}
+h3{font-size:19px;font-weight:700;margin:34px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.note{background:#FFF4D6;border-radius:12px;padding:14px 16px;font-size:14.5px;margin-top:16px}
+code{font:500 13.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#E9E9E4;border-radius:6px;padding:2px 7px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+
+/* color */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+.sw{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+.sw .chip{height:96px}
+.sw .m{padding:13px 16px 15px}
+.sw .m b{display:block;font-size:15px}
+.sw .m span{display:block;color:var(--mut);font-size:13.5px;margin-top:2px;font-variant-numeric:tabular-nums}
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:6px}
+.pair{border-radius:14px;padding:18px;font-weight:700;font-size:16px;position:relative;border:1px solid var(--line)}
+.pair small{display:block;font-weight:500;font-size:13px;margin-top:4px;opacity:.85}
+.pair.bad{outline:2.5px dashed var(--danger);outline-offset:-2.5px}
+.pair.bad::after{content:"never";position:absolute;top:10px;right:12px;font:700 11px Inter;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--danger);border-radius:999px;padding:3px 9px}
+.pair.good::after{content:"✓";position:absolute;top:10px;right:12px;font:700 13px Inter;color:inherit;opacity:.7}
+
+/* type */
+.tspec{display:flex;align-items:baseline;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);padding:16px 0}
+.tspec:last-child{border-bottom:0}
+.tspec .lab{color:var(--mut);font-size:13.5px;flex:none;width:220px;font-variant-numeric:tabular-nums}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;font-weight:600;font-size:15px;border:0;cursor:pointer;font-family:inherit}
+.btn.pri{background:var(--electric);color:#fff}
+.btn.inkb{background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid #C9C9C2}
+.btn.gdark{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.dark{background:var(--ink);border-radius:16px;padding:24px;color:#fff}
+.dark h4{font-family:"Bricolage Grotesque";font-size:15px;margin-bottom:14px;color:rgba(255,255,255,.72);font-weight:600}
+.lighth4,h4.lt{font-size:15px;margin-bottom:14px;color:var(--mut);font-weight:600;font-family:"Bricolage Grotesque"}
+
+/* chips */
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:3px 13px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink)}
+.pill.g{background:var(--chip-green)} .pill.b{background:var(--chip-blue)}
+.pill.c{background:var(--chip-coral)} .pill.n{background:var(--chip-gray)}
+.chiprow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.chiprow .why{color:var(--mut);font-size:14px}
+
+/* cards demo */
+.hero-demo{display:flex;gap:18px;align-items:center;background:var(--ink);color:#fff;border-radius:16px;padding:24px}
+.hero-demo .when{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--volt);margin-bottom:3px}
+.hero-demo h5{font-family:"Bricolage Grotesque";font-size:22px;font-weight:800}
+.hero-demo p{color:rgba(255,255,255,.75);font-size:14px;margin-top:2px}
+.hero-demo .t{flex:1}
+.att-demo{border-left:5px solid var(--coral)}
+.att-demo b{font-size:16px}
+.att-demo p{color:var(--mut);font-size:14px;margin:3px 0 12px}
+
+/* icons */
+.icongrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:12px}
+.ic{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 8px 10px;text-align:center}
+.ic img{width:26px;height:26px;object-fit:contain;margin:0 auto 8px}
+.ic.dark2{background:var(--ink);border-color:var(--ink)}
+.ic span{font-size:12px;color:var(--mut);display:block}
+.ic.dark2 span{color:rgba(255,255,255,.6)}
+
+/* logo */
+.logogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.logo-t{display:grid;place-items:center;height:150px;border-radius:16px;border:1px solid var(--line)}
+.logo-t img{width:64px;height:64px;object-fit:contain}
+.logo-t.on-ink{background:var(--ink);border-color:var(--ink)}
+.logo-t.on-electric{background:var(--electric);border-color:var(--electric)}
+.logo-t.on-paper{background:var(--card)}
+.logocap{color:var(--mut);font-size:13.5px;margin-top:8px}
+
+/* forms */
+.finput{display:flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 16px;min-height:48px;max-width:360px}
+.finput input{border:0;outline:0;background:none;font:inherit;font-size:15px;width:100%;min-height:44px;color:var(--ink)}
+
+/* do/dont */
+.dd{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.dd .card{padding:20px 22px}
+.dd h4{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.dd .do h4{color:#5E7A0C}
+.dd .dont h4{color:var(--danger)}
+.dd ul{list-style:none}
+.dd li{padding:7px 0 7px 26px;position:relative;font-size:15px;border-top:1px solid var(--line)}
+.dd li:first-of-type{border-top:0}
+.dd li::before{position:absolute;left:2px;font-weight:700}
+.dd .do li::before{content:"✓";color:#5E7A0C}
+.dd .dont li::before{content:"✕";color:var(--danger)}
+
+/* jargon table */
+table.j{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.j th{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:13px 18px;border-bottom:1px solid var(--line)}
+.j td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top}
+.j tr:last-child td{border-bottom:0}
+.j td.old{color:var(--danger);text-decoration:line-through;text-decoration-thickness:1.5px;white-space:nowrap}
+.j td.new b{font-weight:600}
+
+/* toc strip */
+.toc{position:sticky;top:0;background:rgba(244,244,240,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:20;margin-bottom:56px}
+.toc .in{max-width:1080px;margin:0 auto;padding:0 28px;display:flex;gap:4px;overflow-x:auto}
+.toc a{color:var(--mut);text-decoration:none;font-size:14px;font-weight:500;padding:14px 12px;white-space:nowrap;display:inline-flex;align-items:center;min-height:48px}
+.toc a:hover{color:var(--ink)}
+section[id]{scroll-margin-top:70px}
+.footer{color:var(--mut);font-size:14px;border-top:1px solid var(--line);padding-top:26px}
+.footer a{color:var(--electric);font-weight:500}
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="in">
+    <div class="brand"><img src="img/logo-f20-w.png" alt=""><span>Teleport MD</span></div>
+    <p class="eyebrow">Direction 02 · Modern Consumer</p>
+    <h1>Care, on demand.<br>The design system.</h1>
+    <p>One system across the patient app and the provider portal: five colors, two typefaces, a two-weight icon set, and a small number of hard rules that every screen passes through an automated gate. Last updated July 17, 2026.</p>
+    <div class="meta"><span>Patient app · 38 screens</span><span>Provider portal · 5 screens</span><span>Gate: 44px · AA · 13px floor</span></div>
+  </div>
+</div>
+
+<nav class="toc" aria-label="Sections"><div class="in">
+  <a href="#logo">Logo</a><a href="#color">Color</a><a href="#type">Type</a><a href="#buttons">Buttons</a><a href="#status">Status</a><a href="#cards">Cards</a><a href="#icons">Icons</a><a href="#forms">Forms</a><a href="#voice">Voice</a><a href="#photo">Photography</a><a href="#a11y">Accessibility</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="logo">
+  <p class="sec-eyebrow">01 · Brand</p>
+  <h2>The mark</h2>
+  <p class="sec-lede">F20 "speed streaks": a medical cross whose right arm extends into three motion bars. Care, moving toward you. Chosen from 47 explored concepts.</p>
+  <div class="logogrid">
+    <div><div class="logo-t on-paper"><img src="img/logo-f20.png" alt="Logo on white"></div><p class="logocap">Full color, on white or paper. The default.</p></div>
+    <div><div class="logo-t on-ink"><img src="img/logo-f20-w.png" alt="Logo on ink"></div><p class="logocap">White, on ink. Sidebars, dark surfaces, splash.</p></div>
+    <div><div class="logo-t on-electric"><img src="img/logo-f20-w.png" alt="Logo on electric"></div><p class="logocap">White, on electric. The splash screen moment.</p></div>
+  </div>
+  <div class="note">Wordmark: <b>Teleport MD</b> in Bricolage Grotesque 700, always beside the mark, never stacked under it. Files: <code>img/logo-f20.png</code> · <code>logo-f20-w.png</code> · <code>logo-f20-ink.png</code>. Production wants an SVG redraw of all three.</div>
+</section>
+
+<section id="color">
+  <p class="sec-eyebrow">02 · Color</p>
+  <h2>Five colors, strict jobs</h2>
+  <p class="sec-lede">Paper is the canvas, ink is the voice, electric is the action, volt is the signal, coral is the alert. If a surface uses more than one accent at full strength, something is wrong.</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#111418"></div><div class="m"><b>Ink</b><span>#111418 · text, dark surfaces</span></div></div>
+    <div class="sw"><div class="chip" style="background:#2D5BFF"></div><div class="m"><b>Electric</b><span>#2D5BFF · the primary action</span></div></div>
+    <div class="sw"><div class="chip" style="background:#FF6857"></div><div class="m"><b>Coral</b><span>#FF6857 · alerts, needs-you</span></div></div>
+    <div class="sw"><div class="chip" style="background:#D8FF47"></div><div class="m"><b>Volt</b><span>#D8FF47 · brand signal, accents</span></div></div>
+    <div class="sw"><div class="chip" style="background:#F4F4F0;border-bottom:1px solid var(--line)"></div><div class="m"><b>Paper</b><span>#F4F4F0 · the canvas</span></div></div>
+  </div>
+
+  <h3>Derived tokens (the raw palette cannot supply these)</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#DE1600"></div><div class="m"><b>Danger text</b><span>#DE1600 · passes on white AND paper</span></div></div>
+    <div class="sw"><div class="chip" style="background:#093FFF"></div><div class="m"><b>Electric hover</b><span>#093FFF</span></div></div>
+    <div class="sw"><div class="chip" style="background:#111418;display:grid;place-items:center"><span style="color:#4C73FF;font-weight:700;font-size:20px">Aa</span></div><div class="m"><b>Electric on dark</b><span>#4C73FF · text on ink only</span></div></div>
+    <div class="sw"><div class="chip" style="background:#4C535C"></div><div class="m"><b>Secondary text</b><span>#4C535C · small text on paper</span></div></div>
+  </div>
+
+  <h3>The hard rules — contrast-tested, not taste</h3>
+  <div class="rules">
+    <div class="pair good" style="background:#FF6857;color:#111418">Ink on coral<small>6.48:1 — the only coral label</small></div>
+    <div class="pair bad" style="background:#FF6857;color:#fff">White on coral<small>2.85:1 — there is no white-on-coral button</small></div>
+    <div class="pair good" style="background:#D8FF47;color:#111418">Ink on volt<small>16.11:1</small></div>
+    <div class="pair bad" style="background:#D8FF47;color:#fff">White on volt<small>1.15:1</small></div>
+    <div class="pair good" style="background:#2D5BFF;color:#fff">White on electric<small>4.51:1</small></div>
+    <div class="pair bad" style="background:#111418;color:#2D5BFF">Electric on ink<small>3.56:1 — large text only; use volt or #4C73FF</small></div>
+    <div class="pair good" style="background:#111418;color:#D8FF47">Volt on ink<small>eyebrows, key phrases</small></div>
+    <div class="pair good" style="background:#fff;color:#DE1600;border:1px solid var(--line)">Danger #DE1600<small>4.5+ on white and on paper</small></div>
+  </div>
+</section>
+
+<section id="type">
+  <p class="sec-eyebrow">03 · Typography</p>
+  <h2>Bricolage speaks, Inter works</h2>
+  <p class="sec-lede">Bricolage Grotesque for headlines, numbers and anything with a voice; Inter for UI. Nothing below 13px, body at 15 to 17px, weights 400 to 800.</p>
+  <div class="card">
+    <div class="tspec"><span class="lab">Display · Bricolage 800 · 40px</span><span class="brico" style="font-size:40px;font-weight:800;letter-spacing:-.02em">Good morning, Dr. Anand</span></div>
+    <div class="tspec"><span class="lab">Page title · Bricolage 700 · 30px</span><span class="brico" style="font-size:30px;font-weight:700;letter-spacing:-.01em">At-home blood draw</span></div>
+    <div class="tspec"><span class="lab">Card title · Bricolage 700-800 · 19-22px</span><span class="brico" style="font-size:21px;font-weight:800">Maya Reyes</span></div>
+    <div class="tspec"><span class="lab">Section head · Inter 700 · 17px</span><span style="font-weight:700;font-size:17px">Today's schedule</span></div>
+    <div class="tspec"><span class="lab">Body · Inter 400-500 · 15-17px</span><span style="font-size:15px">A licensed nurse, at your door.</span></div>
+    <div class="tspec"><span class="lab">Support · Inter 400-500 · 13.5-14px</span><span style="font-size:13.5px;color:var(--mut)">Video · results follow-up</span></div>
+    <div class="tspec"><span class="lab">Eyebrow · Inter 600 · 13px caps</span><span style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Thursday, July 17</span></div>
+  </div>
+  <div class="note"><b>Floor: 13px.</b> The old app shipped 10 to 12px labels; the gate rejects anything smaller than 13px, anywhere, including inline styles.</div>
+</section>
+
+<section id="buttons">
+  <p class="sec-eyebrow">04 · Buttons</p>
+  <h2>One blue action per page</h2>
+  <p class="sec-lede">Capsule shape, 44px minimum height. The hierarchy is positional: electric is the page's one global action, ink acts on the card it sits in, ghost is secondary.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4 class="lt">On light surfaces</h4>
+      <div class="btnrow">
+        <button class="btn pri">+ New visit</button>
+        <button class="btn inkb">Confirm</button>
+        <button class="btn ghost">Propose a time</button>
+        <span style="color:var(--danger);font-weight:600;font-size:14.5px">Cancel this visit</span>
+      </div>
+      <p style="color:var(--mut);font-size:14px;margin-top:16px">Electric = page action (header). Ink = card action. Ghost = secondary. Destructive is quiet danger text, never a filled red button.</p>
+    </div>
+    <div class="dark">
+      <h4>On ink surfaces</h4>
+      <div class="btnrow">
+        <button class="btn pri">Open call preview</button>
+        <button class="btn gdark">Message</button>
+      </div>
+      <p style="color:rgba(255,255,255,.65);font-size:14px;margin-top:16px">On dark cards the electric primary returns, paired with a white-outline ghost. Volt buttons carry ink labels only.</p>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <p class="sec-eyebrow">05 · Status</p>
+  <h2>Chips: tint plus ink, never loud</h2>
+  <p class="sec-lede">Every status is a pale tint of an accent carrying ink text. The grammar is fixed; a developer should be able to pick the color from the state alone.</p>
+  <div class="card">
+    <div class="chiprow"><span class="pill g">Confirmed</span><span class="pill g">Open</span><span class="pill g">Normal</span><span class="pill g">To the lab</span><span class="why">Green <code>#E2F59B</code> — settled, healthy, moving as planned</span></div>
+    <div class="chiprow"><span class="pill b">Crew en route</span><span class="pill b">En route</span><span class="pill b">Draw en route</span><span class="why">Blue <code>#DCE4FF</code> — in motion right now</span></div>
+    <div class="chiprow"><span class="pill c">Needs confirmation</span><span class="pill c">High</span><span class="why">Coral <code>#FFDDD8</code> — needs a human, or out of range</span></div>
+    <div class="chiprow" style="margin-bottom:0"><span class="pill n">Unconfirmed</span><span class="pill n">Finding crew</span><span class="pill n">Requested</span><span class="why">Gray <code>#E8E8E3</code> — idle, waiting, nothing to do yet</span></div>
+  </div>
+  <div class="note"><b>The status machine speaks plain language.</b> Requested → Confirmed → Accepted → En route → Arrived → Collected → Dropped off. The old labels (#WO1, "Pending Crew") are banned on every user-facing surface.</div>
+</section>
+
+<section id="cards">
+  <p class="sec-eyebrow">06 · Cards &amp; surfaces</p>
+  <h2>White on paper, one ink anchor</h2>
+  <p class="sec-lede">Surfaces are white cards with hairline borders on the paper canvas, radius 16. Each page gets at most one ink hero card as its anchor, and coral edges mark the one card that needs you.</p>
+  <div class="grid2">
+    <div class="hero-demo">
+      <div class="t"><div class="when">Next · 9:00 AM · Video visit</div><h5>Maya Reyes</h5><p>Follow-up on Monday's blood draw results</p></div>
+      <button class="btn pri">Open call preview</button>
+    </div>
+    <div class="card att-demo">
+      <b>Needs your confirmation</b>
+      <p>Sofia Park · at-home blood draw · asked for tomorrow morning</p>
+      <div class="btnrow"><button class="btn inkb" style="min-height:44px;padding:0 16px;font-size:14px">Confirm</button><button class="btn ghost" style="min-height:44px;padding:0 16px;font-size:14px">Propose a time</button></div>
+    </div>
+  </div>
+  <div class="note">Radius: 16px cards (20px on bold surfaces), 12px inputs and tiles, capsule buttons and chips. Phone canvas is 390&times;844; the desktop portal is a 240px ink sidebar plus a 1220px max content column.</div>
+</section>
+
+<section id="icons">
+  <p class="sec-eyebrow">07 · Icons</p>
+  <h2>One family, two weights</h2>
+  <p class="sec-lede">Every glyph exists as line and filled, in ink, white and electric variants. Line for navigation and idle states; filled for active states and icon discs. Discs are neutral paper with ink glyphs; color belongs to chips and buttons.</p>
+  <h3 style="margin-top:0">Line — nav, inactive, chrome</h3>
+  <div class="icongrid">
+    <div class="ic"><img src="img/icons/d2-line/home.png" alt=""><span>home</span></div>
+    <div class="ic"><img src="img/icons/d2-line/calendar.png" alt=""><span>calendar</span></div>
+    <div class="ic"><img src="img/icons/d2-line/video.png" alt=""><span>video</span></div>
+    <div class="ic"><img src="img/icons/d2-line/drop.png" alt=""><span>drop</span></div>
+    <div class="ic"><img src="img/icons/d2-line/vitals.png" alt=""><span>vitals</span></div>
+    <div class="ic"><img src="img/icons/d2-line/flask.png" alt=""><span>flask</span></div>
+    <div class="ic"><img src="img/icons/d2-line/bell.png" alt=""><span>bell</span></div>
+    <div class="ic"><img src="img/icons/d2-line/chat.png" alt=""><span>chat</span></div>
+    <div class="ic"><img src="img/icons/d2-line/profile.png" alt=""><span>profile</span></div>
+    <div class="ic"><img src="img/icons/d2-line/care.png" alt=""><span>care</span></div>
+    <div class="ic"><img src="img/icons/d2-line/homecare.png" alt=""><span>homecare</span></div>
+    <div class="ic"><img src="img/icons/d2-line/pin.png" alt=""><span>pin</span></div>
+  </div>
+  <h3>Filled — active tabs, discs, emphasis</h3>
+  <div class="icongrid">
+    <div class="ic"><img src="img/icons/d2-fill/video.png" alt=""><span>video</span></div>
+    <div class="ic"><img src="img/icons/d2-fill/drop.png" alt=""><span>drop</span></div>
+    <div class="ic"><img src="img/icons/d2-fill/vitals.png" alt=""><span>vitals</span></div>
+    <div class="ic"><img src="img/icons/d2-fill/bell.png" alt=""><span>bell</span></div>
+    <div class="ic"><img src="img/icons/d2-fill/calendar.png" alt=""><span>calendar</span></div>
+    <div class="ic dark2"><img src="img/icons/d2-fill/video-w.png" alt=""><span>video-w</span></div>
+    <div class="ic dark2"><img src="img/icons/d2-fill/check-w.png" alt=""><span>check-w</span></div>
+    <div class="ic dark2"><img src="img/icons/d2-line/mic-w.png" alt=""><span>mic-w</span></div>
+    <div class="ic dark2"><img src="img/icons/d2-line/end-w.png" alt=""><span>end-w</span></div>
+  </div>
+  <div class="note">Assets are sliced PNGs in <code>img/icons/d2-line</code> and <code>d2-fill</code> (variants: plain ink, <code>-w</code> white, <code>-e</code> electric). Treat them as the visual reference; production wants SVG redraws at this exact stroke weight.</div>
+</section>
+
+<section id="forms">
+  <p class="sec-eyebrow">08 · Forms</p>
+  <h2>One field at a time</h2>
+  <p class="sec-lede">No funnels. Sign-up is identity only; everything else is captured at the moment it is needed, one field per screen on mobile. Inputs are 48px, radius 12, with the label above, never a placeholder-as-label.</p>
+  <div class="card">
+    <p style="font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:8px">Search</p>
+    <label class="finput"><input type="search" placeholder="Search by name"></label>
+    <p style="color:var(--mut);font-size:14px;margin-top:14px">Search is one box that accepts anything (name, specialty, clinic). The seven-field provider lookup is gone and stays gone.</p>
+  </div>
+</section>
+
+<section id="voice">
+  <p class="sec-eyebrow">09 · Voice</p>
+  <h2>Plain language is a component</h2>
+  <p class="sec-lede">The jargon sweep is part of the build gate: these words never reach a user-facing surface. Say what is happening, honestly, including waiting.</p>
+  <table class="j">
+    <tr><th>Never ship</th><th>Say instead</th></tr>
+    <tr><td class="old">#WO1 · WORK TYPE</td><td class="new"><b>Blood draw at home</b>, or the visit's plain name</td></tr>
+    <tr><td class="old">Pending Crew</td><td class="new"><b>Finding your nurse</b> / <b>Finding crew</b> (provider side)</td></tr>
+    <tr><td class="old">NPI · Taxonomy</td><td class="new">One search box that quietly accepts a referral's NPI number</td></tr>
+    <tr><td class="old">Please wait for approval ⌛</td><td class="new"><b>Requested.</b> "The practice confirms in a few hours." Honest pending, with a time expectation</td></tr>
+    <tr><td class="old">Moses · BAA</td><td class="new">Internal names stay internal</td></tr>
+  </table>
+  <div class="note">Also banned in product copy: em-dashes. Use a colon, a period, or a semicolon.</div>
+</section>
+
+<section id="photo">
+  <p class="sec-eyebrow">10 · Photography</p>
+  <h2>Real people, calm rooms</h2>
+  <div class="dd">
+    <div class="card do"><h4>Do</h4><ul>
+      <li>Real photography: patients at home, clinicians in daylight</li>
+      <li>Warm, calm interiors; the brand accent may appear in the scene</li>
+      <li>Faces engaged with the moment, not the camera (except portraits)</li>
+      <li>Generated imagery is screened: no lettering, no logos, no fake UI on visible screens</li>
+    </ul></div>
+    <div class="card dont"><h4>Don't</h4><ul>
+      <li>No cartoon or friendly-blob illustration, anywhere (standing team rule)</li>
+      <li>No stock-photo gloss: fake smiles, white voids, pointing at screens</li>
+      <li>No visible phone or laptop screens with readable UI</li>
+      <li>No hourglasses, no spinners as personality</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="a11y">
+  <p class="sec-eyebrow">11 · Accessibility</p>
+  <h2>The gate is the spec</h2>
+  <p class="sec-lede">Every screen in both apps passes an automated audit before it ships. The checks target exactly what the old app failed.</p>
+  <div class="grid3">
+    <div class="card"><h5 class="brico" style="font-size:34px;font-weight:800">44px</h5><p style="color:var(--mut);font-size:14.5px;margin-top:6px">Minimum interactive target, both axes. Measured on rendered layout, not design intent.</p></div>
+    <div class="card"><h5 class="brico" style="font-size:34px;font-weight:800">AA</h5><p style="color:var(--mut);font-size:14.5px;margin-top:6px">4.5:1 body, 3:1 large text, on the real composited background. The palette rules above exist because of this check.</p></div>
+    <div class="card"><h5 class="brico" style="font-size:34px;font-weight:800">13px</h5><p style="color:var(--mut);font-size:14.5px;margin-top:6px">Type floor. Nothing smaller renders, including inline styles and generated content.</p></div>
+  </div>
+  <div class="note"><code>audit.js</code> runs the gate per route in the page console and is written to port to CI. Current status: 0 failures across all 43 shipped screens (38 patient + 5 provider), plus a clean jargon sweep.</div>
+</section>
+
+<div class="footer">
+  Teleport MD design system · Direction 02 "Modern Consumer" · July 17, 2026.<br>
+  Live builds: <a href="index-r2.html">patient app board</a> · <a href="index-provider.html">provider portal board</a>. Deferral tracker: V2-FEATURES.md.
+</div>
+
+</div>
+</body>
+</html>
