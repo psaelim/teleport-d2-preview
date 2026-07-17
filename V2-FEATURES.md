@@ -12,10 +12,17 @@ All decisions below were made by June on 2026-07-17 and applied to the prototype
 
 - **Code**: `Price()`, `Payment()`, `Receipt()` remain in `app-r2.html` with their routes
   (`#price`, `#payment`, `#receipt`); nothing in V1 links to them.
-- **Gallery**: the "V2 · built, hidden in V1" section at the end of the screen gallery
-  (local `index-r2.html`, the artifact, and the GitHub Pages board) shows all three.
+- **Gallery**: the three screens sit in their HOME categories (Main navigation / At-home visit /
+  Records & messages) grayed under a "Hidden in V1 · View design" veil — June's call 2026-07-17:
+  keep them where they belong, the veil is the signifier. Same on the artifact and GitHub Pages.
+- **The `?v2` flag**: opening any screen as `app-r2.html?v2#<screen>` renders its V2 variant
+  (pricing elements restored) — Book, Doctor profile, You, Tests, Cancel, Notifications, Collect.
+- **The V2 stack (LOCAL ONLY, never pushed visible to GitHub)**: in the local gallery, the six
+  partially-hidden screens carry their live `?v2` render stacked behind the phone with a
+  "See the V2 version" hover swap. Hostname-gated off `github.io`, per June: it is a personal
+  reminder, not for coworkers.
 - **Removed copy** (dollar figures, fee lines, charge ledgers) is recoverable from git history
-  in `psaelim/teleport-d2-preview` and from this file's "restore notes" column.
+  in `psaelim/teleport-d2-preview` and via the `?v2` flag.
 
 ## Pricing & payment (moved to V2, decided 2026-07-17)
 
