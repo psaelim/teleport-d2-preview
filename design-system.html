@@ -317,7 +317,7 @@ section[id]{scroll-margin-top:70px}
     <div class="ic dark2"><img src="img/icons/ph-line/mic-w.svg" alt=""><span>mic-w</span></div>
     <div class="ic dark2"><img src="img/icons/ph-line/end-w.svg" alt=""><span>end-w</span></div>
   </div>
-  <p class="buildline"><b>Builds as</b> <code>@phosphor-icons/react</code> — one dependency, weight is a prop: <code>&lt;Drop weight="regular" /&gt;</code> idle, <code>weight="fill"</code> active. Semantic mapping is fixed: care = <code>first-aid</code>, homecare = <code>first-aid-kit</code>, vitals = <code>heartbeat</code>, video = <code>video-camera</code>, chevron = <code>caret-right</code>, end call = <code>phone-slash</code>.</p>
+  <p class="buildline"><b>Builds as</b> <code>@phosphor-icons/react</code> — one dependency, weight is a prop: <code>&lt;Drop weight="regular" /&gt;</code> idle, <code>weight="fill"</code> active. Semantic mapping is fixed: care = <code>first-aid</code>, homecare = <code>first-aid-kit</code>, vitals = <code>heartbeat</code>, video = <code>video-camera</code>, chevron = <code>caret-right</code>, end call = <code>phone-slash</code>, confirmation check = <code>check-circle</code> (NOT <code>check</code>: Phosphor renders stroke-only glyphs at fill weight as a filled square, which reads as a checkbox input).</p>
   <div class="note">Adopted 2026-07-20, replacing the custom generated set (which retired the SVG-redraw task). Prototype assets are pre-colored SVGs in <code>img/icons/ph-line</code> and <code>ph-fill</code> (suffixes: plain ink, <code>-w</code> white, <code>-e</code> electric, <code>-g</code> green); production uses the React package directly with <code>currentColor</code>.</div>
 </section>
 
