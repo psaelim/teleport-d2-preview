@@ -109,7 +109,7 @@ code{font:500 13.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:
 .logocap{color:var(--mut);font-size:13.5px;margin-top:8px}
 
 /* forms */
-.finput{display:flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 16px;min-height:48px;max-width:360px}
+.finput{display:flex;align-items:center;background:var(--card);border:1px solid var(--input,#C9C9C2);border-radius:12px;padding:0 16px;min-height:48px;max-width:360px}
 .finput input{border:0;outline:0;background:none;font:inherit;font-size:15px;width:100%;min-height:44px;color:var(--ink)}
 
 /* do/dont */
@@ -141,6 +141,8 @@ table.j{width:100%;border-collapse:collapse;background:var(--card);border:1px so
 section[id]{scroll-margin-top:70px}
 .footer{color:var(--mut);font-size:14px;border-top:1px solid var(--line);padding-top:26px}
 .footer a{color:var(--electric);font-weight:500}
+.buildline{margin-top:16px;padding:12px 16px;border-radius:12px;background:#E9EDFB;font-size:14px;line-height:1.55;color:var(--ink)}
+.buildline b{color:var(--electric);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px;margin-right:6px}
 </style>
 </head>
 <body>
@@ -150,13 +152,13 @@ section[id]{scroll-margin-top:70px}
     <div class="brand"><img src="img/logo-f20-w.png" alt=""><span>Teleport MD</span></div>
     <p class="eyebrow">Direction 02 · Modern Consumer</p>
     <h1>Care, on demand.<br>The design system.</h1>
-    <p>One system across the patient app and the provider portal: five colors, two typefaces, a two-weight icon set, and a small number of hard rules that every screen passes through an automated gate. Last updated July 17, 2026.</p>
-    <div class="meta"><span>Patient app · 38 screens</span><span>Provider portal · 5 screens</span><span>Gate: 44px · AA · 13px floor</span></div>
+    <p>One system across the patient app and the provider portal: five colors, two typefaces, a two-weight icon set, and a small number of hard rules that every screen passes through an automated gate. Last updated July 20, 2026.</p>
+    <div class="meta"><span>Patient app · 38 screens</span><span>Provider portal · 5 screens</span><span>Gate: 44px · AA · 13px floor</span><span>Build: React · Tailwind · shadcn/ui</span></div>
   </div>
 </div>
 
 <nav class="toc" aria-label="Sections"><div class="in">
-  <a href="#logo">Logo</a><a href="#color">Color</a><a href="#type">Type</a><a href="#buttons">Buttons</a><a href="#status">Status</a><a href="#cards">Cards</a><a href="#icons">Icons</a><a href="#forms">Forms</a><a href="#voice">Voice</a><a href="#photo">Photography</a><a href="#a11y">Accessibility</a>
+  <a href="#logo">Logo</a><a href="#color">Color</a><a href="#type">Type</a><a href="#buttons">Buttons</a><a href="#status">Status</a><a href="#cards">Cards</a><a href="#icons">Icons</a><a href="#forms">Forms</a><a href="#voice">Voice</a><a href="#photo">Photography</a><a href="#interact">Interaction</a><a href="#a11y">Accessibility</a>
 </div></nav>
 
 <div class="wrap">
@@ -204,6 +206,7 @@ section[id]{scroll-margin-top:70px}
     <div class="pair good" style="background:#111418;color:#D8FF47">Volt on ink<small>eyebrows, key phrases</small></div>
     <div class="pair good" style="background:#fff;color:#DE1600;border:1px solid var(--line)">Danger #DE1600<small>4.5+ on white and on paper</small></div>
   </div>
+  <p class="buildline"><b>Builds as</b> every token here ships pre-mapped to the shadcn variable contract in <code>shadcn/globals.css</code> (primary = electric, secondary = ink, destructive = #DE1600, sidebar-* = the ink rail, chip-* customs). Use the tokens, never raw hexes.</p>
 </section>
 
 <section id="type">
@@ -213,13 +216,14 @@ section[id]{scroll-margin-top:70px}
   <div class="card">
     <div class="tspec"><span class="lab">Display · Bricolage 800 · 40px</span><span class="brico" style="font-size:40px;font-weight:800;letter-spacing:-.02em">Good morning, Dr. Anand</span></div>
     <div class="tspec"><span class="lab">Page title · Bricolage 700 · 30px</span><span class="brico" style="font-size:30px;font-weight:700;letter-spacing:-.01em">At-home blood draw</span></div>
-    <div class="tspec"><span class="lab">Card title · Bricolage 700-800 · 19-22px</span><span class="brico" style="font-size:21px;font-weight:800">Maya Reyes</span></div>
+    <div class="tspec"><span class="lab">Card title · Bricolage 700-800 · 20-22px</span><span class="brico" style="font-size:21px;font-weight:800">Maya Reyes</span></div>
     <div class="tspec"><span class="lab">Section head · Inter 700 · 17px</span><span style="font-weight:700;font-size:17px">Today's schedule</span></div>
-    <div class="tspec"><span class="lab">Body · Inter 400-500 · 15-17px</span><span style="font-size:15px">A licensed nurse, at your door.</span></div>
-    <div class="tspec"><span class="lab">Support · Inter 400-500 · 13.5-14px</span><span style="font-size:13.5px;color:var(--mut)">Video · results follow-up</span></div>
+    <div class="tspec"><span class="lab">Body · Inter 400-500 · 15px</span><span style="font-size:15px">A licensed nurse, at your door.</span></div>
+    <div class="tspec"><span class="lab">Support · Inter 400-500 · 14px</span><span style="font-size:13.5px;color:var(--mut)">Video · results follow-up</span></div>
     <div class="tspec"><span class="lab">Eyebrow · Inter 600 · 13px caps</span><span style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Thursday, July 17</span></div>
   </div>
-  <div class="note"><b>Floor: 13px.</b> The old app shipped 10 to 12px labels; the gate rejects anything smaller than 13px, anywhere, including inline styles.</div>
+  <div class="note"><b>Floor: 13px, and the scale is fixed: 13 · 14 · 15 · 17 · 20 · 22 · 30 · 40.</b> No half-pixel sizes, no off-scale values; in Tailwind these are the redefined text-xs/sm/base/lg plus display classes. The gate rejects anything under 13px, including inline styles.</div>
+  <p class="buildline"><b>Builds as</b> <code>font-display</code> = Bricolage Grotesque (headings, numbers), <code>font-sans</code> = Inter. <code>text-xs</code> is redefined to 13px so the floor holds; arbitrary values below it are a build error.</p>
 </section>
 
 <section id="buttons">
@@ -246,6 +250,7 @@ section[id]{scroll-margin-top:70px}
       <p style="color:rgba(255,255,255,.65);font-size:14px;margin-top:16px">On dark cards the electric primary returns, paired with a white-outline ghost. Volt buttons carry ink labels only.</p>
     </div>
   </div>
+  <p class="buildline"><b>Builds as</b> shadcn <code>Button</code>, <code>rounded-full</code>, sizes redefined to h-11 (44px) / h-12. Variants: <code>default</code> = electric (one per page), <code>secondary</code> = ink (card actions), <code>outline</code> = ghost (1px border-input), <code>destructive</code> = restyled to quiet danger text, never a filled red button.</p>
 </section>
 
 <section id="status">
@@ -258,6 +263,7 @@ section[id]{scroll-margin-top:70px}
     <div class="chiprow"><span class="pill c">Needs confirmation</span><span class="pill c">High</span><span class="why">Coral <code>#FFDDD8</code> — needs a human, or out of range</span></div>
     <div class="chiprow" style="margin-bottom:0"><span class="pill n">Unconfirmed</span><span class="pill n">Finding crew</span><span class="pill n">Requested</span><span class="why">Gray <code>#E8E8E3</code> — idle, waiting, nothing to do yet</span></div>
   </div>
+  <p class="buildline"><b>Builds as</b> shadcn <code>Badge</code> replaced by a <code>StatusChip</code> with exactly four variants (green/blue/coral/gray), ink text, <code>rounded-full min-h-7</code>. The state-to-variant mapping is fixed; never choose a chip color by taste.</p>
   <div class="note"><b>The status machine speaks plain language.</b> Requested → Confirmed → Accepted → En route → Arrived → Collected → Dropped off. The old labels (#WO1, "Pending Crew") are banned on every user-facing surface.</div>
 </section>
 
@@ -277,6 +283,7 @@ section[id]{scroll-margin-top:70px}
     </div>
   </div>
   <div class="note">Radius: 16px cards (20px on bold surfaces), 12px inputs and tiles, capsule buttons and chips. Phone canvas is 390&times;844; the desktop portal is a 240px ink sidebar plus a 1220px max content column.</div>
+  <p class="buildline"><b>Builds as</b> shadcn <code>Card</code> as shipped, plus one custom <code>ink</code> variant (the hero). Attention card = <code>border-l-4 border-l-coral</code>. Patient slide-over = <code>Sheet side="right"</code>. Sidebar = shadcn <code>Sidebar</code> via the sidebar-* tokens. <b>Custom builds (no shadcn primitive):</b> the week calendar grid, the dispatch status timeline, the video call stage.</p>
 </section>
 
 <section id="icons">
@@ -310,6 +317,7 @@ section[id]{scroll-margin-top:70px}
     <div class="ic dark2"><img src="img/icons/d2-line/mic-w.png" alt=""><span>mic-w</span></div>
     <div class="ic dark2"><img src="img/icons/d2-line/end-w.png" alt=""><span>end-w</span></div>
   </div>
+  <p class="buildline"><b>Builds as</b> lucide-react for utility chrome (chevrons, search, close; stroke 2 to 2.25). The brand glyphs on this page stay custom in both weights: line for nav and idle, filled for active states and discs.</p>
   <div class="note">Assets are sliced PNGs in <code>img/icons/d2-line</code> and <code>d2-fill</code> (variants: plain ink, <code>-w</code> white, <code>-e</code> electric). Treat them as the visual reference; production wants SVG redraws at this exact stroke weight.</div>
 </section>
 
@@ -322,6 +330,7 @@ section[id]{scroll-margin-top:70px}
     <label class="finput"><input type="search" placeholder="Search by name"></label>
     <p style="color:var(--mut);font-size:14px;margin-top:14px">Search is one box that accepts anything (name, specialty, clinic). The seven-field provider lookup is gone and stays gone.</p>
   </div>
+  <p class="buildline"><b>Builds as</b> shadcn <code>Input</code> at <code>h-12</code> (48px) with <code>Label</code> above; <code>Checkbox</code>, <code>RadioGroup</code>, <code>Select</code> as shipped, restyled by the theme. Validation text uses <code>text-destructive</code>.</p>
 </section>
 
 <section id="voice">
@@ -358,8 +367,46 @@ section[id]{scroll-margin-top:70px}
   </div>
 </section>
 
+<section id="interact">
+  <p class="sec-eyebrow">11 · Interaction</p>
+  <h2>States are specified, not inherited</h2>
+  <p class="sec-lede">Radix and shadcn will render focus, hover, and disabled states whether or not anyone designed them. These are the designed ones; do not let library defaults leak through.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4 class="lt">Focus</h4>
+      <div class="btnrow">
+        <button class="btn pri" style="outline:2px solid var(--electric);outline-offset:3px">Focused primary</button>
+        <button class="btn ghost" style="outline:2px solid var(--electric);outline-offset:3px">Focused ghost</button>
+      </div>
+      <p style="color:var(--mut);font-size:14px;margin-top:16px">Keyboard focus: 2px electric ring, 3px offset (<code>ring-2 ring-ring ring-offset-2</code>). On ink surfaces the ring is volt. Focus is never removed, only styled; hash navigation moves focus to the new page's heading.</p>
+    </div>
+    <div class="card">
+      <h4 class="lt">Hover &amp; press</h4>
+      <p style="font-size:14.5px;line-height:1.7">Electric buttons deepen to <code>--electric-hover</code> #093FFF · ink buttons go #000 · ghost borders darken to ink · list rows tint to #FAFAF7 · cards that navigate lift 2 to 3px with a soft shadow · press scales .99. Color shifts, never opacity fades.</p>
+    </div>
+    <div class="card">
+      <h4 class="lt">Disabled</h4>
+      <div class="btnrow">
+        <button class="btn pri" style="opacity:.45" disabled>Confirm</button>
+        <button class="btn ghost" style="opacity:.45" disabled>Propose a time</button>
+      </div>
+      <p style="color:var(--mut);font-size:14px;margin-top:16px">45% opacity, cursor default, still readable. A disabled control always says why nearby ("Coming soon", "Saving…"); silent dead buttons are a defect.</p>
+    </div>
+    <div class="card">
+      <h4 class="lt">Loading</h4>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:14px;border-radius:999px;background:var(--chip-gray);width:60%"></div>
+        <div style="height:14px;border-radius:999px;background:var(--chip-gray);width:85%"></div>
+        <div style="height:14px;border-radius:999px;background:var(--chip-gray);width:40%"></div>
+      </div>
+      <p style="color:var(--mut);font-size:14px;margin-top:16px">Skeletons in <code>--chip-gray</code> shaped like the content (shadcn <code>Skeleton</code>). In-button loading = label swaps to a present-tense verb ("Confirming…"). No full-screen spinners; waiting always comes with words and, where possible, a time expectation.</p>
+    </div>
+  </div>
+  <div class="note">Respect <code>prefers-reduced-motion</code>: lifts, scales and skeleton shimmer collapse to instant state changes.</div>
+</section>
+
 <section id="a11y">
-  <p class="sec-eyebrow">11 · Accessibility</p>
+  <p class="sec-eyebrow">12 · Accessibility</p>
   <h2>The gate is the spec</h2>
   <p class="sec-lede">Every screen in both apps passes an automated audit before it ships. The checks target exactly what the old app failed.</p>
   <div class="grid3">
@@ -371,7 +418,7 @@ section[id]{scroll-margin-top:70px}
 </section>
 
 <div class="footer">
-  Teleport MD design system · Direction 02 "Modern Consumer" · July 17, 2026.<br>
+  Teleport MD design system · Direction 02 "Modern Consumer" · July 20, 2026.<br>
   Live builds: <a href="index-r2.html">patient app board</a> · <a href="index-provider.html">provider portal board</a>. Deferral tracker: V2-FEATURES.md.
 </div>
 

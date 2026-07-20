@@ -25,12 +25,12 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 /* ---------- shell ---------- */
 .shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 .side{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:22px 0 18px;position:sticky;top:0;height:100vh}
-.side .brand{display:flex;align-items:center;gap:10px;padding:0 22px 26px}
+.side .brand{display:flex;align-items:center;gap:10px;padding:0 24px 24px}
 .side .brand img{width:28px;height:28px;object-fit:contain}
 .side .brand span{font-family:"Bricolage Grotesque";font-weight:700;font-size:17px;letter-spacing:.01em}
 .nav{display:flex;flex-direction:column;gap:2px}
-.nav a{display:flex;align-items:center;gap:12px;padding:12px 22px;min-height:46px;color:rgba(255,255,255,.72);text-decoration:none;font-weight:500;font-size:15px;border-left:3px solid transparent}
-.nav a img{width:21px;height:21px;object-fit:contain;opacity:.62}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px 24px;min-height:48px;color:rgba(255,255,255,.72);text-decoration:none;font-weight:500;font-size:15px;border-left:4px solid transparent}
+.nav a img{width:20px;height:20px;object-fit:contain;opacity:.62}
 .nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
 .nav a.on{color:#fff;background:rgba(255,255,255,.07);border-left-color:var(--volt)}
 .nav a.on img{opacity:1}
@@ -38,12 +38,12 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .side .grow{flex:1}
 .me{display:flex;align-items:center;gap:11px;margin:8px 14px 0;padding:10px 8px;border-radius:12px}
 .me:hover{background:rgba(255,255,255,.06)}
-.me img{width:38px;height:38px;border-radius:50%;object-fit:cover}
+.me img{width:40px;height:40px;border-radius:50%;object-fit:cover}
 .me b{display:block;font-size:14px;font-weight:600}
 .me span{font-size:13px;color:rgba(255,255,255,.62)}
 
 /* ---------- main ---------- */
-.main{padding:26px 36px 60px;max-width:1220px;width:100%}
+.main{padding:24px 36px 64px;max-width:1220px;width:100%}
 .crumb{font-size:14px;color:var(--mut);margin-bottom:10px}
 .crumb a{color:var(--electric);text-decoration:none;font-weight:500;display:inline-flex;align-items:center;min-height:44px}
 .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px;flex-wrap:wrap}
@@ -52,12 +52,12 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .pagehead .sub{color:var(--mut);margin-top:5px;font-size:15px}
 .headacts{display:flex;gap:10px;align-items:center}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:99px;font-weight:600;font-size:15px;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:99px;font-weight:600;font-size:15px;text-decoration:none}
 .btn.pri{background:var(--electric);color:#fff}
 .btn.pri:hover{background:var(--electric-hover)}
 .card .btn.pri,.panel .btn.pri{background:var(--ink)}
 .card .btn.pri:hover,.panel .btn.pri:hover{background:#000}
-.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid #C9C9C2}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid #C9C9C2}
 .btn.ghost:hover{border-color:var(--ink)}
 .btn.onink{background:#fff;color:var(--ink)}
 .btn.sm{min-height:44px;padding:0 16px;font-size:14px;border-radius:99px}
@@ -70,7 +70,7 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:2px;min-height:96px}
 .stat .num{font-family:"Bricolage Grotesque";font-weight:700;font-size:30px;line-height:1.1}
 .stat .lbl{font-size:14px;color:var(--mut);font-weight:500}
-.stat .dot{width:9px;height:9px;border-radius:50%;margin-bottom:8px}
+.stat .dot{width:8px;height:8px;border-radius:50%;margin-bottom:8px}
 .stat .dot.e{background:var(--electric)} .stat .dot.c{background:var(--coral)}
 .stat .dot.v{background:#9CBB18} .stat .dot.i{background:var(--ink)}
 
@@ -93,29 +93,29 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .vrow{display:flex;align-items:center;gap:14px;padding:14px 18px;border-top:1px solid var(--line);text-decoration:none;color:inherit}
 .vrow:first-child{border-top:none}
 .vrow:hover{background:#FAFAF7}
-.vrow .time{width:74px;font-weight:600;font-size:14px}
-.vrow .disc{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
-.vrow .disc img{width:19px;height:19px}
+.vrow .time{width:72px;font-weight:600;font-size:14px}
+.vrow .disc{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.vrow .disc img{width:20px;height:20px}
 .disc.e,.disc.v,.disc.p{background:var(--paper)}
 .vrow .who{flex:1;min-width:0}
 .vrow .who b{font-size:15px;font-weight:600;display:block}
-.vrow .who span{font-size:13.5px;color:var(--mut)}
+.vrow .who span{font-size:14px;color:var(--mut)}
 .vrow .chev{width:16px;height:16px;opacity:.4}
 
-.pill{display:inline-flex;align-items:center;min-height:26px;padding:2px 11px;border-radius:99px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:2px 11px;border-radius:99px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
 .pill.blue{background:var(--pill-blue)} .pill.volt{background:var(--pill-green)}
 .pill.coral{background:var(--pill-coral)} .pill.gray{background:var(--pill-gray)}
 
 /* right rail */
-.att{border-left:5px solid var(--coral)}
+.att{border-left:4px solid var(--coral)}
 .req{padding:13px 0;border-top:1px solid var(--line)}
 .req:first-of-type{border-top:none;padding-top:6px}
 .req b{font-size:15px;font-weight:600}
-.req p{font-size:13.5px;color:var(--mut);margin:2px 0 10px}
+.req p{font-size:14px;color:var(--mut);margin:2px 0 10px}
 .req .acts{display:flex;gap:8px}
 .mini{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
 .mini:first-of-type{border-top:none;padding-top:6px}
-.mini img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.mini img{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .mini .t{flex:1;min-width:0}
 .mini b{font-size:14px;font-weight:600;display:block}
 .mini span{font-size:13px;color:var(--mut)}
@@ -123,41 +123,41 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 /* ---------- schedule page ---------- */
 .wk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .wkhead{display:grid;grid-template-columns:64px repeat(5,1fr);border-bottom:1px solid var(--line)}
-.wkhead div{padding:12px 10px;font-size:13.5px;font-weight:600;text-align:center;color:var(--mut)}
+.wkhead div{padding:12px 10px;font-size:14px;font-weight:600;text-align:center;color:var(--mut)}
 .wkhead div.today{color:var(--ink)}
 .wkhead div.today span{background:var(--volt);border-radius:8px;padding:2px 9px}
 .wkbody{display:grid;grid-template-columns:64px repeat(5,1fr);position:relative}
 .hr{grid-column:1;font-size:13px;color:var(--mut);text-align:right;padding:0 10px;transform:translateY(-7px)}
 .slotcol{border-left:1px solid var(--line);position:relative}
 .hline{position:absolute;left:0;right:0;border-top:1px solid #EFEFEA}
-.ev{position:absolute;left:5px;right:5px;border-radius:10px;padding:7px 10px;font-size:13px;font-weight:600;line-height:1.3;overflow:hidden}
+.ev{position:absolute;left:5px;right:5px;border-radius:12px;padding:7px 10px;font-size:13px;font-weight:600;line-height:1.3;overflow:hidden}
 .ev span{display:block;font-weight:500;font-size:13px;opacity:.85}
 .ev.video{background:var(--electric);color:#fff}
 .ev.draw{background:var(--ink);color:#fff}
 .ev.draw i{font-style:normal;color:var(--volt)}
 .ev.block{background:repeating-linear-gradient(-45deg,#E8E8E3 0 6px,#F1F1EC 6px 12px);color:var(--mut);font-weight:500}
-.avrow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:14.5px}
+.avrow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:15px}
 .avrow:first-of-type{border-top:none;padding-top:4px}
 .avrow b{font-weight:600;width:44px;display:inline-block}
 .avrow span{color:var(--mut)}
 .avrow .off{color:var(--mut);font-weight:500}
-.note{background:#FFF4D6;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;margin-top:14px}
+.note{background:#FFF4D6;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;margin-top:14px}
 
 /* ---------- visit detail ---------- */
 .vhead{display:flex;align-items:center;gap:14px;margin-bottom:4px;flex-wrap:wrap}
-.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:14.5px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:15px}
 .kv dt{color:var(--mut)}
 .kv dd{font-weight:500}
 .pt{display:flex;gap:14px;align-items:center;margin-bottom:14px}
-.pt img{width:54px;height:54px;border-radius:14px;object-fit:cover}
+.pt img{width:56px;height:56px;border-radius:12px;object-fit:cover}
 .pt b{font-size:17px;font-weight:700;display:block}
-.pt span{font-size:13.5px;color:var(--mut)}
-.orders .orow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-weight:500;font-size:14.5px}
+.pt span{font-size:14px;color:var(--mut)}
+.orders .orow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-weight:500;font-size:15px}
 .orders .orow:first-of-type{border-top:none}
 .orders .orow img{width:18px;height:18px}
-.orders .orow span{margin-left:auto;color:var(--mut);font-weight:400;font-size:13.5px}
+.orders .orow span{margin-left:auto;color:var(--mut);font-weight:400;font-size:14px}
 .tl{list-style:none;margin:6px 0 14px}
-.tl li{position:relative;padding:0 0 18px 26px;font-size:14.5px}
+.tl li{position:relative;padding:0 0 18px 26px;font-size:15px}
 .tl li::before{content:"";position:absolute;left:6px;top:5px;width:9px;height:9px;border-radius:50%;background:#C9C9C2}
 .tl li::after{content:"";position:absolute;left:10px;top:16px;bottom:-2px;width:1.5px;background:var(--line)}
 .tl li:last-child::after{display:none}
@@ -165,30 +165,30 @@ h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .tl li.now::before{background:var(--electric);box-shadow:0 0 0 4px var(--pill-blue)}
 .tl li.now b{color:var(--electric)}
 .tl li b{font-weight:600;display:block}
-.tl li span{color:var(--mut);font-size:13.5px}
+.tl li span{color:var(--mut);font-size:14px}
 .tl li.todo{color:var(--mut)}
 .crew{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.crew img{width:46px;height:46px;border-radius:50%;object-fit:cover}
+.crew img{width:48px;height:48px;border-radius:50%;object-fit:cover}
 .crew b{display:block;font-size:15px;font-weight:600}
-.crew span{font-size:13.5px;color:var(--mut)}
+.crew span{font-size:14px;color:var(--mut)}
 .map{width:100%;height:150px;object-fit:cover;border-radius:12px;margin-bottom:14px}
-.danger{color:var(--danger);font-weight:600;font-size:14.5px;background:none;padding:12px 0;min-height:44px}
+.danger{color:var(--danger);font-weight:600;font-size:15px;background:none;padding:12px 0;min-height:44px}
 
 /* ---------- patients ---------- */
 .toolrow{display:flex;gap:12px;margin-bottom:18px}
-.search{flex:1;max-width:420px;display:flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 16px;min-height:46px}
+.search{flex:1;max-width:420px;display:flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 16px;min-height:48px}
 .search input{border:none;outline:none;background:none;font:inherit;font-size:15px;width:100%;color:var(--ink);min-height:44px}
 .search input::placeholder{color:var(--mut)}
 table.pts{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .pts th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);text-align:left;padding:13px 18px;border-bottom:1px solid var(--line);font-weight:600}
-.pts td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:middle}
+.pts td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:middle}
 .pts tr:last-child td{border-bottom:none}
 .pts tbody tr{cursor:pointer}
 .pts tbody tr:hover{background:#FAFAF7}
 .avi{width:36px;height:36px;border-radius:50%;background:var(--pill-blue);color:var(--ink);display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
 .avi.photo{background:none} .avi img{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .pcell{display:flex;align-items:center;gap:12px;font-weight:600}
-td .sub{color:var(--mut);font-size:13.5px;display:block;font-weight:400}
+td .sub{color:var(--mut);font-size:14px;display:block;font-weight:400}
 
 /* slide-over */
 .scrim{position:fixed;inset:0;background:rgba(17,20,24,.4);opacity:0;pointer-events:none;transition:.2s;z-index:40}
@@ -200,7 +200,7 @@ body.pop .panel{transform:none}
 .panel .pt img{width:64px;height:64px}
 .panel .sechead{margin-top:22px}
 .panel .acts{display:flex;flex-direction:column;gap:10px;margin-top:22px}
-.res{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px}
+.res{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
 .res:first-of-type{border-top:none;padding-top:2px}
 .res span{color:var(--mut)}
 
@@ -460,7 +460,7 @@ body.pop .panel{transform:none}
 
           <h2 class="sechead">Instructions for the crew</h2>
           <div class="card">
-            <p style="font-size:14.5px">Patient is anxious about needles, please take it slow. Use the butterfly if the first stick fails.</p>
+            <p style="font-size:15px">Patient is anxious about needles, please take it slow. Use the butterfly if the first stick fails.</p>
             <div style="margin-top:12px"><button class="btn ghost sm">Edit note</button></div>
           </div>
 
