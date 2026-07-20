@@ -70,6 +70,19 @@ const state = {
   spec: null,                                // doctor-search specialty filter
   bookfor: 0, fb: 'you',                     // who a booking is for; family back target
   cx: false, creason: null,                  // the live draw, cancelled
+  /* R2.2 — five backlog screens built 2026-07-20, reviewed on
+     mock-backlog-screens.html: */
+  badcode: 0,                                // verify misses: 1-2 = wrong code, 3 = fresh code sent
+  ttab: 0,                                   // Terms & privacy: 0 = terms, 1 = privacy
+  rday: 2, rslot: null, moved: false,        // moving the video visit (own state: no scheduler bleed)
+  vcx: false, vcreason: null,                // the video visit, cancelled
+  /* R2.2b — the draw's missing states (built 2026-07-20, reviewed
+     on mock-draw-states.html). Visiting #nodraw flips the live
+     demo into the safe-stop timeline; rebooking clears it. */
+  nodraw: false,                             // the draw stopped safely after two tries
+  /* R2.2c — Visits search (built 2026-07-20, reviewed on
+     mock-visits-search.html): */
+  vq: '',                                    // the search query; empty = tabs as usual
 };
 
 /* At-home draw catalogue: key, name, what it covers, price, and
@@ -264,7 +277,20 @@ function Home() {
       <span class="chev"><img src="img/icons/ph-line/chevron-w.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.7"></span>
     </button>
 
-    ${state.cx ? '' : `
+    ${state.cx ? '' : state.nodraw ? `
+    <h2 class="section">Happening now</h2>
+
+    <!-- R2.2b: the safe stop replaces the live card with a
+         coral-edge attention row; rebooking makes it vanish. -->
+    <button class="row" onclick="go('nodraw')" style="align-items:flex-start;padding:16px;border-left:4px solid var(--raw-coral)">
+      <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+      <span class="body">
+        <span class="pill pill-urgent" style="margin-bottom:6px">Needs a new time</span>
+        <span class="title">We couldn&rsquo;t finish today&rsquo;s draw</span>
+        <span class="sub">Stopped safely &middot; your order is kept, pick a new time</span>
+      </span>
+      <span class="chev">${I.chev}</span>
+    </button>` : `
     <h2 class="section">Happening now</h2>
 
     <!-- The live at-home draw. In the old app this was a card
@@ -280,15 +306,18 @@ function Home() {
       <span class="chev">${I.chev}</span>
     </button>`}
 
+    ${state.vcx ? '' : `
     <h2 class="section">Next up</h2>
-    <button class="row" onclick="go('precall')" style="padding:16px">
+    <!-- R2.2: the row opens the visit hub (manage) — reschedule,
+         cancel and, 10 minutes out, Join all live there. -->
+    <button class="row" onclick="go('manage')" style="padding:16px">
       <img class="avatar" src="${DR_ANAND}" alt="">
       <span class="body">
         <span class="title">Dr. Priya Anand</span>
-        <span class="sub">Video visit &middot; Tomorrow, 10:15 AM</span>
+        <span class="sub">Video visit &middot; ${vWhenShort()}</span>
       </span>
       <span class="chev">${I.chev}</span>
-    </button>
+    </button>`}
 
     <!-- FIXES: the old app nagged about profile completion on every
          screen, forever. This appears only because insurance is
@@ -959,15 +988,29 @@ function Requested() {
    patient as a grey label on a card called "#WO1".
    NOW: same state machine, given a screen worth the wait.
    ============================================================ */
-function Track() {
+function Track(lateForce) {
   /* Once the visit is cancelled there is nothing to track: any
-     surface that still points here lands on the cancel receipt. */
+     surface that still points here lands on the cancel receipt.
+     Same for the safe stop (R2.2b). */
   if (state.cx) return Cancel();
+  if (state.nodraw) return NoDraw();
+  /* R2.2b — the late state lives at #late (board + flow map); in
+     production it replaces this screen the moment dispatch reports
+     a delay. The pill stays blue: she is still in motion; the
+     coral-edge card is attention, not alarm. */
+  const late = lateForce || false;
   return `
   ${bar('Blood draw at home', 'home')}
   <div class="scroll">
     <span class="pill pill-en-route">On the way</span>
-    <h1 class="display" style="margin-top:12px">Jennifer arrives<br>about 2:40 PM.</h1>
+    <h1 class="display" style="margin-top:12px">Jennifer arrives<br>about ${late ? '3:00' : '2:40'} PM.</h1>
+    ${late ? `
+    <div class="card" style="border-left:4px solid var(--raw-coral);margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:4px">Running about 20 minutes behind</div>
+      <div class="tiny">Traffic on the bridge. Jennifer is sorry &mdash; the new arrival is about
+        3:00 PM, and we&rsquo;ll keep this updated. If the new time doesn&rsquo;t work,
+        moving or cancelling is free.</div>
+    </div>` : ''}
 
     <div class="card" style="display:flex;gap:16px;align-items:center">
       <img class="avatar lg" src="${CREW_JEN}" alt="">
@@ -1000,7 +1043,7 @@ function Track() {
         </div>
         <div class="step now">
           <div class="rail"><div class="dot"></div><div class="bar"></div></div>
-          <div class="txt"><div class="t">On the way</div><div class="s">Left 2:18 PM &middot; 8 minutes out</div></div>
+          <div class="txt"><div class="t">On the way</div><div class="s">Left 2:18 PM &middot; ${late ? 'running behind, about 3:00 PM' : '8 minutes out'}</div></div>
         </div>
         <div class="step">
           <div class="rail"><div class="dot"></div><div class="bar"></div></div>
@@ -1042,7 +1085,7 @@ function Track() {
    component as Lab results. Our states, plain words: a request
    is a request, and nothing is called a #WO1.
    ============================================================ */
-function Visits() {
+function Visits(qForce) {
   /* Requested + Upcoming share one tab (June): the status pill
      already says which is which, so soonest-first in one list. */
   const vtabs = ['Upcoming', 'In progress', 'Past'];
@@ -1057,39 +1100,94 @@ function Visits() {
       </span>
       <span class="chev">${I.chev}</span>
     </button>`;
-  const panels = [
-    /* Upcoming: confirmed visits and pending requests, soonest
-       first; the pill carries the status */
-    vrow(`go('precall')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
-         'pill-accepted', 'Confirmed', 'Dr. Priya Anand', 'Tomorrow, 10:15 AM &middot; video visit') +
-    vrow(`go('requested')`, `<span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>`,
-         'pill-pending', 'Finding your nurse', 'Blood draw at home', 'Wed, 10 AM - 12 PM &middot; requested today') +
-    vrow(`go('vrequested')`, `<span class="avatar initials">SO</span>`,
-         'pill-pending', 'Awaiting practice', 'Dr. Sarah Okafor', 'Thu, 2:30 PM &middot; video visit'),
-    /* In progress: the live crew visit — unless it was cancelled,
-       in which case the truth is that nothing is happening */
-    state.cx
-      ? '<div class="empty">Nothing in progress right now.</div>'
-      : vrow(`go('track')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
-             'pill-en-route', 'On the way', 'Blood draw at home', 'Today &middot; Jennifer Reyes'),
-    /* Past: a cancelled visit is history, not a live card */
-    (state.cx
-      ? vrow(`go('cancel')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
-             'pill-canceled', 'Cancelled', 'Blood draw at home', 'Today &middot; cancelled before arrival')
-      : '') +
-    vrow(`go('summary')`, `<img class="avatar" src="${DR_BELL}" alt="">`,
-         'pill-complete', 'Complete', 'Dr. Marcus Bell', '6 June &middot; notes and results ready'),
+  /* R2.2c — Visits search (parked item un-parked, built 2026-07-20;
+     reviewed on mock-visits-search.html). Every visit is data
+     first: ONE list feeds both the tabs and the search, so the box
+     can only match what a card really says — the old app promised
+     name search over #WO1 cards; this box cannot lie that way.
+     Entry: [tab, action, avatar, pillCls, pillTxt, title, sub,
+     extra search words a patient might type that the card implies].
+     Carried over per-row rules: the confirmed video visit opens
+     its hub (manage); the safe-stop order is an Upcoming action,
+     not history; cancelled visits are history, not live cards. */
+  const AV_DROP = `<span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>`;
+  const tnames = selTests().map(x => x[1]).join(', ');
+  const visits = [
+    ...(state.vcx ? [] : [[0, `go('manage')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
+      'pill-accepted', 'Confirmed', 'Dr. Priya Anand', `${vWhenShort()} &middot; video visit`, 'video doctor primary care july']]),
+    ...(state.nodraw ? [[0, `go('nodraw')`, AV_DROP,
+      'pill-urgent', 'Needs a new time', 'Blood draw at home', 'Stopped safely today &middot; your order is kept', `${tnames} nurse jennifer reyes blood july`]] : []),
+    [0, `go('accepted')`, AV_DROP,
+      'pill-accepted', 'Confirmed', 'Blood draw at home', 'Wed, 10 AM - 12 PM &middot; Jennifer Reyes', `${tnames} nurse blood wednesday july`],
+    [0, `go('declined')`, `<span class="avatar initials">SO</span>`,
+      'pill-canceled', 'Practice full', 'Dr. Sarah Okafor', 'Thu, 2:30 PM &middot; the practice can&rsquo;t take new patients', 'video doctor thursday july'],
+    ...(state.cx || state.nodraw ? [] : [[1, `go('track')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
+      'pill-en-route', 'On the way', 'Blood draw at home', 'Today &middot; Jennifer Reyes', `${tnames} nurse blood today july`]]),
+    ...(state.vcx ? [[2, `go('vcancel')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
+      'pill-canceled', 'Cancelled', 'Dr. Priya Anand', 'Video visit &middot; cancelled by you', 'video doctor july']] : []),
+    ...(state.cx ? [[2, `go('cancel')`, `<img class="avatar" src="${CREW_JEN}" alt="">`,
+      'pill-canceled', 'Cancelled', 'Blood draw at home', 'Today &middot; cancelled before arrival', `${tnames} nurse jennifer reyes blood july`]] : []),
+    [2, `go('summary')`, `<img class="avatar" src="${DR_BELL}" alt="">`,
+      'pill-complete', 'Complete', 'Dr. Marcus Bell', '6 June &middot; notes and results ready', 'video doctor cardiology'],
+    /* R2.2c: the two history rows are the same visits Results > All
+       already shows, dates and all — the two surfaces agree. They
+       open there, where their numbers live. */
+    [2, `go('resultsall')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
+      'pill-complete', 'Complete', 'Dr. Priya Anand', '2 April &middot; annual physical, full panel', 'doctor lipid cholesterol glucose vitamin d a1c'],
+    [2, `go('resultsall')`, AV_DROP,
+      'pill-complete', 'Complete', 'Blood draw at home', '20 January &middot; lipid panel, vitamin D, A1c', 'nurse blood cholesterol draw'],
   ];
+  const rawQ = qForce != null ? qForce : state.vq;
+  const q = rawQ.trim().toLowerCase();
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const corpus = v => (v[4] + ' ' + v[5] + ' ' + v[6] + ' ' + v[7]).replace(/&[a-z]+;/g, ' ').toLowerCase();
+  const hits = q ? visits.filter(v => corpus(v).includes(q)) : [];
+  const panels = [0, 1, 2].map(n => {
+    const rows = visits.filter(v => v[0] === n).map(v => vrow(v[1], v[2], v[3], v[4], v[5], v[6])).join('');
+    return rows || '<div class="empty">Nothing in progress right now.</div>';
+  });
   return `
   ${bar('Visits')}
   <div class="scroll">
+    <label class="vsearch">
+      <input type="search" id="vq" placeholder="Doctor, test, or month" aria-label="Search your visits"
+             value="${esc(rawQ)}" oninput="vqType(this.value)">
+      ${rawQ ? '<button class="clear" onclick="vqClear()">Clear</button>' : ''}
+    </label>
+    ${q ? (hits.length ? `
+    <p class="tiny" style="margin:0 0 8px" role="status">${hits.length} visit${hits.length === 1 ? ' matches' : 's match'} &ldquo;${esc(rawQ)}&rdquo;</p>
+    ${hits.map(v => vrow(v[1], v[2], v[3], v[4], v[5], v[6])).join('')}` : `
+    <div class="empty">
+      <div class="big" aria-hidden="true">&empty;</div>
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Nothing matches &ldquo;${esc(rawQ)}&rdquo;.</div>
+      <div>Try a doctor, a test, or a month &mdash; like &ldquo;anand&rdquo;, &ldquo;lipid&rdquo;,
+        or &ldquo;january&rdquo;. We search your visits, not your results &mdash; those have
+        their own tabs.</div>
+      <button class="btn btn-ghost" style="margin-top:16px" onclick="vqClear()">Clear search</button>
+    </div>`) : `
     <div class="tabs">
       ${vtabs.map((n, i) => `
         <button class="tabx" aria-selected="${t === i}" onclick="state.vtab=${i};render()">${n}</button>`).join('')}
     </div>
-    ${panels[t]}
+    ${panels[t]}`}
   </div>
   ${tabbar('visits')}`;
+}
+
+/* Search typing re-renders, then puts the caret back. From the
+   board's #vsearch demo route, the first interaction hands over
+   to the live #visits screen. */
+function vqType(v) {
+  state.vq = v;
+  if (location.hash === '#vsearch') { go('visits'); return; }
+  render();
+  const i = document.getElementById('vq');
+  if (i) { i.focus(); const n = i.value.length; try { i.setSelectionRange(n, n); } catch (e) {} }
+}
+function vqClear() {
+  state.vq = '';
+  if (location.hash === '#vsearch') { go('visits'); return; }
+  render();
 }
 
 function Msgs() {
@@ -1493,8 +1591,12 @@ function Welcome() {
       <input id="ph" class="input" type="tel" placeholder="(555) 000-1234">
       <button class="btn btn-emphasis" style="margin-top:12px" onclick="go('verify')">Continue</button>
       <button class="btn btn-ghost" style="margin-top:8px" onclick="go('signup')">New to Teleport? Create an account</button>
+      <!-- R2.2: the two links are real routes now (terms). Padded
+           inline targets keep the 44px floor inside a caption. -->
       <p class="tiny" style="text-align:center;margin-top:12px;max-width:300px;margin-left:auto;margin-right:auto">
-        We will text you a sign-in code. By continuing you agree to the Terms and the Privacy Policy.
+        We will text you a sign-in code. By continuing you agree to the
+        <button class="tlink" onclick="state.ttab=0;go('terms')">Terms</button> and the
+        <button class="tlink" onclick="state.ttab=1;go('terms')">Privacy Policy</button>.
       </p>
     </div>
   </div>`;
@@ -1535,7 +1637,7 @@ function Signup() {
     </div>
 
     <div style="margin-top:28px">
-      <button class="btn btn-emphasis" onclick="go('verify')">Continue</button>
+      <button class="btn btn-emphasis" onclick="signupGo()">Continue</button>
       <p class="tiny" style="text-align:center;margin-top:12px">
         That is the whole form. No insurance cards, no documents, no photos today.
       </p>
@@ -1548,24 +1650,54 @@ function Signup() {
    and sign-up, so there is exactly one door into the app.
    Each digit box is its own 46x56 target, above the 44px floor.
    ============================================================ */
-function Verify() {
+function Verify(force) {
+  /* R2.2 — the wrong-code states (backlog, built 2026-07-20).
+     Danger is text plus a ring on the boxes; misses are budgeted
+     out loud, and the third miss texts a fresh code — the recovery
+     IS the code, never a lockout. The board's #verifyerr route
+     renders miss 1 via `force` without touching live state. */
+  const bc = force || state.badcode;
+  const digits = bc === 3 ? [] : bc ? ['8','2','4','1','0','9'] : ['8','2','4','1'];
   return `
   ${bar('', 'welcome')}
   <div class="scroll" style="padding-top:0">
     <h1 class="display sm">Enter the code.</h1>
-    <p class="muted" style="margin-top:-12px">We texted a 6-digit code to ${state.fields.phone}.</p>
+    <p class="muted" style="margin-top:-12px">
+      We texted a ${bc === 3 ? 'fresh' : '6-digit'} code to ${state.fields.phone}.
+    </p>
 
     <div class="code-row" style="margin-top:28px">
       ${[1,2,3,4,5,6].map(n => `
-        <input class="code" type="text" inputmode="numeric" maxlength="1" aria-label="Digit ${n}"
-               ${n <= 4 ? `value="${[8,2,4,1][n-1]}"` : ''}>`).join('')}
+        <input class="code${bc === 1 || bc === 2 ? ' err' : ''}" type="text" inputmode="numeric" maxlength="1"
+               aria-label="Digit ${n}" ${bc === 1 || bc === 2 ? 'aria-invalid="true"' : ''}
+               ${digits[n-1] ? `value="${digits[n-1]}"` : ''}>`).join('')}
     </div>
+    ${bc === 1 || bc === 2 ? `
+    <span class="errline" role="alert">That code didn&rsquo;t match.
+      ${bc === 1 ? 'Two more tries' : 'One more try'}, then we&rsquo;ll text you a fresh one.</span>` : ''}
+    ${bc === 3 ? `
+    <span class="errline" role="alert" style="color:var(--text-secondary)">That code is used up. A fresh one is on its way.</span>` : ''}
 
     <div style="margin-top:28px">
-      <button class="btn btn-primary" onclick="go('home')">Verify and continue</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="alert('Code re-sent')">Text me a new code</button>
+      <button class="btn btn-primary" onclick="verifyGo()">Verify and continue</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="newCode()">Text me a new code</button>
     </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">Codes expire after 10 minutes.</p>
   </div>`;
+}
+
+/* Success = six digits that are not the known-wrong demo code
+   (824109, the one the error state shows). Anything else is a
+   miss; the third miss becomes the fresh-code state. */
+function verifyGo() {
+  const v = [...app.querySelectorAll('.code')].map(b => b.value).join('');
+  if (v.length === 6 && v !== '824109') { state.badcode = 0; go('home'); return; }
+  state.badcode = state.badcode >= 2 ? 3 : state.badcode + 1;
+  if (location.hash === '#verifyerr') go('verify'); else render();
+}
+function newCode() {
+  state.badcode = 3;
+  if (location.hash === '#verifyerr') go('verify'); else render();
 }
 
 /* ============================================================
@@ -1580,9 +1712,23 @@ function Notifs() {
   const fresh = [
     state.cx
       ? ['drop',   'Visit cancelled',         'Blood draw at home &middot; cancelled before arrival', 'now', `go('cancel')`]
+      /* R2.2b: the stop gets a neutral push title — the bad news
+         is delivered inside the app, never in a preview. */
+      : state.nodraw
+      ? ['care',   'About today&rsquo;s draw', 'We couldn&rsquo;t finish &mdash; what happens next is inside', '2:52 PM', `go('nodraw')`]
       : ['drop',   'Jennifer is on the way',  'Blood draw &middot; arrives about 2:40 PM', 'now',   `go('track')`],
+    /* R2.2b: the accepted moment — the promise Requested made. */
+    ['drop',     'You have a nurse',        'Jennifer accepted Wednesday&rsquo;s draw &middot; tap to get ready', '12:40 PM', `go('accepted')`],
     ['chat',     'New message',             'Dr. Anand: &ldquo;Your results look good overall.&rdquo;', '11:02 AM', `state.thread='anand';go('thread')`],
-    ['calendar', 'Visit reminder',          'Dr. Priya Anand &middot; tomorrow, 10:15 AM', '9:00 AM', `go('precall')`],
+    /* R2.2: cancelling or moving the video visit rewrites the
+       reminder — the feed never contradicts the calendar. */
+    state.vcx
+      ? ['calendar', 'Visit cancelled',     'Dr. Priya Anand &middot; the video visit is off; nothing is charged', '9:00 AM', `go('vcancel')`]
+      : ['calendar', 'Visit reminder',      `Dr. Priya Anand &middot; ${state.moved ? vWhenShort() : 'tomorrow, 10:15 AM'}`, '9:00 AM', `go('precall')`],
+    /* R2.2: the declined request lands here first. The push title
+       stays neutral — the disappointment is delivered inside the
+       app, never in a lock-screen preview. */
+    ['care',     'About your Thursday request', 'Dr. Okafor&rsquo;s practice can&rsquo;t take new patients &middot; other options inside', '8:12 AM', `go('declined')`],
   ];
   const earlier = [
     ['flask',    'Lab results ready',       'Lipid panel &middot; reviewed by Dr. Anand', 'Yesterday', `go('results')`],
@@ -2032,6 +2178,432 @@ function Receipt() {
   </div>`;
 }
 
+/* ============================================================
+   R2.2 — FIVE BACKLOG SCREENS, BUILT (2026-07-20).
+   Wrong code, under-18, terms & privacy, reschedule/cancel a
+   video visit, request declined by practice. Reviewed frame by
+   frame on mock-backlog-screens.html before landing here.
+   ============================================================ */
+
+/* R2.2 — an under-18 birthday exits the solo funnel (year-only
+   check; the prototype's clock is July 2026). */
+function signupGo() {
+  const dob = (document.getElementById('dob') || {}).value || '';
+  const yr = (dob.match(/(19|20)\d\d/) || [])[0];
+  go(yr && 2026 - yr < 18 ? 'minor' : 'verify');
+}
+
+/* UNDER 18 — instead of a teen account type, reuse Family: the
+   parent's account is the account, the teen is a bookable member.
+   Drafts the product answer to DEV-FAQ open decision #9. */
+function Minor() {
+  return `
+  ${bar('Create account', 'signup')}
+  <div class="scroll">
+    <h1 class="display sm">This part needs a parent.</h1>
+    <p class="muted" style="margin-top:-12px">
+      Teleport accounts belong to adults. Under 18, a parent or guardian books
+      your care from their account &mdash; you&rsquo;re one of their Family.
+    </p>
+
+    <div class="card" style="margin-top:24px">
+      <div class="track">
+        <div class="step now">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">We text your parent or guardian</div><div class="s">A link to sign in, or to create their own account</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+          <div class="txt"><div class="t">They add you under Family</div><div class="s">Your name and birthday arrive prefilled &mdash; one tap</div></div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="dot"></div></div>
+          <div class="txt"><div class="t">Care works the same</div><div class="s">They book; you take the visit</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <label class="flabel" for="gph">Parent or guardian&rsquo;s phone</label>
+      <input id="gph" class="input" type="tel" placeholder="(555) 000-1234">
+      <button class="btn btn-emphasis" style="margin-top:12px" onclick="alert('We texted them the link.')">Text them the link</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="go('signup')">I mistyped my birthday</button>
+      <p class="tiny" style="text-align:center;margin-top:12px;max-width:300px;margin-left:auto;margin-right:auto">
+        Nothing you typed is saved until they approve. If the text never
+        arrives, nothing exists.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* TERMS & PRIVACY — the Sign in links, made real. Plain-language
+   promises first, the binding text below; acceptance stays "by
+   continuing" (no checkbox in the identity-only flow). */
+function Terms() {
+  const t = state.ttab;
+  const sv = (ico, txt) => `
+      <div class="sv"><img src="img/icons/ph-line/${ico}.svg" alt=""><span>${txt}</span></div>`;
+  const body = t === 0 ? `
+    <div class="card" style="margin-top:16px">
+      <div style="font-weight:700;margin-bottom:14px">The short version</div>
+      ${sv('check', 'You pay per visit. No subscription, no membership, no surprise line items.')}
+      ${sv('lock', 'Your records are yours. Download or delete them whenever you want.')}
+      ${sv('lock', 'We never sell your health data, and we never will.')}
+      ${sv('care', 'Licensed clinicians make every medical call. The app just gets them to you.')}
+      ${sv('calendar', 'Cancel any visit free up to 10 hours before it starts.')}
+    </div>
+    <p class="tiny" style="margin-top:10px">
+      The short version is a summary, not the agreement. The full text below is the one that binds.
+    </p>
+    <h2 class="section">1. The service</h2>
+    <p class="legal">Teleport MD arranges video visits with licensed providers and at-home
+      sample collection by licensed clinical staff. Teleport MD is not itself a medical
+      practice and does not employ your doctor&hellip;</p>
+    <h2 class="section">2. Your account</h2>
+    <p class="legal">One account per adult. You are responsible for keeping your phone
+      number current, since sign-in codes and visit updates are sent by text&hellip;</p>
+    <h2 class="section">3. Visits and cancellation</h2>
+    <p class="legal">Visits may be cancelled without charge until 10 hours before the
+      scheduled start&hellip;</p>` : `
+    <div class="card" style="margin-top:16px">
+      <div style="font-weight:700;margin-bottom:14px">The short version</div>
+      ${sv('lock', 'We collect what care needs: identity, visits, results, and the address a nurse drives to.')}
+      ${sv('profile', 'It is shared only inside your care: your doctor, the lab, your insurer if you add one.')}
+      ${sv('check', 'No selling, no ad targeting, no data brokers. Ever.')}
+      ${sv('flask', 'Results live in the app, so you see them as soon as your doctor has.')}
+    </div>
+    <p class="tiny" style="margin-top:10px">
+      The short version is a summary, not the policy. The full text below governs.
+    </p>
+    <h2 class="section">1. What we collect</h2>
+    <p class="legal">Identity and contact details you provide, visit and order records
+      created as you use the service, and results returned by the lab&hellip;</p>
+    <h2 class="section">2. Who sees it</h2>
+    <p class="legal">The clinicians in your care, the laboratory processing an order,
+      and &mdash; only if you add a plan &mdash; your insurer for claims&hellip;</p>
+    <h2 class="section">3. Your controls</h2>
+    <p class="legal">Export or delete your records from You &gt; Personal info; deleting
+      your account removes everything not legally required to be retained&hellip;</p>`;
+  return `
+  ${bar('Terms &amp; privacy', 'welcome')}
+  <div class="scroll">
+    <div class="tabs">
+      <button class="tabx" aria-selected="${t === 0}" onclick="state.ttab=0;render()">Terms</button>
+      <button class="tabx" aria-selected="${t === 1}" onclick="state.ttab=1;render()">Privacy</button>
+    </div>
+    ${body}
+    <p class="tiny" style="margin-top:24px">Effective July 20, 2026 &middot; Version 1.0</p>
+  </div>`;
+}
+
+/* The video visit's calendar, shared by the manage/reschedule
+   screens. Own state (rday/rslot) so nothing bleeds into Book's
+   scheduler — the known demo-data trap from DEV-FAQ section 3. */
+const VDAYS = [['Tue','15'],['Wed','16'],['Thu','17'],['Fri','18'],['Sat','19'],['Sun','20']];
+const VSLOTS = ['9:30 AM','10:15 AM','11:00 AM','1:30 PM','2:00 PM','3:45 PM'];
+const DAYFULL = { Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+const vWhenShort = () => state.moved ? `${VDAYS[state.rday][0]} ${VDAYS[state.rday][1]}, ${VSLOTS[state.rslot]}` : 'Tomorrow, 10:15 AM';
+const vWhenLong  = () => state.moved ? `${VDAYS[state.rday][0]} ${VDAYS[state.rday][1]} July, ${VSLOTS[state.rslot]}` : 'Wed 16 July, 10:15 AM';
+
+/* YOUR VISIT — the hub a Confirmed row opens (Visits and Home).
+   Pre-call keeps its reminder/notification entries; Join surfaces
+   here 10 minutes before. Cancel here is quiet danger text — the
+   coral button waits for the final confirm on VCancel. */
+function Manage() {
+  return `
+  ${bar('', 'visits')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-accepted">Confirmed</span>
+    <h1 class="display" style="margin-top:12px">${state.moved
+      ? `${DAYFULL[VDAYS[state.rday][0]]}, ${VSLOTS[state.rslot].replace(' ', '&nbsp;')}.`
+      : 'Wednesday, 10:15&nbsp;AM.'}</h1>
+
+    <div class="card" style="margin-top:8px">
+      <div style="display:flex;gap:16px;align-items:center">
+        <img class="avatar lg" src="${DR_ANAND}" alt="">
+        <div>
+          <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+          <div class="tiny">Primary care &middot; video visit &middot; 30 minutes</div>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--border-subtle);margin:18px 0 14px"></div>
+      <div class="tiny">${state.moved
+        ? 'Moved from Wednesday 10:15 AM &mdash; your note came along.'
+        : 'Booked for you &middot; your note to Dr. Anand is attached.'}
+        The join button appears here and in Notifications 10 minutes before.</div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-secondary" onclick="go('reschedule')">Pick a new time</button>
+      <button class="btn btn-quiet-danger" style="margin-top:8px" onclick="go('vcancel')">Cancel this visit</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        ${state.moved
+          ? 'Free to change or cancel until 10 hours before the visit.'
+          : 'Free to change or cancel until 12:15 AM tonight &mdash; 10 hours before the visit.'}
+      </p>
+    </div>
+  </div>`;
+}
+
+/* PICK A NEW TIME — Book's day/slot grammar, reused verbatim. The
+   CTA names the exact new slot, so the button is the receipt. */
+function Reschedule() {
+  const d = state.rday, s = state.rslot;
+  return `
+  ${bar('Pick a new time', 'manage')}
+  <div class="scroll" style="padding-bottom:170px">
+    <div class="row" style="cursor:default;margin-bottom:24px">
+      <img class="avatar" src="${DR_ANAND}" alt="">
+      <span class="body">
+        <span class="title">Dr. Priya Anand</span>
+        <span class="sub">Now booked: ${vWhenLong()}</span>
+      </span>
+    </div>
+
+    <h2 class="section" style="margin-top:0">Pick a time</h2>
+    <div class="days">
+      ${VDAYS.map(([dow, num], i) => `
+        <button class="day" aria-pressed="${d === i}" onclick="state.rday=${i};render()">
+          <span class="dow">${dow}</span><span class="num">${num}</span>
+        </button>`).join('')}
+    </div>
+
+    <div class="slots" style="margin-top:16px">
+      ${VSLOTS.map((sl, i) => `
+        <button class="slot" aria-pressed="${s === i}" ${i === 2 ? 'disabled' : ''}
+                onclick="state.rslot=${i};render()">${sl}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="ctabar">
+    <button class="btn btn-primary" ${s === null ? 'disabled style="opacity:.4"' : ''}
+            onclick="${s === null ? '' : `state.moved=true;go('moved')`}">
+      ${s === null ? 'Choose a time' : `Move to ${VDAYS[d][0]} ${VDAYS[d][1]}, ${VSLOTS[s]}`}
+    </button>
+    <p class="tiny">Your note moves with the visit. The old time goes back to the practice.</p>
+  </div>`;
+}
+
+/* MOVED — the Booked moment, reused for a move. The new time
+   cascades to Visits, Home and the reminder from state. */
+function Moved() {
+  return `
+  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
+    <div class="tick"><img src="img/icons/ph-line/check-fill-e.svg" alt=""></div>
+    <h1 class="display">You&rsquo;re moved.</h1>
+    <p class="muted" style="margin-top:-12px">The practice has the change; everything else about the visit stays put.</p>
+
+    <div class="card" style="margin-top:24px">
+      <div style="display:flex;gap:16px;align-items:center">
+        <img class="avatar lg" src="${DR_ANAND}" alt="">
+        <div>
+          <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+          <div class="tiny">Primary care</div>
+        </div>
+      </div>
+      <div style="margin:20px 0 4px;font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.02em">
+        ${vWhenLong()}
+      </div>
+      <div class="tiny">Video visit &middot; 30 minutes &middot; was Wed 16 July, 10:15 AM</div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="alert('Added to calendar')">Update my calendar</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Back to home</button>
+    </div>
+    <p class="tiny" style="text-align:center;margin-top:16px">
+      We will text you a link 10 minutes before.
+    </p>
+  </div>`;
+}
+
+/* CANCEL THE VIDEO VISIT — the draw cancel's honest two-step. No
+   nurse is driving, so the stakes copy is about the slot and the
+   note. V1 is fee-free; the $25 late-fee line returns with pricing
+   (V2-FEATURES.md); ?v2 renders it. */
+function VCancel() {
+  if (state.vcx) return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-canceled">Cancelled</span>
+    <h1 class="display" style="margin-top:12px">This visit is off.</h1>
+    <p class="muted" style="margin-top:-12px">${state.moved ? `${DAYFULL[VDAYS[state.rday][0]]} ${VSLOTS[state.rslot]}` : 'Wednesday 10:15 AM'} with Dr. Anand is cancelled; the practice knows.</p>
+
+    <div class="card" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">What happens now</div>
+      <div class="tiny">
+        Nothing was charged and nothing goes on your record. Dr. Anand stays on
+        your care team, so booking again is the instant path &mdash; no new request.
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('book')">Book another time</button>
+      <button class="btn btn-secondary" style="margin-top:12px" onclick="go('home')">Back to home</button>
+    </div>
+  </div>`;
+  const reasons = ['Feeling better', 'Bad timing', 'Found care elsewhere', 'Something else'];
+  return `
+  ${bar('Cancel', 'manage')}
+  <div class="scroll">
+    <h1 class="display sm">Cancel this visit?</h1>
+    <p class="muted" style="margin-top:-12px">
+      ${state.moved ? `${DAYFULL[VDAYS[state.rday][0]]}&rsquo;s ${VSLOTS[state.rslot]}` : 'Wednesday&rsquo;s 10:15'} with Dr. Anand goes back to the
+      practice, and your note to her is deleted.
+    </p>
+
+    <h2 class="section">Tell us why <span class="tiny" style="font-weight:400">(optional)</span></h2>
+    <div class="chips" style="margin-top:0">
+      ${reasons.map(r => `
+      <button class="chip" aria-pressed="${state.vcreason === r}"
+              onclick="state.vcreason = state.vcreason === '${r}' ? null : '${r}'; render()">${r}</button>`).join('')}
+    </div>
+
+    <div style="margin-top:32px">
+      <button class="btn btn-secondary" onclick="go('manage')">Keep my visit</button>
+      <button class="btn btn-danger" style="margin-top:12px" onclick="state.vcx=true;render()">Cancel the visit</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        ${V2VIEW
+          ? 'Free now. Inside 10 hours of the visit, a $25 late fee applies.'
+          : 'Free to cancel &mdash; you&rsquo;re well before the 10-hour mark.'}
+      </p>
+    </div>
+  </div>`;
+}
+
+/* PRACTICE FULL — the other ending of Request sent. The pill names
+   the reason, the blame lands on capacity, and "declined" never
+   reaches the patient. The note-deleted-unread line is a real
+   backend promise. */
+function Declined() {
+  return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-canceled">Practice full</span>
+    <h1 class="display" style="margin-top:12px">Dr. Okafor can&rsquo;t take new patients right now.</h1>
+    <p class="muted" style="margin-top:-12px">
+      The practice reviewed your Thursday request and their panel is full.
+      That&rsquo;s their capacity, not anything about you.
+    </p>
+
+    <div class="card" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">What happened to your request</div>
+      <div class="tiny">
+        Thursday 2:30 PM was released, and your note to Dr. Okafor was deleted
+        without being read. Nothing was booked and nothing was shared beyond your name.
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('doctors')">Find a doctor with openings</button>
+      <button class="row" style="margin-top:12px;padding:16px" onclick="go('book')">
+        <img class="avatar" src="${DR_ANAND}" alt="">
+        <span class="body">
+          <span class="title">Or book Dr. Anand</span>
+          <span class="sub">Your care team &middot; has times tomorrow</span>
+        </span>
+        <span class="chev">${I.chev}</span>
+      </button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        From here, search only shows doctors accepting new patients.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   R2.2b — THE DRAW'S MISSING STATES, BUILT (2026-07-20).
+   The "nurse accepted" moment, the late banner (in Track), and
+   the safe stop. Reviewed on mock-draw-states.html.
+   ============================================================ */
+
+/* YOU HAVE A NURSE — the promise the Requested screen made, kept.
+   Acceptance usually lands the day before, so this is its own
+   moment, not a Track variant — and it carries the prep guidance,
+   which had no other home. */
+function Accepted() {
+  return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-accepted">Confirmed</span>
+    <h1 class="display" style="margin-top:12px">You have a nurse.</h1>
+    <p class="muted" style="margin-top:-12px">Jennifer Reyes accepted your Wednesday visit.</p>
+
+    <div class="card" style="margin-top:8px">
+      <div style="display:flex;gap:16px;align-items:center">
+        <img class="avatar lg" src="${CREW_JEN}" alt="">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+          <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--border-subtle);margin:18px 0 14px"></div>
+      <div class="tiny">Wednesday, 10 AM &ndash; 12 PM &middot; ${addrList()[0][1]}<br>
+        ${selTests().map(t => t[1]).join(' and ') || 'Your tests'} &middot; about 15 minutes</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div style="font-weight:700;margin-bottom:14px">Get ready</div>
+      <div class="sv"><img src="img/icons/ph-line/drop.svg" alt=""><span>Fast for 12 hours before the visit &mdash; the lipid panel needs it. Water is not just fine, it helps.</span></div>
+      <div class="sv"><img src="img/icons/ph-line/vitals.svg" alt=""><span>Warm hands, easy veins: no need to do anything else special.</span></div>
+      <div class="sv"><img src="img/icons/ph-line/lock.svg" alt=""><span>Jennifer will show a door code that matches yours. It arrives with the live map when she&rsquo;s driving.</span></div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="go('home')">Back to home</button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        We&rsquo;ll text when Jennifer is on the way, with a live map.
+      </p>
+    </div>
+  </div>`;
+}
+
+/* WE COULDN'T FINISH — the safe stop. Terminal for the visit, not
+   for the order: it stays in Upcoming as "Needs a new time", and
+   rebooking clears the state. Blame lands nowhere. */
+function NoDraw() {
+  return `
+  ${bar('', 'home')}
+  <div class="scroll" style="padding-top:0">
+    <span class="pill pill-urgent">Needs a new time</span>
+    <h1 class="display" style="margin-top:12px">We couldn&rsquo;t finish the draw.</h1>
+    <p class="muted" style="margin-top:-12px">
+      Jennifer tried twice and stopped &mdash; that&rsquo;s the safe protocol,
+      not anything you did wrong.
+    </p>
+
+    <div class="card" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">What happens now</div>
+      <div class="tiny">
+        Nothing was collected, and your test order (${selTests().map(t => t[1]).join(', ') || 'unchanged'})
+        is kept exactly as it was. Dr. Anand has been told &mdash; nothing about
+        your care changes except the timing.
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div style="font-weight:700;margin-bottom:14px">For the next try</div>
+      <div class="sv"><img src="img/icons/ph-line/drop.svg" alt=""><span>Drink water the evening before and the morning of &mdash; hydrated veins are easier veins.</span></div>
+      <div class="sv"><img src="img/icons/ph-line/calendar.svg" alt=""><span>Mornings tend to go better. We&rsquo;ll surface those slots first.</span></div>
+    </div>
+
+    <div style="margin-top:24px">
+      <button class="btn btn-emphasis" onclick="state.nodraw=false;go('collect')">Pick a new time</button>
+      <button class="row" style="margin-top:12px;padding:16px" onclick="alert('Directions to Quest, 3rd Ave')">
+        <span class="nicon"><img src="img/icons/ph-fill/tube.svg" alt=""></span>
+        <span class="body">
+          <span class="title">Or use a draw site</span>
+          <span class="sub">Quest on 3rd Ave, 0.4 mi &middot; same order, walk in</span>
+        </span>
+        <span class="chev">${I.chev}</span>
+      </button>
+      <p class="tiny" style="text-align:center;margin-top:12px">
+        Same order, same tests &mdash; nothing to re-request.
+      </p>
+    </div>
+  </div>`;
+}
+
 /* ---------- router ---------- */
 const routes = {
   home: Home, getcare: GetCare, doctors: Doctors, docprofile: DocProfile,
@@ -2046,6 +2618,19 @@ const routes = {
   /* R2.1 — the former stubs */
   insurance: Insurance, family: Family, payment: Payment, editfield: EditField,
   tests: Tests, address: Address, cancel: Cancel, receipt: Receipt,
+  /* R2.2 — the five backlog screens (built 2026-07-20). verifyerr
+     is the board's window onto the error state; manage shows the
+     cancelled truth once the visit is off. */
+  verifyerr: () => Verify(1), minor: Minor, terms: Terms,
+  manage: () => state.vcx ? VCancel() : Manage(),
+  reschedule: Reschedule, moved: Moved, vcancel: VCancel, declined: Declined,
+  /* R2.2b — the draw's missing states. #late renders Track's late
+     variant without touching state; #nodraw flips the demo into
+     the safe-stop timeline (rebooking clears it). */
+  accepted: Accepted, late: () => Track(1),
+  nodraw: () => { state.nodraw = true; return NoDraw(); },
+  /* R2.2c — the board's window onto Visits search mid-query. */
+  vsearch: () => Visits('lipid'),
 };
 
 function render() {

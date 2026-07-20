@@ -17,6 +17,12 @@ const SECTIONS = [
    'Net new. The old sign-up funneled documents, dependents and insurance before any care; identity is enough to start.', true],
   ['verify','Text code','One code serves sign-in and sign-up.',
    'Net new. Each digit box is its own 46&times;56 target, above the 44px floor.', true],
+  ['verifyerr','Wrong code','The code fails without shame or lockout.',
+   'Net new (backlog, built 2026-07-20; reviewed on mock-backlog-screens.html). Danger is text plus a 2px ring on the boxes &mdash; nothing turns coral, nothing shakes. Misses are budgeted out loud (&ldquo;two more tries&rdquo;), and the third miss texts a fresh code: the recovery IS the code, never a lockout or a support ticket.', true],
+  ['minor','Under 18','A birthday under 18 hands the account to a parent.',
+   'Net new (backlog, built 2026-07-20). Instead of a teen account type, the flow reuses Family: we text the parent or guardian, they add the teen with prefilled details, and bookings already work through &ldquo;Who is this for?&rdquo;. Nothing is saved until they approve. Drafts the product answer to DEV-FAQ open decision #9.', true],
+  ['terms','Terms & privacy','The short version first, the binding text below.',
+   'Net new (backlog, built 2026-07-20). The Sign in links are real now: five plain-language promises up top, the full text underneath, acceptance stays &ldquo;by continuing&rdquo; &mdash; no checkbox in the identity-only flow. Legal still owes sign-off that each promise survives the real terms.', true],
   ]],
   ['Main navigation', [
   ['home','Home','The hero is now the thing only Teleport does.',
@@ -25,6 +31,8 @@ const SECTIONS = [
    'June\'s re-cut: one at-home tile (the next screen picks the service), video visit, my visits, lab results. New house-with-cross glyph.', false],
   ['visits','Visits','Upcoming, In progress, Past.',
    'The old Appointments tab structure in the Lab-results tab component; pending requests and confirmed visits share Upcoming, with the status pill telling them apart. No work-order IDs.', false],
+  ['vsearch','Visits search','One box: who, what, or when.',
+   'Net new (the parked item, un-parked; built 2026-07-20, reviewed on mock-visits-search.html). The old app&rsquo;s search hinted &ldquo;e.g. First Name, Last Name&rdquo; over cards titled #WO1 &mdash; a box that promised what it could not match. This one names its three axes (doctor, test, or month) and reads the rows&rsquo; real text plus their test names, so it can only find what a card really says. Typing swaps the tabs for one flat list across statuses &mdash; the pill carries the status &mdash; and the no-match state is the app&rsquo;s first real empty state: name what failed, teach the axes, one-tap exit. Past gains the two history rows Results&nbsp;&gt;&nbsp;All already shows (2 April physical, 20 January draw), so the two surfaces finally agree. <span style="color:#FFB4A8">Open for the team: how far back does visit history sync &mdash; all-time or a window? Should search ever read results values (&ldquo;218&rdquo; finding the high cholesterol) or is that strictly a results-tab job? And does the box live on all three tabs as built, or Past only?</span>', true],
   ['notifs','Notifications','Now a tab: one feed for everything.',
    'Per the old design\'s nav: messages, lab results, crew updates and reminders in one place, each opening its real destination. (The receipt item is hidden with pricing until V2.) New bell, heart-pulse and test-tube icons generated in both weights.', false],
   ['you','You','Status instead of a completion nag.',
@@ -47,10 +55,18 @@ const SECTIONS = [
    'The care-team path: you\'ve seen this doctor before, so times are the whole screen. Family members are selectable under "Who is this for?"; the payment row reads Cash in V1 (pricing is V2) and the optional doctor note stays.', false],
   ['confirmed','Booked','A booking is a booking.',
    'Care-team video visits confirm instantly; only new-doctor requests wait for the practice.', false],
+  ['manage','Your visit','One hub for a booked visit.',
+   'Net new (backlog, built 2026-07-20). The Confirmed rows on Visits and Home open this instead of jumping to Pre-call: the visit, the 10-hour rule, a quiet &ldquo;Pick a new time&rdquo; and a quieter cancel (danger text here; coral waits for the final confirm). Join appears here 10 minutes out; Pre-call keeps its reminder entries.', true],
+  ['reschedule','Pick a new time','Book&rsquo;s grid, reused for moving.',
+   'Net new (backlog, built 2026-07-20). Same day/slot grammar as Book with its own state (no scheduler bleed); the CTA names the exact new slot so the button is the receipt. Confirm reuses the Booked moment as &ldquo;You&rsquo;re moved.&rdquo; and the new time cascades to Visits, Home and the reminder.', true],
+  ['vcancel','Cancel the video visit','The draw cancel&rsquo;s honest two-step, for video.',
+   'Net new (backlog, built 2026-07-20). Optional why-chips, &ldquo;Keep my visit&rdquo; first, coral only on the final act; cancelling cascades everywhere the visit appeared. V1 is fee-free; the $25 late-cancel line returns with pricing (tracked in V2-FEATURES.md; ?v2 shows it).', true],
   ['docprofile','Doctor profile','Who they are, then their times.',
    'Net new. The old flow jumped from a 44-result list straight to a request form.', true],
   ['vrequested','Video request sent','Honest pending for new-patient requests.',
    'Care-team bookings stay instant; a practice accepting a new patient genuinely takes time. Replaces the approval hourglass.', true],
+  ['declined','Practice full','The other ending of Request sent.',
+   'Net new (backlog, built 2026-07-20). The pill names the reason and the blame lands on capacity &mdash; the word &ldquo;declined&rdquo; never reaches the patient. The note is deleted unread (a real backend promise), the push title stays neutral, and both forward paths are one tap. Open: are there decline reasons beyond a full panel?', true],
   ['precall','Pre-call check','Stops a visit failing on a muted mic.',
    'Kept from round 1; the coworker\'s list keeps the secure video visit and waiting room.', false],
   ['waiting','Waiting room','A wait with an ETA is not a broken app.',
@@ -71,8 +87,14 @@ const SECTIONS = [
    'Hidden in V1 (pricing moved to V2, team call 2026-07-17). Fully designed and working: flat capped travel, computed ledger, price-locked promise. V1 skips from Booking straight to Requested. Tracked in V2-FEATURES.md.', false, true],
   ['requested','Requested','The honest version of "wait for approval".',
    'Net new. The old app ended every booking on a cartoon hourglass. Dispatch takes time, so we say so, show the next three steps, and promise a notification.', true],
+  ['accepted','You have a nurse','The promise Requested made, kept.',
+   'Net new (backlog, built 2026-07-20; reviewed on mock-draw-states.html). Acceptance usually lands the day before, so it is its own moment, not a Track variant: the nurse card (credential line matches Track), the window and address, and the prep guidance that had no other home &mdash; the 12-hour fast for the lipid panel, hydration, the door-code heads-up. The Visits row flips gray &ldquo;Finding your nurse&rdquo; to green &ldquo;Confirmed &middot; Jennifer Reyes&rdquo; and opens here until visit day.', true],
   ['track','Tracking','The good status machine, given a screen worth it.',
    'The crew moment the feedback asked us to highlight: named nurse, live ETA, door code.', false],
+  ['late','Running late','Track, telling the truth about the ETA.',
+   'Net new (backlog, built 2026-07-20). A Track variant behind #late, not a new screen: the pill stays blue (she is still in motion), the headline restates the new arrival as the new truth, and the coral-edge attention card carries the apology and &ldquo;moving or cancelling is free&rdquo;. Call and Message stay the outlets &mdash; Jennifer&rsquo;s running-behind text already lives in Messages. <span style="color:#FFB4A8">Open for the team: what delay triggers the banner (15 minutes past the first ETA?), and who reports it &mdash; the crew app (not started) or dispatch?</span>', true],
+  ['nodraw','We couldn&rsquo;t finish','The safe stop, turned into preparation.',
+   'Net new (backlog, built 2026-07-20). The two-attempt stop framed as the protocol working: blame lands nowhere, the order survives untouched, Dr. Anand is told, and &ldquo;For the next try&rdquo; converts failure into preparation. It stays in Upcoming as &ldquo;Needs a new time&rdquo; &mdash; the order is live, not history &mdash; and rebooking clears the state everywhere. <span style="color:#FFB4A8">Open for the team: clinical sign-off on the two-attempt wording; the Quest draw-site row hangs on lab integration (DEV-FAQ open decision #7); &ldquo;patient not home&rdquo; is a separate ending, not drafted; and the chip is the solid coral pill-urgent (6.48:1, its first use in the patient app) &mdash; the shadcn grammar would use the pale tint instead. Pick a register.</span>', true],
   ['cancel','Cancel the visit','Turning a nurse around, told straight.',
    'Net new, was a stub. Confirming cascades everywhere: home card gone, In progress empty, a Past entry, a notification, and the test order is kept for rebooking. (Charge honesty copy returns with pricing in V2.)', true],
   ]],
@@ -99,8 +121,8 @@ const FLOWS = [
    'First launch: the splash and three intro slides (Skip works from any of them). Returning patients skip Create account and go straight to the text code.'],
   ['Video visit', [['getcare'], ['doctors'], ['book', 'docprofile'], ['confirmed', 'vrequested'], ['precall'], ['waiting'], ['call'], ['postcall']],
    'Top path: your care team, instant. Bottom path: a new doctor, the practice confirms. Both continue at Pre-call check on visit day.'],
-  ['At-home crew visit', [['home'], ['collect'], ['requested'], ['track'], ['cancel']],
-   'V1 requests directly from Booking (the price step is V2). Tracking goes live once a nurse accepts; results land in Lab results afterwards.'],
+  ['At-home crew visit', [['home'], ['collect'], ['requested'], ['accepted'], ['track', 'late'], ['nodraw', 'cancel']],
+   'V1 requests directly from Booking (the price step is V2). The nurse accepting is its own moment now; Tracking (and its late state) is visit day. Besides done, two honest endings: the safe stop and a cancel. Results land in Lab results afterwards.'],
   ['Booking side-doors', [['collect'], ['tests', 'address']],
    'Both open from rows on Booking and return there; the order updates from whatever changes.'],
   ['Records & messages', [['visits'], ['summary'], ['results'], ['resultsall', 'trends'], ['thread']],
@@ -109,26 +131,14 @@ const FLOWS = [
    'Every row on You opens a real screen now (Payment is a quiet placeholder until V2). The last step belongs to Personal info: each Details row edits one field at a time.'],
   ['Notifications fan-out', [['notifs'], ['track', 'thread', 'precall', 'results']],
    'Every notification opens its real destination. (The receipt notification returns with pricing in V2.)'],
+  ['Edges & changes', [['terms', 'minor', 'verifyerr'], ['manage'], ['reschedule', 'vcancel'], ['declined']],
+   'The sign-in edges: Terms from the Sign in links, the under-18 handoff from a birthday, the wrong code from Verify. Your visit is the hub for moving or cancelling the booked video visit; Practice full is the other ending of Request sent, arriving by notification.'],
 ];
 /* All ten 'stub' items were built on 2026-07-16 and moved up into
-   SECTIONS as real screens; only planned/parked work remains. */
+   SECTIONS as real screens. The five sign-in and video-visit
+   backlog items followed on 2026-07-20 (reviewed frame by frame on
+   mock-backlog-screens.html); only the below remains. */
 const BACKLOG = [
-  ['Sign in & sign up', [
-    ['Wrong-code error', 'planned'],
-    ['Under-18 path', 'planned'],
-    ['Terms & privacy', 'planned'],
-  ]],
-  ['Video visit', [
-    ['Reschedule / cancel visit', 'planned'],
-    ['Request declined by practice', 'planned'],
-  ]],
-  ['At-home visit', [
-    ['"Nurse accepted" moment', 'planned'],
-    ['Unable to draw / nurse delayed', 'planned'],
-  ]],
-  ['Records & messages', [
-    ['Visits search', 'parked'],
-  ]],
   ['System states', [
     ['Loading / error / offline', 'planned'],
     ['Empty states (visits, notifs)', 'planned'],

@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backlog screens — review</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-r2.css">
+<style>
+  /* Review board chrome, same grammar as the other mock-*.html pages:
+     dark ground, volt section labels, gray notes. The phones reuse
+     tokens.css + app-r2.css untouched. */
+  html { background:#0B0D10; }  /* app-r2.css paints html paper; keep the board dark edge-to-edge */
+  body { background:#0B0D10; padding:40px 32px 80px; }
+  .head { max-width:840px; margin:0 auto 12px; }
+  .head h1 { color:#fff; font:700 30px/1.15 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0 0 10px; }
+  .head p { color:#868D97; font:400 14px/1.55 Inter; margin:0; max-width:640px; }
+  .head b { color:#D8FF47; font-weight:600; }
+  .sect { max-width:1400px; margin:56px auto 0; }
+  .sect > h2 { color:#D8FF47; font:600 13px/1 Inter; letter-spacing:.14em; text-transform:uppercase; margin:0 0 20px; }
+  .frames { display:flex; flex-wrap:wrap; gap:36px; align-items:flex-start; }
+  .frame { width:390px; }
+  .lab { color:#fff; font:600 15px/1.3 Inter; margin:0 0 4px; }
+  .lab b { color:#D8FF47; font-weight:700; }
+  .sub2 { color:#868D97; font:400 13px/1.5 Inter; margin:0 0 12px; }
+  .note { color:#868D97; font:400 13px/1.55 Inter; margin:12px 0 0; }
+  .note b { color:#C9CED6; font-weight:600; }
+  .note .q { color:#FFB4A8; }
+
+  /* Phone frame: the .app shell, pinned to 390x844 instead of 100dvh */
+  .ph {
+    position:relative; width:390px; height:844px;
+    background:var(--surface-page); border-radius:26px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(255,255,255,.09);
+  }
+
+  /* Error grammar for the code boxes: danger is TEXT + a 2px danger
+     ring on the offending inputs. No coral fill, no shake. */
+  .code.err { border-color:var(--danger-text-on-light); border-width:2px; }
+  .errline {
+    display:block; margin-top:10px;
+    color:var(--danger-text-on-light); font-size:14px; font-weight:600; line-height:1.45;
+  }
+
+  /* Quiet destructive action (THEME-NOTES rule: destructive is danger
+     text, never a filled red button; the coral btn-danger stays for
+     the final confirm only). */
+  .btn-quiet-danger { background:none; color:var(--danger-text-on-light); }
+  .btn-quiet-danger:hover { background:var(--surface-sunken); }
+
+  /* Terms: short-version rows and legal body */
+  .sv { display:flex; gap:12px; align-items:flex-start; }
+  .sv + .sv { margin-top:14px; }
+  .sv img { width:20px; height:20px; object-fit:contain; flex-shrink:0; margin-top:1px; }
+  .sv span { font-size:14px; line-height:1.5; }
+  .legal { font-size:14px; line-height:1.6; color:var(--text-secondary); margin:6px 0 0; }
+
+  /* Row-variant strip (not a full phone) */
+  .strip { background:var(--surface-page); border-radius:18px; padding:16px; }
+  .strip + .strip { margin-top:12px; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Five backlog screens, drafted for review.</h1>
+  <p>Wrong-code error &middot; under-18 path &middot; terms &amp; privacy &middot; reschedule / cancel a video
+     visit &middot; request declined by practice. Everything here is static and self-contained —
+     <b>app-r2.html and screens-r2.js are untouched</b>. Approve (or mark up) a frame and I port it
+     into the prototype, the board and the flow map.</p>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Sign in &amp; sign up</h2>
+  <div class="frames">
+
+    <!-- 1 · WRONG CODE -->
+    <div class="frame">
+      <p class="lab"><b>1</b> &middot; Wrong code</p>
+      <p class="sub2">Error state of the existing Verify screen, same route.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <h1 class="display sm">Enter the code.</h1>
+          <p class="muted" style="margin-top:-12px">We texted a 6-digit code to (555) 000-1234.</p>
+
+          <div class="code-row" style="margin-top:28px">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" aria-invalid="true" value="8">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" aria-invalid="true" value="2">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" aria-invalid="true" value="4">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" aria-invalid="true" value="1">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" aria-invalid="true" value="0">
+            <input class="code err" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" aria-invalid="true" value="9">
+          </div>
+          <span class="errline" role="alert">That code didn&rsquo;t match. Two more tries, then we&rsquo;ll text you a fresh one.</span>
+
+          <div style="margin-top:28px">
+            <button class="btn btn-primary">Verify and continue</button>
+            <button class="btn btn-ghost" style="margin-top:8px">Text me a new code</button>
+          </div>
+          <p class="tiny" style="text-align:center;margin-top:16px">Codes expire after 10 minutes.</p>
+        </div>
+      </div>
+      <p class="note"><b>Behavior:</b> the first keystroke clears all six boxes and the error.
+        After the third miss the copy flips to &ldquo;That code is used up. We texted you a new
+        one.&rdquo; and the old code dies &mdash; no lockout screen, the fresh code IS the recovery.
+        Danger is text + a 2px ring on the boxes (#DE1600, 4.5:1); nothing turns coral, nothing shakes.</p>
+    </div>
+
+    <!-- 2 · UNDER-18 -->
+    <div class="frame">
+      <p class="lab"><b>2</b> &middot; Under-18 path</p>
+      <p class="sub2">Shown when the DOB on Create account computes under 18.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Create account</h1>
+        </header>
+        <div class="scroll">
+          <h1 class="display sm">This part needs a parent.</h1>
+          <p class="muted" style="margin-top:-12px">
+            Teleport accounts belong to adults. Under 18, a parent or guardian books
+            your care from their account &mdash; you&rsquo;re one of their Family.
+          </p>
+
+          <div class="card" style="margin-top:24px">
+            <div class="track">
+              <div class="step now">
+                <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+                <div class="txt"><div class="t">We text your parent or guardian</div><div class="s">A link to sign in, or to create their own account</div></div>
+              </div>
+              <div class="step">
+                <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+                <div class="txt"><div class="t">They add you under Family</div><div class="s">Your name and birthday arrive prefilled &mdash; one tap</div></div>
+              </div>
+              <div class="step">
+                <div class="rail"><div class="dot"></div></div>
+                <div class="txt"><div class="t">Care works the same</div><div class="s">They book; you take the visit</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:24px">
+            <label class="flabel" for="gph">Parent or guardian&rsquo;s phone</label>
+            <input id="gph" class="input" type="tel" placeholder="(555) 000-1234">
+            <button class="btn btn-emphasis" style="margin-top:12px">Text them the link</button>
+            <button class="btn btn-ghost" style="margin-top:8px">I mistyped my birthday</button>
+            <p class="tiny" style="text-align:center;margin-top:12px;max-width:300px;margin-left:auto;margin-right:auto">
+              Nothing you typed is saved until they approve. If the text never
+              arrives, nothing exists.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Why this shape:</b> it reuses Family instead of inventing a teen account
+        type &mdash; the member they add is instantly bookable under &ldquo;Who is this for?&rdquo;,
+        which already works. The escape hatch (&ldquo;I mistyped my birthday&rdquo;) returns to the
+        form with fields intact. <span class="q">For review: DEV-FAQ open decision #9 (family
+        consent) is still open &mdash; this drafts the product answer for it.</span></p>
+    </div>
+
+    <!-- 3 · TERMS & PRIVACY -->
+    <div class="frame">
+      <p class="lab"><b>3</b> &middot; Terms &amp; privacy</p>
+      <p class="sub2">Opens from the links on Sign in; also from You &gt; Settings later.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Terms &amp; privacy</h1>
+        </header>
+        <div class="scroll">
+          <div class="tabs">
+            <button class="tabx" aria-selected="true">Terms</button>
+            <button class="tabx" aria-selected="false">Privacy</button>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <div style="font-weight:700;margin-bottom:14px">The short version</div>
+            <div class="sv"><img src="img/icons/ph-line/check.svg" alt=""><span>You pay per visit. No subscription, no membership, no surprise line items.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/lock.svg" alt=""><span>Your records are yours. Download or delete them whenever you want.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/lock.svg" alt=""><span>We never sell your health data, and we never will.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/care.svg" alt=""><span>Licensed clinicians make every medical call. The app just gets them to you.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/calendar.svg" alt=""><span>Cancel any visit free up to 10 hours before it starts.</span></div>
+          </div>
+          <p class="tiny" style="margin-top:10px">
+            The short version is a summary, not the agreement. The full text below is the one that binds.
+          </p>
+
+          <h2 class="section">1. The service</h2>
+          <p class="legal">Teleport MD arranges video visits with licensed providers and
+            at-home sample collection by licensed clinical staff. Teleport MD is not
+            itself a medical practice and does not employ your doctor&hellip;</p>
+          <h2 class="section">2. Your account</h2>
+          <p class="legal">One account per adult. You are responsible for keeping your
+            phone number current, since sign-in codes and visit updates are sent by
+            text&hellip;</p>
+          <h2 class="section">3. Visits and cancellation</h2>
+          <p class="legal" style="opacity:.45">Visits may be cancelled without charge until 10 hours
+            before the scheduled start&hellip;</p>
+          <p class="tiny" style="margin-top:24px">Effective July 20, 2026 &middot; Version 1.0</p>
+        </div>
+      </div>
+      <p class="note"><b>Acceptance stays passive</b> &mdash; the &ldquo;By continuing you
+        agree&rdquo; line on Sign in is the act; no checkbox, per the identity-only sign-up
+        philosophy. The two links there become real routes (<b>terms</b>, one screen, two tabs).
+        <span class="q">For review: the five short-version claims are product promises &mdash;
+        legal needs to sign off that each one survives the real terms.</span></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Change a video visit</h2>
+  <div class="frames">
+
+    <!-- 4 · YOUR VISIT (manage) -->
+    <div class="frame">
+      <p class="lab"><b>4</b> &middot; Your visit</p>
+      <p class="sub2">New hub: the Confirmed row on Visits opens this. Join appears here 10 minutes before.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <span class="pill pill-accepted">Confirmed</span>
+          <h1 class="display" style="margin-top:12px">Wednesday, 10:15&nbsp;AM.</h1>
+
+          <div class="card" style="margin-top:8px">
+            <div style="display:flex;gap:16px;align-items:center">
+              <img class="avatar lg" src="img/dr-anand-avatar.png" alt="">
+              <div>
+                <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+                <div class="tiny">Primary care &middot; video visit &middot; 30 minutes</div>
+              </div>
+            </div>
+            <div class="rule" style="height:1px;background:var(--border-subtle);margin:18px 0 14px"></div>
+            <div class="tiny">Booked for you &middot; your note to Dr. Anand is attached.
+              The join button appears here and in Notifications 10 minutes before.</div>
+          </div>
+
+          <div style="margin-top:24px">
+            <button class="btn btn-secondary">Pick a new time</button>
+            <button class="btn btn-quiet-danger" style="margin-top:8px">Cancel this visit</button>
+            <p class="tiny" style="text-align:center;margin-top:12px">
+              Free to change or cancel until 12:15 AM tonight &mdash; 10 hours before the visit.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>The one navigation change</b> this set asks for: Visits &gt; Confirmed
+        currently jumps straight to Pre-call check; it would open this instead, and Pre-call
+        keeps its reminder/notification entries. Cancel here is quiet danger text &mdash; the
+        coral button waits until the final confirm (frame 6).</p>
+    </div>
+
+    <!-- 5 · PICK A NEW TIME -->
+    <div class="frame">
+      <p class="lab"><b>5</b> &middot; Pick a new time</p>
+      <p class="sub2">Book&rsquo;s day/slot grammar, reused verbatim.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Pick a new time</h1>
+        </header>
+        <div class="scroll" style="padding-bottom:170px">
+          <div class="row" style="cursor:default;margin-bottom:24px">
+            <img class="avatar" src="img/dr-anand-avatar.png" alt="">
+            <span class="body">
+              <span class="title">Dr. Priya Anand</span>
+              <span class="sub">Now booked: Wed 16 July, 10:15 AM</span>
+            </span>
+          </div>
+
+          <h2 class="section" style="margin-top:0">Pick a time</h2>
+          <div class="days">
+            <button class="day" aria-pressed="false"><span class="dow">Tue</span><span class="num">15</span></button>
+            <button class="day" aria-pressed="false"><span class="dow">Wed</span><span class="num">16</span></button>
+            <button class="day" aria-pressed="true"><span class="dow">Thu</span><span class="num">17</span></button>
+            <button class="day" aria-pressed="false"><span class="dow">Fri</span><span class="num">18</span></button>
+            <button class="day" aria-pressed="false"><span class="dow">Sat</span><span class="num">19</span></button>
+            <button class="day" aria-pressed="false"><span class="dow">Sun</span><span class="num">20</span></button>
+          </div>
+          <div class="slots" style="margin-top:16px">
+            <button class="slot" aria-pressed="false">9:30 AM</button>
+            <button class="slot" aria-pressed="false">10:15 AM</button>
+            <button class="slot" disabled>11:00 AM</button>
+            <button class="slot" aria-pressed="false">1:30 PM</button>
+            <button class="slot" aria-pressed="true">2:00 PM</button>
+            <button class="slot" aria-pressed="false">3:45 PM</button>
+          </div>
+        </div>
+        <div class="ctabar">
+          <button class="btn btn-primary">Move to Thu 17, 2:00 PM</button>
+          <p class="tiny">Your note moves with the visit. The old time goes back to the practice.</p>
+        </div>
+      </div>
+      <p class="note"><b>Confirm reuses Booked</b> with the headline &ldquo;You&rsquo;re
+        moved.&rdquo; and the new date &mdash; no new screen. The CTA names the exact new slot
+        so the button is the receipt. One open bit of state: who this visit is for carries
+        over untouched (family bookings move the same way).</p>
+    </div>
+
+    <!-- 6 · CANCEL ASK -->
+    <div class="frame">
+      <p class="lab"><b>6</b> &middot; Cancel this visit?</p>
+      <p class="sub2">Mirrors the at-home Cancel ask; video has no nurse driving, so the stakes copy changes.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Cancel</h1>
+        </header>
+        <div class="scroll">
+          <h1 class="display sm">Cancel this visit?</h1>
+          <p class="muted" style="margin-top:-12px">
+            Wednesday&rsquo;s 10:15 with Dr. Anand goes back to the practice, and your
+            note to her is deleted.
+          </p>
+
+          <h2 class="section">Tell us why <span class="tiny" style="font-weight:400">(optional)</span></h2>
+          <div class="chips" style="margin-top:0">
+            <button class="chip" aria-pressed="false">Feeling better</button>
+            <button class="chip" aria-pressed="false">Bad timing</button>
+            <button class="chip" aria-pressed="true">Found care elsewhere</button>
+            <button class="chip" aria-pressed="false">Something else</button>
+          </div>
+
+          <div style="margin-top:32px">
+            <button class="btn btn-secondary">Keep my visit</button>
+            <button class="btn btn-danger" style="margin-top:12px">Cancel the visit</button>
+            <p class="tiny" style="text-align:center;margin-top:12px">
+              Free to cancel &mdash; you&rsquo;re well before the 10-hour mark.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>V1 has no fees</b>, so inside 10 hours the only change is the last
+        line (&ldquo;Inside 10 hours we still cancel &mdash; we just tell the practice you&rsquo;re
+        not coming.&rdquo;). The $25 late-fee variant returns with pricing and goes into
+        V2-FEATURES.md like the draw&rsquo;s cost copy did. &ldquo;Keep my visit&rdquo; stays
+        first and calm, same order as the draw cancel.</p>
+    </div>
+
+    <!-- 7 · CANCELLED STATE -->
+    <div class="frame">
+      <p class="lab"><b>7</b> &middot; Cancelled</p>
+      <p class="sub2">The after-state; same cascade grammar as the draw cancel.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <span class="pill pill-canceled">Cancelled</span>
+          <h1 class="display" style="margin-top:12px">This visit is off.</h1>
+          <p class="muted" style="margin-top:-12px">Wednesday 10:15 AM with Dr. Anand is cancelled; the practice knows.</p>
+
+          <div class="card" style="margin-top:8px">
+            <div style="font-weight:700;margin-bottom:4px">What happens now</div>
+            <div class="tiny">
+              Nothing was charged and nothing goes on your record. Dr. Anand stays on
+              your care team, so booking again is the instant path &mdash; no new request.
+            </div>
+          </div>
+
+          <div style="margin-top:24px">
+            <button class="btn btn-emphasis">Book another time</button>
+            <button class="btn btn-secondary" style="margin-top:12px">Back to home</button>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Cascade:</b> the Visits Upcoming row disappears, a Cancelled entry
+        lands in Past, the reminder notification is withdrawn and replaced with
+        &ldquo;Visit cancelled&rdquo; &mdash; identical plumbing to the draw&rsquo;s
+        <b>state.cx</b> cascade, driven by one flag.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Request declined by practice</h2>
+  <div class="frames">
+
+    <!-- 8 · DECLINED -->
+    <div class="frame">
+      <p class="lab"><b>8</b> &middot; Practice can&rsquo;t take you</p>
+      <p class="sub2">The other ending of Request sent &mdash; opened from its notification.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <span class="pill pill-canceled">Practice full</span>
+          <h1 class="display" style="margin-top:12px">Dr. Okafor can&rsquo;t take new patients right now.</h1>
+          <p class="muted" style="margin-top:-12px">
+            The practice reviewed your Thursday request and their panel is full.
+            That&rsquo;s their capacity, not anything about you.
+          </p>
+
+          <div class="card" style="margin-top:8px">
+            <div style="font-weight:700;margin-bottom:4px">What happened to your request</div>
+            <div class="tiny">
+              Thursday 2:30 PM was released, and your note to Dr. Okafor was deleted
+              without being read. Nothing was booked and nothing was shared beyond
+              your name.
+            </div>
+          </div>
+
+          <div style="margin-top:24px">
+            <button class="btn btn-emphasis">Find a doctor with openings</button>
+            <button class="row" style="margin-top:12px;padding:16px">
+              <img class="avatar" src="img/dr-anand-avatar.png" alt="">
+              <span class="body">
+                <span class="title">Or book Dr. Anand</span>
+                <span class="sub">Your care team &middot; has times tomorrow</span>
+              </span>
+              <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+            </button>
+            <p class="tiny" style="text-align:center;margin-top:12px">
+              From here, search only shows doctors accepting new patients.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Copy stance:</b> never &ldquo;declined&rdquo; or &ldquo;rejected&rdquo;
+        at the patient &mdash; the pill states the reason (<b>Practice full</b>, gray = settled),
+        the headline names the fact, and the blame lands explicitly on capacity. The privacy
+        line (&ldquo;note deleted unread&rdquo;) is a real promise the backend must keep.
+        <span class="q">For review: does the practice ever decline for another reason
+        (out of network, wrong specialty)? If so the pill/headline need one variant per
+        reason we&rsquo;re willing to say out loud.</span></p>
+    </div>
+
+    <!-- 9 · ROW VARIANTS -->
+    <div class="frame">
+      <p class="lab"><b>9</b> &middot; Where it surfaces</p>
+      <p class="sub2">Row variants only &mdash; no new screens.</p>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Visits &middot; Upcoming (pending &rarr; closed)</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="avatar initials">SO</span>
+          <span class="body">
+            <span class="pill pill-canceled" style="margin-bottom:6px">Practice full</span>
+            <span class="title">Dr. Sarah Okafor</span>
+            <span class="sub">Thu, 2:30 PM &middot; the practice can&rsquo;t take new patients</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+        <p class="tiny" style="margin:10px 0 0">The row moves from Upcoming to Past on next visit; tapping it opens frame 8 for a week, then the visit summary grammar takes over.</p>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Notifications &middot; fresh</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/care.svg" alt=""></span>
+          <span class="body">
+            <span class="title">About your Thursday request</span>
+            <span class="sub">Dr. Okafor&rsquo;s practice can&rsquo;t take new patients &middot; other options inside</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+        <p class="tiny" style="margin:10px 0 0">Neutral title on the lock screen &mdash; the disappointment is delivered inside the app, not in a push preview.</p>
+      </div>
+
+      <p class="note"><b>Also touched when this ports:</b> Request sent (frame&nbsp;8&rsquo;s
+        happy sibling) gains a third rail outcome, and the flow map&rsquo;s &ldquo;Video
+        visit&rdquo; lane gets the declined branch beside <b>vrequested</b>.</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

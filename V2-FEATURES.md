@@ -52,3 +52,4 @@ capture stays as a records/coverage feature but is not offered as a booking paym
 
 | Screen | Feature | Deferred on | Reason | V1 action | Status |
 |--------|---------|-------------|--------|-----------|--------|
+| Cancel the visit — video (vcancel) | $25 late-cancel fee line (inside 10 hours) | 2026-07-20 | Pricing is V2; V1 is cash-only with no fees | Copy reads "Free to cancel"; `?v2` renders the fee sentence | Ready, veiled |

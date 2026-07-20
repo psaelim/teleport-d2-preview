@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw states — review</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-r2.css">
+<style>
+  /* Review-board chrome, same grammar as mock-backlog-screens.html. */
+  html { background:#0B0D10; }
+  body { background:#0B0D10; padding:40px 32px 80px; }
+  .head { max-width:840px; margin:0 auto 12px; }
+  .head h1 { color:#fff; font:700 30px/1.15 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0 0 10px; }
+  .head p { color:#868D97; font:400 14px/1.55 Inter; margin:0; max-width:640px; }
+  .head b { color:#D8FF47; font-weight:600; }
+  .sect { max-width:1400px; margin:56px auto 0; }
+  .sect > h2 { color:#D8FF47; font:600 13px/1 Inter; letter-spacing:.14em; text-transform:uppercase; margin:0 0 20px; }
+  .frames { display:flex; flex-wrap:wrap; gap:36px; align-items:flex-start; }
+  .frame { width:390px; }
+  .lab { color:#fff; font:600 15px/1.3 Inter; margin:0 0 4px; }
+  .lab b { color:#D8FF47; font-weight:700; }
+  .sub2 { color:#868D97; font:400 13px/1.5 Inter; margin:0 0 12px; }
+  .note { color:#868D97; font:400 13px/1.55 Inter; margin:12px 0 0; }
+  .note b { color:#C9CED6; font-weight:600; }
+  .note .q { color:#FFB4A8; }
+  .ph {
+    position:relative; width:390px; height:844px;
+    background:var(--surface-page); border-radius:26px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(255,255,255,.09);
+  }
+  .strip { background:var(--surface-page); border-radius:18px; padding:16px; }
+  .strip + .strip { margin-top:12px; }
+
+  /* From the ported R2.2 set (already in app-r2.css) — repeated here
+     only so this mock stands alone if opened before that CSS ships. */
+  .sv { display:flex; gap:12px; align-items:flex-start; }
+  .sv + .sv { margin-top:14px; }
+  .sv img { width:20px; height:20px; object-fit:contain; flex-shrink:0; margin-top:1px; }
+  .sv span { font-size:14px; line-height:1.5; }
+
+  /* The coral-edge attention card (THEME-NOTES: border-l-4 coral on
+     a normal card — attention without an alarm). */
+  .attn { border-left:4px solid var(--raw-coral); }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>The draw&rsquo;s missing states, drafted for review.</h1>
+  <p>The &ldquo;nurse accepted&rdquo; moment &middot; nurse running late &middot; unable to draw.
+     Static and self-contained &mdash; <b>nothing in the prototype is touched</b>. Same deal as last
+     time: mark up or approve, then I port into app-r2.html, the board and the flow map.</p>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>The accepted moment</h2>
+  <div class="frames">
+
+    <!-- 1 · NURSE ACCEPTED -->
+    <div class="frame">
+      <p class="lab"><b>1</b> &middot; You have a nurse</p>
+      <p class="sub2">The notification&rsquo;s destination, usually the day before. Track stays the live-day screen.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <span class="pill pill-accepted">Confirmed</span>
+          <h1 class="display" style="margin-top:12px">You have a nurse.</h1>
+          <p class="muted" style="margin-top:-12px">Jennifer Reyes accepted your Wednesday visit.</p>
+
+          <div class="card" style="margin-top:8px">
+            <div style="display:flex;gap:16px;align-items:center">
+              <img class="avatar lg" src="img/crew-jennifer-face.png" alt="">
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+                <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+              </div>
+            </div>
+            <div style="height:1px;background:var(--border-subtle);margin:18px 0 14px"></div>
+            <div class="tiny">Wednesday, 10 AM &ndash; 12 PM &middot; 122 E 81st St, Apt 4B<br>
+              Lipid panel and vitals check &middot; about 15 minutes</div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <div style="font-weight:700;margin-bottom:14px">Get ready</div>
+            <div class="sv"><img src="img/icons/ph-line/drop.svg" alt=""><span>Fast for 12 hours before the visit &mdash; the lipid panel needs it. Water is not just fine, it helps.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/vitals.svg" alt=""><span>Warm hands, easy veins: no need to do anything else special.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/lock.svg" alt=""><span>Jennifer will show a door code that matches yours. It arrives with the live map when she&rsquo;s driving.</span></div>
+          </div>
+
+          <div style="margin-top:24px">
+            <button class="btn btn-emphasis">Back to home</button>
+            <p class="tiny" style="text-align:center;margin-top:12px">
+              We&rsquo;ll text when Jennifer is on the way, with a live map.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Why its own screen:</b> acceptance usually lands the day before, and
+        Track is built for the live day (map, ETA, door code). This is the promise the
+        Requested screen made (&ldquo;we will notify you the moment a nurse accepts&rdquo;), kept
+        &mdash; and it carries the prep guidance, which has no other home. The credential line
+        matches Track exactly.</p>
+    </div>
+
+    <!-- 2 · WHERE IT SURFACES -->
+    <div class="frame">
+      <p class="lab"><b>2</b> &middot; Where it surfaces</p>
+      <p class="sub2">Row variants only &mdash; the pill does the storytelling.</p>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Notifications &middot; fresh</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+          <span class="body">
+            <span class="title">You have a nurse</span>
+            <span class="sub">Jennifer accepted Wednesday&rsquo;s draw &middot; tap to get ready</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Visits &middot; Upcoming (gray &rarr; green)</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+          <span class="body">
+            <span class="pill pill-accepted" style="margin-bottom:6px">Confirmed</span>
+            <span class="title">Blood draw at home</span>
+            <span class="sub">Wed, 10 AM &ndash; 12 PM &middot; Jennifer Reyes</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+        <p class="tiny" style="margin:10px 0 0">Was gray &ldquo;Finding your nurse&rdquo;. The row now opens the accepted screen until visit day, then Track.</p>
+      </div>
+
+      <p class="note"><b>Also touched when this ports:</b> the Requested screen&rsquo;s rail
+        flips its second step to done, and the prototype finally has the full arc &mdash;
+        Requested &rarr; accepted &rarr; Track &mdash; instead of teleporting from &ldquo;finding&rdquo;
+        to &ldquo;driving&rdquo;.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>When the day wobbles</h2>
+  <div class="frames">
+
+    <!-- 3 · RUNNING LATE -->
+    <div class="frame">
+      <p class="lab"><b>3</b> &middot; Running late</p>
+      <p class="sub2">A Track variant, not a new screen. The pill stays blue &mdash; she&rsquo;s still in motion.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Blood draw at home</h1>
+        </header>
+        <div class="scroll">
+          <span class="pill pill-en-route">On the way</span>
+          <h1 class="display" style="margin-top:12px">Jennifer arrives<br>about 3:00 PM.</h1>
+
+          <div class="card attn" style="margin-bottom:12px">
+            <div style="font-weight:700;margin-bottom:4px">Running about 20 minutes behind</div>
+            <div class="tiny">Traffic on the bridge. Jennifer is sorry &mdash; the new arrival is about
+              3:00 PM, and we&rsquo;ll keep this updated. If the new time doesn&rsquo;t work,
+              moving or cancelling is free.</div>
+          </div>
+
+          <div class="card" style="display:flex;gap:16px;align-items:center">
+            <img class="avatar lg" src="img/crew-jennifer-face.png" alt="">
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+              <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top:12px">
+            <button class="btn btn-secondary">Call</button>
+            <button class="btn btn-secondary">Message</button>
+          </div>
+
+          <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+            <img src="img/route-map.png" alt="Jennifer's route to your address"
+                 style="width:100%;height:170px;object-fit:cover;display:block">
+          </div>
+
+          <h2 class="section">Progress</h2>
+          <div class="card">
+            <div class="track">
+              <div class="step done">
+                <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+                <div class="txt"><div class="t">Jennifer accepted</div><div class="s">Yesterday, 5:03 PM</div></div>
+              </div>
+              <div class="step now">
+                <div class="rail"><div class="dot"></div><div class="bar"></div></div>
+                <div class="txt"><div class="t">On the way</div><div class="s">Left 2:18 PM &middot; running behind, about 3:00 PM</div></div>
+              </div>
+              <div class="step">
+                <div class="rail"><div class="dot"></div></div>
+                <div class="txt"><div class="t">Draw</div><div class="s">About 15 minutes</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>One banner, no alarm:</b> the coral-edge card (attention grammar) sits
+        under the headline, the ETA is simply restated as the new truth, and Call / Message
+        stay the outlets &mdash; Jennifer&rsquo;s &ldquo;running behind&rdquo; text already exists in
+        Messages. The free-to-move line reuses the cancel path; no new controls.
+        <span class="q">For review: what delay makes this banner appear &mdash; 15 minutes past
+        the first ETA? And who reports it, the crew app (not started) or dispatch?</span></p>
+    </div>
+
+    <!-- 4 · COULDN'T FINISH -->
+    <div class="frame">
+      <p class="lab"><b>4</b> &middot; We couldn&rsquo;t finish</p>
+      <p class="sub2">The honest end-state when the draw stops safely. Terminal for the visit, not for the order.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1></h1>
+        </header>
+        <div class="scroll" style="padding-top:0">
+          <span class="pill pill-urgent">Needs a new time</span>
+          <h1 class="display" style="margin-top:12px">We couldn&rsquo;t finish the draw.</h1>
+          <p class="muted" style="margin-top:-12px">
+            Jennifer tried twice and stopped &mdash; that&rsquo;s the safe protocol,
+            not anything you did wrong.
+          </p>
+
+          <div class="card" style="margin-top:8px">
+            <div style="font-weight:700;margin-bottom:4px">What happens now</div>
+            <div class="tiny">
+              Nothing was collected, and your test order (lipid panel, vitals check) is
+              kept exactly as it was. Dr. Anand has been told &mdash; nothing about your
+              care changes except the timing.
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <div style="font-weight:700;margin-bottom:14px">For the next try</div>
+            <div class="sv"><img src="img/icons/ph-line/drop.svg" alt=""><span>Drink water the evening before and the morning of &mdash; hydrated veins are easier veins.</span></div>
+            <div class="sv"><img src="img/icons/ph-line/calendar.svg" alt=""><span>Mornings tend to go better. We&rsquo;ll surface those slots first.</span></div>
+          </div>
+
+          <div style="margin-top:24px">
+            <button class="btn btn-emphasis">Pick a new time</button>
+            <button class="row" style="margin-top:12px;padding:16px">
+              <span class="nicon"><img src="img/icons/ph-fill/tube.svg" alt=""></span>
+              <span class="body">
+                <span class="title">Or use a draw site</span>
+                <span class="sub">Quest on 3rd Ave, 0.4 mi &middot; same order, walk in</span>
+              </span>
+              <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+            </button>
+            <p class="tiny" style="text-align:center;margin-top:12px">
+              Same order, same tests &mdash; nothing to re-request.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Copy stance:</b> the two-attempt stop is framed as the protocol working,
+        blame lands nowhere, and the &ldquo;for the next try&rdquo; card turns the failure into
+        preparation. The pill is coral (&ldquo;needs you&rdquo;) because the order genuinely needs
+        an action, not mourning. <span class="q">For review: clinical sign-off on the
+        two-attempt wording; the draw-site row hangs on lab integration (open decision #7);
+        &ldquo;patient not home&rdquo; is a different ending that isn&rsquo;t drafted here; and the
+        pill is the solid coral pill-urgent (6.48:1, first use in the patient app) &mdash; the
+        shadcn chip grammar would use the pale #FFDDD8 tint instead, so pick a register.</span></p>
+    </div>
+
+    <!-- 5 · WHERE THESE SURFACE -->
+    <div class="frame">
+      <p class="lab"><b>5</b> &middot; Where these surface</p>
+      <p class="sub2">Row variants only &mdash; no further new screens.</p>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Notifications &middot; the delay</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+          <span class="body">
+            <span class="title">Jennifer is running behind</span>
+            <span class="sub">New arrival about 3:00 PM &middot; live map inside</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Notifications &middot; the stop (neutral push title)</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/care.svg" alt=""></span>
+          <span class="body">
+            <span class="title">About today&rsquo;s draw</span>
+            <span class="sub">We couldn&rsquo;t finish &mdash; what happens next is inside</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Visits &middot; Upcoming (the order wants a time)</p>
+        <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+          <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+          <span class="body">
+            <span class="pill pill-urgent" style="margin-bottom:6px">Needs a new time</span>
+            <span class="title">Blood draw at home</span>
+            <span class="sub">Stopped safely today &middot; your order is kept</span>
+          </span>
+          <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+        </button>
+        <p class="tiny" style="margin:10px 0 0">It stays in Upcoming, not Past &mdash; the order is live and needs an action. Today&rsquo;s attempt lands in Past once a new time is booked.</p>
+      </div>
+
+      <p class="note"><b>Home:</b> the &ldquo;Happening now&rdquo; card is replaced by a coral-edge
+        row pointing at the couldn&rsquo;t-finish screen, then disappears once rebooked. The
+        provider portal&rsquo;s visit card gets the same state on its side
+        (&ldquo;Stopped after two attempts&rdquo;) when the crew persona is built.</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

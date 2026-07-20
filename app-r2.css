@@ -126,6 +126,17 @@ h2.section:first-child { margin-top: 0; }
 
 /* coral + INK label. White on coral is 2.85:1 and is forbidden. */
 .btn-danger { background: var(--action-danger); color: var(--action-danger-text); }
+/* R2.2 (2026-07-20) — quiet destructive entry: danger is text; the
+   coral fill is reserved for the final confirm. */
+.btn-quiet-danger { background: none; color: var(--danger-text-on-light); }
+.btn-quiet-danger:hover { background: var(--surface-sunken); }
+/* Inline text link with a full 44px hit target: the padding carries
+   the target, the negative margin keeps the caption's line height. */
+.tlink {
+  display: inline-block; background: none; border: 0; cursor: pointer;
+  font: inherit; color: inherit; font-weight: 600; text-decoration: underline;
+  padding: 13px 2px; margin: -13px -1px; min-height: var(--target-min);
+}
 
 .btn-ghost {
   background: transparent; color: var(--text-link);
@@ -621,6 +632,40 @@ img[src*="dr-bell"]       { object-position: 50% 26%; }  /* 9:16 studio headshot
   outline: 3px solid var(--border-focus);
   outline-offset: 1px;
 }
+/* R2.2 (2026-07-20) — the wrong-code state: danger is text plus a
+   ring on the boxes. Never a coral fill, nothing shakes. */
+.code.err { border-color: var(--danger-text-on-light); border-width: 2px; }
+.errline {
+  display: block; margin-top: 10px;
+  color: var(--danger-text-on-light);
+  font-size: 14px; font-weight: 600; line-height: 1.45;
+}
+
+/* R2.2c (2026-07-20) — Visits search: the provider roster's search
+   capsule, on patient tokens. Placeholder names what matches. */
+.vsearch {
+  display: flex; align-items: center;
+  background: var(--surface-card); border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md); padding: 0 16px; min-height: 48px;
+  margin-bottom: 16px;
+}
+.vsearch input {
+  border: none; outline: none; background: none; font: inherit; font-size: 15px;
+  width: 100%; color: var(--text-primary); min-height: 44px;
+}
+.vsearch input::placeholder { color: var(--text-secondary); }
+.vsearch .clear {
+  border: 0; background: none; cursor: pointer; flex-shrink: 0;
+  min-width: 44px; min-height: 44px; margin-right: -16px;
+  font: 600 14px Inter; color: var(--text-secondary);
+}
+
+/* R2.2 — Terms & privacy: short-version rows and legal body */
+.sv { display: flex; gap: 12px; align-items: flex-start; }
+.sv + .sv { margin-top: 14px; }
+.sv img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; margin-top: 1px; }
+.sv span { font-size: 14px; line-height: 1.5; }
+.legal { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 6px 0 0; }
 
 /* R2 home hero photo: the crew service made visible. The image sits
    flush to the card top; text keeps its electric ground below, so

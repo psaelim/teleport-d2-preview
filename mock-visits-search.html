@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visits search — review</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-r2.css">
+<style>
+  /* Review-board chrome, same grammar as the other mock boards. */
+  html { background:#0B0D10; }
+  body { background:#0B0D10; padding:40px 32px 80px; }
+  .head { max-width:840px; margin:0 auto 12px; }
+  .head h1 { color:#fff; font:700 30px/1.15 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0 0 10px; }
+  .head p { color:#868D97; font:400 14px/1.55 Inter; margin:0; max-width:640px; }
+  .head b { color:#D8FF47; font-weight:600; }
+  .sect { max-width:1400px; margin:56px auto 0; }
+  .sect > h2 { color:#D8FF47; font:600 13px/1 Inter; letter-spacing:.14em; text-transform:uppercase; margin:0 0 20px; }
+  .frames { display:flex; flex-wrap:wrap; gap:36px; align-items:flex-start; }
+  .frame { width:390px; }
+  .lab { color:#fff; font:600 15px/1.3 Inter; margin:0 0 4px; }
+  .lab b { color:#D8FF47; font-weight:700; }
+  .sub2 { color:#868D97; font:400 13px/1.5 Inter; margin:0 0 12px; }
+  .note { color:#868D97; font:400 13px/1.55 Inter; margin:12px 0 0; }
+  .note b { color:#C9CED6; font-weight:600; }
+  .note .q { color:#FFB4A8; }
+  .ph {
+    position:relative; width:390px; height:844px;
+    background:var(--surface-page); border-radius:26px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(255,255,255,.09);
+  }
+
+  /* The search capsule — the provider roster's .search, translated
+     to the patient tokens (48px, hairline border, radius-md). */
+  .vsearch {
+    display:flex; align-items:center;
+    background:var(--surface-card); border:1.5px solid var(--border-strong);
+    border-radius:var(--radius-md); padding:0 16px; min-height:48px;
+    margin-bottom:16px;
+  }
+  .vsearch input {
+    border:none; outline:none; background:none; font:inherit; font-size:15px;
+    width:100%; color:var(--text-primary); min-height:44px;
+  }
+  .vsearch input::placeholder { color:var(--text-secondary); }
+  .vsearch .clear {
+    border:0; background:none; cursor:pointer; flex-shrink:0;
+    min-width:44px; min-height:44px; margin-right:-16px;
+    font:600 14px Inter; color:var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Visits search, drafted for review.</h1>
+  <p>The parked backlog item, un-parked. One box above the tabs that actually matches what the
+     cards say &mdash; who, what, and when. Static and self-contained; <b>nothing in the
+     prototype is touched</b>. Mark up or approve, then I port it.</p>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>One honest box</h2>
+  <div class="frames">
+
+    <!-- 1 · IDLE -->
+    <div class="frame">
+      <p class="lab"><b>1</b> &middot; The box, idle</p>
+      <p class="sub2">Above the tabs, always there. Tabs and rows unchanged until you type.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <label class="vsearch">
+            <input type="search" placeholder="Doctor, test, or month" aria-label="Search your visits">
+          </label>
+          <div class="tabs">
+            <button class="tabx" aria-selected="true">Upcoming</button>
+            <button class="tabx" aria-selected="false">In progress</button>
+            <button class="tabx" aria-selected="false">Past</button>
+          </div>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <img class="avatar" src="img/dr-anand-avatar.png" alt="">
+            <span class="body">
+              <span class="pill pill-accepted" style="margin-bottom:6px">Confirmed</span>
+              <span class="title">Dr. Priya Anand</span>
+              <span class="sub">Tomorrow, 10:15 AM &middot; video visit</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+            <span class="body">
+              <span class="pill pill-accepted" style="margin-bottom:6px">Confirmed</span>
+              <span class="title">Blood draw at home</span>
+              <span class="sub">Wed, 10 AM - 12 PM &middot; Jennifer Reyes</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+        </div>
+      </div>
+      <p class="note"><b>The fix this makes:</b> the old app&rsquo;s visits search hinted
+        &ldquo;e.g. First Name, Last Name&rdquo; while every card was titled <b>#WO1</b> &mdash;
+        a box that promised what it couldn&rsquo;t match. This placeholder names exactly what
+        works: doctor, test, or month. Same capsule treatment as the provider roster&rsquo;s
+        search, on patient tokens (48px, filter-as-you-type).</p>
+    </div>
+
+    <!-- 2 · WHAT: "lipid" -->
+    <div class="frame">
+      <p class="lab"><b>2</b> &middot; &ldquo;lipid&rdquo; &mdash; the what</p>
+      <p class="sub2">Typing swaps the tabs for one flat list, newest first, across all statuses.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <label class="vsearch">
+            <input type="search" value="lipid" aria-label="Search your visits">
+            <button class="clear">Clear</button>
+          </label>
+          <p class="tiny" style="margin:0 0 8px">3 visits match &ldquo;lipid&rdquo;</p>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+            <span class="body">
+              <span class="pill pill-en-route" style="margin-bottom:6px">On the way</span>
+              <span class="title">Blood draw at home</span>
+              <span class="sub">Today &middot; lipid panel, vitals check</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+            <span class="body">
+              <span class="pill pill-accepted" style="margin-bottom:6px">Confirmed</span>
+              <span class="title">Blood draw at home</span>
+              <span class="sub">Wed, 10 AM - 12 PM &middot; lipid panel, vitals check</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+            <span class="body">
+              <span class="pill pill-complete" style="margin-bottom:6px">Complete</span>
+              <span class="title">Blood draw at home</span>
+              <span class="sub">12 March &middot; lipid panel, hemoglobin A1c</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+        </div>
+      </div>
+      <p class="note"><b>Why flat, not tabbed:</b> the question is &ldquo;find that visit&rdquo;,
+        not &ldquo;find it in this tab&rdquo; &mdash; so results ignore tab boundaries and the
+        pill carries the status, exactly the Upcoming-tab trick already in use. Matching reads
+        the row&rsquo;s real text plus its test names &mdash; &ldquo;lipid&rdquo; finds draws
+        whose card says so, because patients remember tests, not dates.</p>
+    </div>
+
+    <!-- 3 · WHEN: "march" -->
+    <div class="frame">
+      <p class="lab"><b>3</b> &middot; &ldquo;march&rdquo; &mdash; the when</p>
+      <p class="sub2">Months work because that&rsquo;s how people remember history.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <label class="vsearch">
+            <input type="search" value="march" aria-label="Search your visits">
+            <button class="clear">Clear</button>
+          </label>
+          <p class="tiny" style="margin:0 0 8px">1 visit matches &ldquo;march&rdquo;</p>
+          <button class="row" style="align-items:flex-start;padding:16px;width:100%">
+            <span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>
+            <span class="body">
+              <span class="pill pill-complete" style="margin-bottom:6px">Complete</span>
+              <span class="title">Blood draw at home</span>
+              <span class="sub">12 March &middot; lipid panel, hemoglobin A1c</span>
+            </span>
+            <span class="chev"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5"></span>
+          </button>
+        </div>
+      </div>
+      <p class="note"><b>Porting note:</b> Past currently holds one visit (Dr. Bell, 6 June),
+        so the demo gains two dated history rows (12 March draw, 28 January draw) &mdash; the
+        same three draws the Results &ldquo;All&rdquo; tab already shows, so the two surfaces
+        finally agree. Each opens the existing Visit summary.</p>
+    </div>
+
+    <!-- 4 · EMPTY -->
+    <div class="frame">
+      <p class="lab"><b>4</b> &middot; Nothing matches</p>
+      <p class="sub2">The empty state teaches the box&rsquo;s three axes, then offers the exit.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <label class="vsearch">
+            <input type="search" value="x-ray" aria-label="Search your visits">
+            <button class="clear">Clear</button>
+          </label>
+          <div class="empty">
+            <div class="big" aria-hidden="true">&empty;</div>
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Nothing matches &ldquo;x-ray&rdquo;.</div>
+            <div>Try a doctor, a test, or a month &mdash; like &ldquo;anand&rdquo;,
+              &ldquo;lipid&rdquo;, or &ldquo;march&rdquo;. We search your visits,
+              not your results &mdash; those have their own tabs.</div>
+            <button class="btn btn-ghost" style="margin-top:16px">Clear search</button>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>First drafted empty state</b> in the app (the backlog&rsquo;s
+        &ldquo;empty states&rdquo; theme starts here): name what failed, teach what works,
+        one-tap exit. The results line also draws the privacy boundary out loud &mdash;
+        search reads visit cards, never results values or message content.
+        <span class="q">For review, three team calls: how far back does visit history sync
+        (all-time or a window)? Should search ever read results values (&ldquo;218&rdquo;
+        finding the high cholesterol) or is that a results-tab job? And does the box live on
+        all three tabs as drafted, or Past only?</span></p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
