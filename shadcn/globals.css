@@ -1,0 +1,151 @@
+/* Teleport MD — D2 "Modern Consumer" theme for shadcn/ui + Tailwind v4.
+   Drop-in globals.css: maps the design-system tokens
+   (https://psaelim.github.io/teleport-d2-preview/design-system.html)
+   onto shadcn's variable contract. Values are the shipped hexes from
+   tokens.css — do not "adjust" them; every pair is contrast-tested.
+   Tailwind v3 fallback: move the @theme block into tailwind.config
+   theme.extend.colors / fontFamily / fontSize. */
+
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ---- shadcn contract ---- */
+  --background: #F4F4F0;            /* paper — the canvas */
+  --foreground: #111418;            /* ink */
+  --card: #FFFFFF;
+  --card-foreground: #111418;
+  --popover: #FFFFFF;
+  --popover-foreground: #111418;
+
+  --primary: #2D5BFF;               /* electric — THE page action */
+  --primary-foreground: #FFFFFF;    /* 4.51:1, verified */
+
+  --secondary: #111418;             /* ink — card-level actions ("Confirm") */
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #E9E9E4;
+  --muted-foreground: #4C535C;      /* the ONLY gray for small text on paper */
+
+  --accent: #ECECE7;                /* hover surfaces, menu highlights */
+  --accent-foreground: #111418;
+
+  --destructive: #DE1600;           /* validated on white AND paper */
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E3E3DE;
+  --input: #C9C9C2;
+  --ring: #2D5BFF;
+
+  --radius: 0.75rem;                /* 12px: inputs, tiles. Cards use radius-lg (16px). */
+
+  /* ---- D2 brand tokens (not in the shadcn contract) ---- */
+  --ink: #111418;
+  --paper: #F4F4F0;
+  --electric: #2D5BFF;
+  --electric-hover: #093FFF;
+  --electric-on-dark: #4C73FF;      /* electric TEXT on ink; never a fill */
+  --volt: #D8FF47;                  /* ink text only. White on volt = 1.15:1 */
+  --coral: #FF6857;                 /* fill w/ ink label only. Never white text, never text on white */
+
+  /* status chips: pale tint + ink text, always */
+  --chip-green: #E2F59B;            /* settled: Confirmed, Open, Normal, To the lab */
+  --chip-blue:  #DCE4FF;            /* in motion: En route */
+  --chip-coral: #FFDDD8;            /* needs a human: Needs confirmation, High */
+  --chip-gray:  #E8E8E3;            /* idle: Unconfirmed, Finding crew, Requested */
+
+  /* charts (results trends) */
+  --chart-1: #2D5BFF;
+  --chart-2: #9CBB18;               /* volt, darkened for marks on white */
+  --chart-3: #FF6857;
+  --chart-4: #111418;
+  --chart-5: #4C73FF;
+
+  /* shadcn sidebar contract → the ink rail */
+  --sidebar: #111418;
+  --sidebar-foreground: rgba(255, 255, 255, 0.72);
+  --sidebar-primary: #2D5BFF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);   /* active/hover row */
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: transparent;
+  --sidebar-ring: #D8FF47;                        /* volt active indicator */
+}
+
+/* Dark mode is NOT designed. The ink surfaces in the apps are
+   components (hero card, sidebar, video stage), not a theme.
+   Do not enable `.dark` until a dark theme is actually designed. */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-electric: var(--electric);
+  --color-electric-hover: var(--electric-hover);
+  --color-electric-on-dark: var(--electric-on-dark);
+  --color-volt: var(--volt);
+  --color-coral: var(--coral);
+  --color-chip-green: var(--chip-green);
+  --color-chip-blue: var(--chip-blue);
+  --color-chip-coral: var(--chip-coral);
+  --color-chip-gray: var(--chip-gray);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* type: Bricolage speaks, Inter works */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", sans-serif;
+
+  /* Type ladder is fixed: 13 / 14 / 15 / 17 (+ display 20/22/30/40).
+     13px floor: Tailwind's text-xs is 12px — redefine it so the
+     floor holds even when someone reaches for the smallest step.
+     Arbitrary values (text-[11px]) still violate it; the CI audit
+     (audit.js port) is the backstop. */
+  --text-xs: 13px;
+  --text-xs--line-height: 1.35;
+  --text-sm: 14px;
+  --text-sm--line-height: 1.5;
+  --text-base: 15px;
+  --text-base--line-height: 1.5;
+  --text-lg: 17px;
+  --text-lg--line-height: 1.5;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;   /* inputs, tiles */
+  --radius-lg: 1rem;      /* cards */
+  --radius-xl: 1.25rem;
+  /* buttons + chips are capsules: use rounded-full, not a radius token */
+}
