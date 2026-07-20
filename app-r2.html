@@ -145,8 +145,8 @@ const meAvatar = (cls) => state.photo
 /* ---------- icons ---------- */
 const I = {
   /* back/chev come from the line set; back is the chevron flipped. */
-  back:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)">',
-  chev:  '<img src="img/icons/d2-line/chevron.png" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5">',
+  back:  '<img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)">',
+  chev:  '<img src="img/icons/ph-line/chevron.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.5">',
   home:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>',
   cal:   '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
   chat:  '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-6.5A8 8 0 1 1 21 12Z"/></svg>',
@@ -191,12 +191,13 @@ if (app.parentElement === document.body) {
 /* Icon cache-buster: Safari on the phone kept serving stale icon
    PNGs after we edited them in place (June caught the old bell).
    BUMP THIS whenever any img/icons file changes. */
-const ICONS_V = '2';
+const ICONS_V = '3';
 
-/* Tab icons: Higgsfield line set (D2 = sheet fb3ed346 "line-B"
-   base + swaps June circled from ac39f3e2 "line-A"), sliced to
-   transparent PNGs in img/icons/d2-line/. Active tab uses the
-   electric-tinted -e variant; inactive dims via opacity. */
+/* Tab icons: Phosphor (June's pick, 2026-07-20; replaced the
+   Higgsfield-sliced PNG set). Colored variant SVGs generated from
+   @phosphor-icons/core into img/icons/ph-line + ph-fill; same
+   -w/-e/-g suffix scheme as before. Active tab = fill weight,
+   electric; inactive dims via opacity. */
 function tabbar(active) {
   /* R2 round 2 (June, old design as ref): the Messages tab becomes
      a NOTIFICATIONS tab — one feed for everything (messages, lab
@@ -210,7 +211,7 @@ function tabbar(active) {
   return `<nav class="tabbar">${t.map(([r, label, ico]) => `
     <button class="tab" ${active === r ? 'aria-current="page"' : ''} onclick="go('${r}')">
       <span class="ico">
-        <img src="img/icons/${active === r ? 'd2-fill' : 'd2-line'}/${ico}${active === r ? '-e' : ''}.png" alt="">
+        <img src="img/icons/${active === r ? 'ph-fill' : 'ph-line'}/${ico}${active === r ? '-e' : ''}.svg" alt="">
         ${r === 'notifs' ? '<span class="tbadge" aria-label="3 unread notifications">3</span>' : ''}
       </span><span>${label}</span>
     </button>`).join('')}</nav>`;
@@ -255,12 +256,12 @@ function Home() {
     <!-- Ink second-act card (June's pick B), now the GET CARE door:
          one entry to all four care paths. Copy = June's pick. -->
     <button class="row video-ink" style="margin-top:12px;padding:16px" onclick="go('getcare')">
-      <span class="vdisc"><img src="img/icons/d2-fill/vitals-w.png" alt=""></span>
+      <span class="vdisc"><img src="img/icons/ph-fill/vitals-w.svg" alt=""></span>
       <span class="body">
         <span class="title">Get care, your way</span>
         <span class="sub">Video visit, at your home, or your results</span>
       </span>
-      <span class="chev"><img src="img/icons/d2-line/chevron-w.png" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.7"></span>
+      <span class="chev"><img src="img/icons/ph-line/chevron-w.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.7"></span>
     </button>
 
     ${state.cx ? '' : `
@@ -337,7 +338,7 @@ function GetCare() {
     <div class="needs">
       ${needs.map(([name, cls, ico, route]) => `
         <button class="need ${cls}" onclick="go('${route}')">
-          <span class="ico"><img src="img/icons/d2-fill/${ico}.png" alt=""></span>
+          <span class="ico"><img src="img/icons/ph-fill/${ico}.svg" alt=""></span>
           <span class="name">${name}</span>
         </button>`).join('')}
     </div>
@@ -494,7 +495,7 @@ function DocProfile() {
 function VRequested() {
   return `
   <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
-    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <div class="tick"><img src="img/icons/ph-line/check-fill-e.svg" alt=""></div>
     <h1 class="display">Request sent.</h1>
     <p class="muted" style="margin-top:-12px">Thursday, 2:30 PM with Dr. Sarah Okafor.</p>
 
@@ -602,7 +603,7 @@ function Book() {
 function Confirmed() {
   return `
   <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:70vh">
-    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <div class="tick"><img src="img/icons/ph-line/check-fill-e.svg" alt=""></div>
     <h1 class="display">You're booked.</h1>
     <p class="muted" style="margin-top:-12px">A confirmation is on its way to your phone.</p>
 
@@ -651,22 +652,22 @@ function PreCall() {
 
     <div class="check">
       <div class="item">
-        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="ok"><img src="img/icons/ph-fill/check-g.svg" alt=""></span>
         <span class="body"><span class="t">Camera</span><span class="s">FaceTime HD Camera</span></span>
       </div>
       <div class="item">
-        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="ok"><img src="img/icons/ph-fill/check-g.svg" alt=""></span>
         <span class="body"><span class="t">Microphone</span><span class="s">We can hear you</span></span>
       </div>
       <div class="item">
-        <span class="ok"><img src="img/icons/d2-fill/check-g.png" alt=""></span>
+        <span class="ok"><img src="img/icons/ph-fill/check-g.svg" alt=""></span>
         <span class="body"><span class="t">Connection</span><span class="s">Strong enough for video</span></span>
       </div>
     </div>
 
     <div class="card" style="margin-top:20px;background:var(--surface-sunken);box-shadow:none">
       <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="margin-top:2px;display:flex"><img src="img/icons/d2-line/lock.png" alt="" style="width:14px;height:14px;object-fit:contain;opacity:.75"></span>
+        <span style="margin-top:2px;display:flex"><img src="img/icons/ph-line/lock.svg" alt="" style="width:14px;height:14px;object-fit:contain;opacity:.75"></span>
         <div class="tiny" style="color:var(--text-primary)">
           This visit is end-to-end encrypted. It will appear in your visit history,
           and Dr. Anand can see your shared records during the call.
@@ -727,7 +728,7 @@ function Call() {
       ${state.camOff
         ? `<div class="self" style="display:grid;place-items:center;color:#868D97;font-size:13px;text-align:center;padding:8px">Camera off</div>`
         : `<img class="self" src="${SELF}" alt="You">`}
-      <div class="enc"><img src="img/icons/d2-line/lock-w.png" alt="" style="width:13px;height:13px;object-fit:contain"><span>End-to-end encrypted</span></div>
+      <div class="enc"><img src="img/icons/ph-line/lock-w.svg" alt="" style="width:13px;height:13px;object-fit:contain"><span>End-to-end encrypted</span></div>
     </div>
 
     <!-- Line-set icons. Variant follows the surface: white on the
@@ -735,11 +736,11 @@ function Call() {
          coral end chip. Off-state = pressed style + CSS slash. -->
     <div class="calltray">
       <button class="callbtn" aria-pressed="${state.muted}" aria-label="${state.muted ? 'Unmute' : 'Mute'}"
-              onclick="state.muted=!state.muted;render()"><img src="img/icons/d2-fill/mic${state.muted ? '' : '-w'}.png" alt=""></button>
+              onclick="state.muted=!state.muted;render()"><img src="img/icons/ph-fill/mic${state.muted ? '' : '-w'}.svg" alt=""></button>
       <button class="callbtn" aria-pressed="${state.camOff}" aria-label="${state.camOff ? 'Turn camera on' : 'Turn camera off'}"
-              onclick="state.camOff=!state.camOff;render()"><img src="img/icons/d2-fill/camera${state.camOff ? '' : '-w'}.png" alt=""></button>
-      <button class="callbtn" aria-label="Captions" onclick="alert('Captions on')"><img src="img/icons/d2-fill/cc-w.png" alt=""></button>
-      <button class="callbtn end" aria-label="End call" onclick="go('postcall')"><img src="img/icons/d2-fill/end.png" alt=""></button>
+              onclick="state.camOff=!state.camOff;render()"><img src="img/icons/ph-fill/camera${state.camOff ? '' : '-w'}.svg" alt=""></button>
+      <button class="callbtn" aria-label="Captions" onclick="alert('Captions on')"><img src="img/icons/ph-fill/cc-w.svg" alt=""></button>
+      <button class="callbtn end" aria-label="End call" onclick="go('postcall')"><img src="img/icons/ph-fill/end.svg" alt=""></button>
     </div>
   </div>`;
 }
@@ -751,7 +752,7 @@ function Call() {
 function PostCall() {
   return `
   <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
-    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <div class="tick"><img src="img/icons/ph-line/check-fill-e.svg" alt=""></div>
     <h1 class="display">Visit complete.</h1>
     <p class="muted" style="margin-top:-12px">12 minutes with Dr. Priya Anand.</p>
 
@@ -877,7 +878,7 @@ function Price() {
       </div>
 
       <div class="capped" style="margin-top:20px">
-        <span style="display:flex;margin-top:2px"><img src="img/icons/d2-line/lock.png" alt="" style="width:16px;height:16px;object-fit:contain"></span>
+        <span style="display:flex;margin-top:2px"><img src="img/icons/ph-line/lock.svg" alt="" style="width:16px;height:16px;object-fit:contain"></span>
         <span><strong>This price is locked.</strong> Travel is capped at $12.50 no matter which nurse
         takes the job or how far they travel.</span>
       </div>
@@ -916,7 +917,7 @@ function Price() {
 function Requested() {
   return `
   <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:80vh">
-    <div class="tick"><img src="img/icons/d2-line/check-fill-e.png" alt=""></div>
+    <div class="tick"><img src="img/icons/ph-line/check-fill-e.svg" alt=""></div>
     <h1 class="display">Request sent.</h1>
     <p class="muted" style="margin-top:-12px">We are matching you with a licensed nurse near you.</p>
 
@@ -1061,7 +1062,7 @@ function Visits() {
        first; the pill carries the status */
     vrow(`go('precall')`, `<img class="avatar" src="${DR_ANAND}" alt="">`,
          'pill-accepted', 'Confirmed', 'Dr. Priya Anand', 'Tomorrow, 10:15 AM &middot; video visit') +
-    vrow(`go('requested')`, `<span class="nicon"><img src="img/icons/d2-fill/drop.png" alt=""></span>`,
+    vrow(`go('requested')`, `<span class="nicon"><img src="img/icons/ph-fill/drop.svg" alt=""></span>`,
          'pill-pending', 'Finding your nurse', 'Blood draw at home', 'Wed, 10 AM - 12 PM &middot; requested today') +
     vrow(`go('vrequested')`, `<span class="avatar initials">SO</span>`,
          'pill-pending', 'Awaiting practice', 'Dr. Sarah Okafor', 'Thu, 2:30 PM &middot; video visit'),
@@ -1332,7 +1333,7 @@ function Thread() {
     </div>
     <div class="composer">
       <input type="text" placeholder="Write a message" aria-label="Write a message">
-      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/ph-line/chevron-w.svg" alt=""></button>
     </div>
   </div>`;
   return `
@@ -1357,7 +1358,7 @@ function Thread() {
     </div>
     <div class="composer">
       <input type="text" placeholder="Write a message" aria-label="Write a message">
-      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/d2-line/chevron-w.png" alt=""></button>
+      <button class="send" aria-label="Send" onclick="alert('Sent')"><img src="img/icons/ph-line/chevron-w.svg" alt=""></button>
     </div>
   </div>`;
 }
@@ -1589,7 +1590,7 @@ function Notifs() {
   ];
   const row = ([ico, t, sub, time, act], unread) => `
       <button class="row${unread ? ' unread' : ''}" onclick="${act}">
-        <span class="nicon"><img src="img/icons/d2-${unread ? 'fill' : 'line'}/${ico}.png" alt=""></span>
+        <span class="nicon"><img src="img/icons/ph-${unread ? 'fill' : 'line'}/${ico}.svg" alt=""></span>
         <span class="body">
           <span class="title">${t}</span>
           <span class="sub">${sub}</span>
@@ -1624,7 +1625,7 @@ function Insurance() {
       ${state[key]
         ? `<img class="shotimg" src="${state[key]}" alt="${label} of your insurance card">
            <span class="retake">Retake</span>`
-        : `<img class="capico" src="img/icons/d2-fill/camera.png" alt="">
+        : `<img class="capico" src="img/icons/ph-fill/camera.svg" alt="">
            <span class="cap-label">${label}</span>`}
     </button>
     <input type="file" accept="image/*" capture="environment" id="${key}in"
