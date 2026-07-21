@@ -962,3 +962,41 @@ textarea.input {
   font-family: var(--font-display); font-weight: 800; font-size: 17px;
   letter-spacing: -.01em; color: var(--text-primary);
 }
+
+/* R2.2d (2026-07-21) — system states, ported from
+   mock-system-states.html after review. */
+
+/* Skeletons: the row geometry in motion, never a spinner. Shimmer
+   respects prefers-reduced-motion; production shows skeletons only
+   after a 300ms grace period. */
+.skel {
+  background: linear-gradient(90deg, var(--chip-idle, #E8E8E3) 25%, #F1F1EC 50%, var(--chip-idle, #E8E8E3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+.skelrow {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px;
+}
+.skel.disc { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+.skel.pill { width: 96px; height: 22px; border-radius: 999px; margin-bottom: 8px; }
+.skel.l1 { width: 60%; height: 16px; margin-bottom: 8px; }
+.skel.l2 { width: 85%; height: 13px; }
+
+/* Offline: the ink truth bar pinned above the screen. System truth,
+   not an alarm — never coral, no yellow banner. */
+.offbar {
+  background: var(--raw-ink); color: #fff;
+  font-size: 13.5px; font-weight: 600;
+  padding: 10px 20px; display: flex; gap: 8px; align-items: center;
+  flex-shrink: 0;
+}
+.offbar .sub { font-weight: 400; color: #A7ADB6; }
+
+/* Empty states gain a line-icon glyph (the search empty state's
+   grammar: glyph, one truth, one reassurance, one action). */
+.empty .glyph { width: 44px; height: 44px; object-fit: contain; opacity: .45; margin: 0 auto 14px; display: block; }

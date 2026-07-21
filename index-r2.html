@@ -203,7 +203,7 @@
   <rect x="76" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
   <rect x="113" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
 </svg></span>
-      <span class="meta"><span class="mtxt"><span class="t">Screen gallery</span><span class="s">49 built screens + 8 drafted states, annotated</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
+      <span class="meta"><span class="mtxt"><span class="t">Screen gallery</span><span class="s">57 live screens with annotations and status</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
     </button>
   </div>
 </div>
@@ -261,7 +261,7 @@ const tocSection = (sec, list) => `<details open><summary>${sec}</summary>` +
 document.getElementById('toc').innerHTML = '<p class="toc-t">Screens</p>' +
   SECTIONS.map(([sec, list]) => tocSection(sec, list)).join('') +
   BACKLOG.filter(([sec]) => !SECTIONS.some(([s2]) => s2 === sec)).map(([sec]) => tocSection(sec, [])).join('') +
-  '<p class="toc-leg">V2: built and grayed in place, hidden from V1 flows (pricing, July 17 team call) &middot; draft: on its review board (mock-system-states.html), open questions in coral, not yet ported into the live prototype. The full deferral list lives in V2-FEATURES.md.</p>';
+  '<p class="toc-leg">V2: built and grayed in place, hidden from V1 flows (pricing, July 17 team call). The backlog is empty: the system states were the last item, ported 2026-07-21 with their open questions kept in coral. The full deferral list lives in V2-FEATURES.md.</p>';
 const tocObs = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   document.querySelectorAll('.toc a').forEach(a =>

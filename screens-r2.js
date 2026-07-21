@@ -114,37 +114,38 @@ const SECTIONS = [
   ['receipt','Receipt','The paid ledger with card and reference.',
    'Hidden in V1 (pricing moved to V2, team call 2026-07-17): no charges in V1 means no receipts. The design stays ready, including the notification-feed entry that opens it. Tracked in V2-FEATURES.md.', true, true],
   ]],
-  /* Drafted for review, NOT yet ported into app-r2.html: these
-     entries embed their frames straight off mock-system-states.html
-     (?frame=<id> solo mode). Entry shape gains a 7th field, src —
-     when present the gallery iframes it instead of app-r2.html#hash.
-     Last in SECTIONS on purpose: the 49 built screens keep their
-     numbers. June, 2026-07-21: in the gallery, open questions kept. */
+  /* R2.2d — the system states, PORTED into app-r2.html 2026-07-21
+     (drafted 2026-07-20 on mock-system-states.html; June approved
+     the port, open questions kept in coral until the team answers).
+     Pure routes like #late; #fresh / ?fresh flips the demo to day
+     zero. Last in SECTIONS on purpose: the 49 earlier screens keep
+     their numbers. (The 7th entry field, src, stays supported by
+     the gallery for future draft boards — unused here now.) */
   ['System states', [
-  ['skel','Visits, loading','Skeleton, not spinner: the row geometry in motion.',
-   'Drafted 2026-07-20 on mock-system-states.html, in the gallery as a draft. Skeletons mirror the exact layout they become (disc, pill, two lines = a visit row), the chrome renders instantly, and no spinner exists anywhere in the app. Shimmer respects prefers-reduced-motion; skeletons appear only after a 300ms grace period &mdash; a fast load shows nothing at all. <span style="color:#FFB4A8">Open for the team: do we cache last-known data so returning users see yesterday&rsquo;s truth instantly instead of skeletons? (Recommended, but it&rsquo;s a platform/PWA call &mdash; DEV-FAQ open decision #1.)</span>',
-   true, false, 'mock-system-states.html?frame=skel'],
+  ['loading','Visits, loading','Skeleton, not spinner: the row geometry in motion.',
+   'Net new (the last backlog item, built 2026-07-21; reviewed on mock-system-states.html). Skeletons mirror the exact layout they become (disc, pill, two lines = a visit row), the chrome renders instantly, and no spinner exists anywhere in the app. Shimmer respects prefers-reduced-motion; in production skeletons appear only after a 300ms grace period &mdash; a fast load shows nothing at all. <span style="color:#FFB4A8">Open for the team: do we cache last-known data so returning users see yesterday&rsquo;s truth instantly instead of skeletons? (Recommended, but it&rsquo;s a platform/PWA call &mdash; DEV-FAQ open decision #1.)</span>',
+   true],
   ['busy','Busy buttons','The label becomes the verb in progress.',
-   'Drafted 2026-07-20. One grammar for every CTA &mdash; Request the visit, Confirm booking, Move to Thu, Save: same size, same place, label swaps to present-progressive, disabled kills double-submit; success stays the existing full-screen moment, no toast. Failure reuses the wrong-code screen&rsquo;s .errline &mdash; danger text under the control, the button back at idle, the truth (&ldquo;nothing was booked&rdquo;) stated outright. No new components.',
-   true, false, 'mock-system-states.html?frame=busy'],
+   'Net new (built 2026-07-21). One grammar for every CTA &mdash; Request the visit, Confirm booking, Move to Thu: same size, same place, label swaps to present-progressive, disabled kills double-submit; success stays the existing full-screen moment, no toast. Drive it live: pick a window and tap the CTA &mdash; &ldquo;Requesting&hellip;&rdquo; holds for a beat before the Requested moment. Failure reuses the wrong-code screen&rsquo;s .errline &mdash; danger text under the control, the button back at idle, the truth (&ldquo;nothing was booked&rdquo;) stated outright. No new components.',
+   true],
   ['cantload','Can&rsquo;t load','Blame lands on us; the data is declared safe.',
-   'Drafted 2026-07-20. The server failed, the phone is fine. Same shape as the search empty state (glyph, one truth, one reassurance, one action) so failure never feels like a different app; no error codes on the surface &mdash; the code goes to telemetry. <span style="color:#FFB4A8">Open for the team: retry policy &mdash; manual only as drafted, or one silent auto-retry before the state shows? And do we want a status-page link for long outages?</span>',
-   true, false, 'mock-system-states.html?frame=cantload'],
+   'Net new (built 2026-07-21). The server failed, the phone is fine. Same shape as the search empty state (glyph, one truth, one reassurance, one action) so failure never feels like a different app; no error codes on the surface &mdash; the code goes to telemetry. Try again performs the retry (and, in the demo, succeeds). <span style="color:#FFB4A8">Open for the team: retry policy &mdash; manual only as built, or one silent auto-retry before the state shows? And do we want a status-page link for long outages?</span>',
+   true],
   ['offline','Offline, still browsing','The ink truth bar; cached content stays readable.',
-   'Drafted 2026-07-20. Offline is a place, not an error &mdash; ink, not coral, no yellow banner &mdash; and cached content is never grayed out. The strip disappears on reconnect and anything queued (a booking, a message) sends itself, confirmed with the existing notification grammar.',
-   true, false, 'mock-system-states.html?frame=offline'],
+   'Net new (built 2026-07-21). Offline is a place, not an error &mdash; ink, not coral, no yellow banner &mdash; and cached content is never grayed out. The strip disappears on reconnect and anything queued (a booking, a message) sends itself, confirmed with the existing notification grammar.',
+   true],
   ['offtrack','Offline while Jennifer drives','The screen answers the fear, not the network.',
-   'Drafted 2026-07-20. The one moment offline is scary, so the headline says it straight: &ldquo;Jennifer is still coming.&rdquo; The door code is explicitly declared offline-safe &mdash; a real engineering requirement this screen creates &mdash; and Call / Message are dialer-level, so they stay live. <span style="color:#FFB4A8">Open for the team: crew-side behavior when the patient drops offline &mdash; does Jennifer&rsquo;s app tell her? Depends on the crew persona (not started) and dispatch mechanics (DEV-FAQ #4, #6).</span>',
-   true, false, 'mock-system-states.html?frame=offtrack'],
+   'Net new (built 2026-07-21). The one moment offline is scary, so the headline says it straight: &ldquo;Jennifer is still coming.&rdquo; The door code is explicitly declared offline-safe &mdash; a real engineering requirement this screen creates &mdash; and Call / Message are dialer-level, so they stay live. <span style="color:#FFB4A8">Open for the team: crew-side behavior when the patient drops offline &mdash; does Jennifer&rsquo;s app tell her? Depends on the crew persona (not started) and dispatch mechanics (DEV-FAQ #4, #6).</span>',
+   true],
   ['emptyvisits','Visits, before the first visit','The search box hides until there is something to search.',
-   'Drafted 2026-07-20. The action is the real door (Get care, the four-tile screen), never a generic &ldquo;browse&rdquo;. Past&rsquo;s own empty line is quieter &mdash; &ldquo;Your history builds here after your first visit.&rdquo; &mdash; no button, nothing to sell.',
-   true, false, 'mock-system-states.html?frame=emptyvisits'],
+   'Net new (built 2026-07-21). The action is the real door (Get care, the four-tile screen), never a generic &ldquo;browse&rdquo;. Past&rsquo;s own empty line is quieter &mdash; &ldquo;Your history builds here after your first visit.&rdquo; &mdash; no button, nothing to sell. Day zero is one switch: #fresh (or ?fresh) empties every feed at once, so the board can show a new user&rsquo;s first day honestly.',
+   true],
   ['emptynotifs','Notifications, all clear','The no-marketing promise, said out loud.',
-   'Drafted 2026-07-20. No action on purpose: an empty feed is a good state, not a dead end &mdash; the reassurance IS the content. &ldquo;Never marketing&rdquo; is a product promise stated where it is testable. <span style="color:#FFB4A8">Open for the team: is that promise policy? It constrains growth and lifecycle pings forever &mdash; and it should.</span>',
-   true, false, 'mock-system-states.html?frame=emptynotifs'],
+   'Net new (built 2026-07-21). No action on purpose: an empty feed is a good state, not a dead end &mdash; the reassurance IS the content. &ldquo;Never marketing&rdquo; is a product promise stated where it is testable. <span style="color:#FFB4A8">Open for the team: is that promise policy? It constrains growth and lifecycle pings forever &mdash; and it should.</span>',
+   true],
   ['emptyfam','Results &amp; Messages, first run','Same grammar, one line each.',
-   'Drafted 2026-07-20. Results land &ldquo;usually 2 to 3 days after the lab receives it, reviewed by your doctor first&rdquo;; threads are &ldquo;named by people, never by ticket&rdquo;. When this ports, a single #fresh route flips the whole app to first-run (empty Visits, Notifications, Results, Messages, a Home without the live cards); loading and offline live at #loading / #offline / #offtrack the same pure-route way #late does.',
-   true, false, 'mock-system-states.html?frame=emptyfam'],
+   'Net new (built 2026-07-21). Results land &ldquo;usually 2 to 3 days after the lab receives it, reviewed by your doctor first&rdquo;; threads are &ldquo;named by people, never by ticket&rdquo;. This frame shows Results; Messages tells its line at ?fresh#msgs. All four feeds (Visits, Notifications, Results, Messages) empty together off the one #fresh switch &mdash; no state can disagree.',
+   true],
   ]],
 ];
 const SCREENS = SECTIONS.flatMap(([sec, list]) => list);
@@ -165,6 +166,8 @@ const FLOWS = [
    'Every notification opens its real destination. (The receipt notification returns with pricing in V2.)'],
   ['Edges & changes', [['terms', 'minor', 'verifyerr'], ['manage'], ['reschedule', 'vcancel'], ['declined']],
    'The sign-in edges: Terms from the Sign in links, the under-18 handoff from a birthday, the wrong code from Verify. Your visit is the hub for moving or cancelling the booked video visit; Practice full is the other ending of Request sent, arriving by notification.'],
+  ['System states', [['loading', 'cantload'], ['offline', 'offtrack'], ['emptyvisits', 'emptynotifs', 'emptyfam']],
+   'Not a journey — the four state families, as pure routes like #late. #fresh (one switch) flips the whole app to day zero; busy buttons are behavior, not a screen: pick a window on Book the draw and tap Request the visit.'],
 ];
 /* All ten 'stub' items were built on 2026-07-16 and moved up into
    SECTIONS as real screens. The five sign-in and video-visit

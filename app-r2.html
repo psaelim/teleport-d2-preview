@@ -83,6 +83,10 @@ const state = {
   /* R2.2c — Visits search (built 2026-07-20, reviewed on
      mock-visits-search.html): */
   vq: '',                                    // the search query; empty = tabs as usual
+  /* R2.2d — system states (built 2026-07-21, reviewed on
+     mock-system-states.html). One switch flips the whole demo to
+     day zero: ?fresh in the URL, or visiting #fresh. */
+  fresh: new URLSearchParams(location.search).has('fresh'),
 };
 
 /* At-home draw catalogue: key, name, what it covers, price, and
@@ -151,6 +155,17 @@ window.loadShot = (inp, key) => {
   r.readAsDataURL(f);
 };
 window.loadPhoto = (inp) => loadShot(inp, 'photo');
+
+/* R2.2d — busy buttons, one grammar for every CTA: while the action
+   is pending the label becomes the verb in progress, same size,
+   same place; disabled kills double-submit. The button never
+   shrinks to a spinner, and success stays the existing full-screen
+   moment (Requested / Booked / You're moved) — no toast. */
+window.busyGo = (btn, verb, route) => {
+  if (btn.disabled) return;
+  btn.disabled = true; btn.style.opacity = .55; btn.textContent = verb;
+  setTimeout(() => go(route), 700);
+};
 const meAvatar = (cls) => state.photo
   ? `<img class="avatar ${cls}" src="${state.photo}" alt="Your profile photo">`
   : `<span class="avatar ${cls} initials">${initials()}</span>`;
@@ -245,7 +260,32 @@ const bar = (title, back) => `
    Collection") and a card titled "#WO1".
    NOW: one question, one live thing, one next action.
    ============================================================ */
-function Home() {
+function Home(offline) {
+  /* R2.2d — #offline: the truth bar variant. Offline is a place,
+     not an error: ink, never coral, and cached content stays fully
+     readable, never grayed out. The strip disappears on reconnect
+     and anything queued (a booking, a message) sends itself, with
+     the existing notification grammar confirming it went. */
+  if (offline) return `
+  <div class="offbar">You&rsquo;re offline.<span class="sub">Showing the latest we have.</span></div>
+  <div class="scroll">
+    <p class="greet" style="margin-top:8px">Hi ${firstName()}.</p>
+    <h1 class="display">How can we help?</h1>
+    <div class="card" style="display:flex;gap:16px;align-items:center">
+      <img class="avatar lg" src="${DR_ANAND}" alt="">
+      <div>
+        <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+        <div class="tiny">Video visit &middot; ${vWhenShort()}</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div style="font-weight:700;margin-bottom:4px">What still works</div>
+      <div class="tiny">Everything you have already loaded &mdash; visits, results,
+        addresses. Booking and messages will send the moment you are back;
+        calling never needed the app.</div>
+    </div>
+  </div>
+  ${tabbar('home')}`;
   return `
   <div class="scroll">
     <!-- Brand row (June's pick, placement 1 of 4): the F20 mark +
@@ -277,7 +317,7 @@ function Home() {
       <span class="chev"><img src="img/icons/ph-line/chevron-w.svg" alt="" style="width:16px;height:16px;object-fit:contain;opacity:.7"></span>
     </button>
 
-    ${state.cx ? '' : state.nodraw ? `
+    ${state.fresh || state.cx ? '' : state.nodraw ? `
     <h2 class="section">Happening now</h2>
 
     <!-- R2.2b: the safe stop replaces the live card with a
@@ -306,7 +346,7 @@ function Home() {
       <span class="chev">${I.chev}</span>
     </button>`}
 
-    ${state.vcx ? '' : `
+    ${state.fresh || state.vcx ? '' : `
     <h2 class="section">Next up</h2>
     <!-- R2.2: the row opens the visit hub (manage) — reschedule,
          cancel and, 10 minutes out, Join all live there. -->
@@ -323,7 +363,7 @@ function Home() {
          screen, forever. This appears only because insurance is
          genuinely missing and it will block the next claim; the
          moment the card is captured it is gone for good. -->
-    ${state.insured ? '' : `
+    ${state.fresh || state.insured ? '' : `
     <div class="banner" style="margin-top:24px">
       <div>
         <div class="t">Add your insurance card</div>
@@ -613,7 +653,7 @@ function Book() {
   <!-- Floating CTA (June): always visible, like the tab bar -->
   <div class="ctabar">
     <button class="btn btn-primary" ${state.slot === null ? 'disabled style="opacity:.4"' : ''}
-            onclick="${state.slot === null ? '' : `go('confirmed')`}">
+            onclick="${state.slot === null ? '' : `busyGo(this,'Booking&hellip;','confirmed')`}">
       ${state.slot === null ? 'Choose a time' : 'Confirm booking'}
     </button>
     <p class="tiny">
@@ -868,9 +908,12 @@ function Collect() {
     <!-- V1 (team, 2026-07-17): all pricing is V2, so the price
          screen is skipped; requesting is the next step. The Price()
          screen and route stay in the file for V2. -->
+    <!-- R2.2d — busy button: the label becomes "Requesting…" while
+         the request is pending; success stays the Requested moment. -->
     <div style="margin-top:32px">
       <button class="btn btn-primary" ${state.slot === null || !selTests().length ? 'disabled style="opacity:.4"' : ''}
-              onclick="${state.slot === null || !selTests().length ? '' : `go('${V2VIEW ? 'price' : 'requested'}')`}">
+              onclick="${state.slot === null || !selTests().length ? ''
+                : V2VIEW ? `go('price')` : `busyGo(this,'Requesting&hellip;','requested')`}">
         ${!selTests().length ? 'Choose your tests' : state.slot === null ? 'Choose a window'
           : V2VIEW ? 'See the price' : 'Request the visit'}
       </button>
@@ -1072,6 +1115,50 @@ function Track(lateForce) {
   </div>`;
 }
 
+/* R2.2d — #offtrack: offline during the live visit, the one moment
+   offline is scary. The headline answers the fear, not the network;
+   the door code is explicitly declared offline-safe (it must
+   genuinely be cached — a real engineering requirement this screen
+   creates); Call and Message are dialer-level, so they stay live.
+   The map is gone, not grayed: paused, said in words. */
+function OffTrack() {
+  if (state.cx) return Cancel();
+  if (state.nodraw) return NoDraw();
+  return `
+  <div class="offbar">You&rsquo;re offline.<span class="sub">The map is paused, not the visit.</span></div>
+  <div class="scroll">
+    <span class="pill pill-en-route" style="margin-top:8px">On the way</span>
+    <h1 class="display" style="margin-top:12px">Jennifer is still<br>coming.</h1>
+
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:4px">Being offline changes nothing for her</div>
+      <div class="tiny">Jennifer has your address and the visit is unaffected. The
+        live map and ETA will catch up when you reconnect &mdash; last update 2:31 PM,
+        arriving about 2:40 PM. Calling and texting work without the app.</div>
+    </div>
+
+    <div class="card" style="display:flex;gap:16px;align-items:center;margin-top:12px">
+      <img class="avatar lg" src="${CREW_JEN}" alt="">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+        <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="alert('Calling Jennifer')">Call</button>
+      <button class="btn btn-secondary" onclick="state.thread='jen';go('thread')">Message</button>
+    </div>
+
+    <div class="card" style="margin-top:12px;background:var(--raw-ink);color:#fff;border:0">
+      <div style="font-weight:700;font-size:17px;margin-bottom:6px">At the door</div>
+      <div style="font-size:15px;color:#A7ADB6">
+        Jennifer will show a code that matches yours: <strong style="color:var(--raw-volt);font-size:19px">4B-7291</strong>.
+        Saved to your phone &mdash; it works offline.
+      </div>
+    </div>
+  </div>`;
+}
+
 /* ============================================================
    VISITS
    FIXES: the old list mixed video-visit cards and "#WO1" work
@@ -1090,6 +1177,33 @@ function Visits(qForce) {
      already says which is which, so soonest-first in one list. */
   const vtabs = ['Upcoming', 'In progress', 'Past'];
   const t = state.vtab;
+  /* R2.2d — day zero (#fresh): the tabs render, the search box
+     hides until there is something to search, and each tab tells
+     its first-run truth. The action is the real door (Get care,
+     the four-tile screen), never a generic "browse"; Past's line
+     is quieter on purpose — no button, nothing to sell. */
+  if (state.fresh) {
+    const fempty = [`
+    <div class="empty">
+      <img class="glyph" src="img/icons/ph-line/calendar.svg" alt="">
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Nothing booked yet.</div>
+      <div>A nurse at your door or a doctor on video &mdash; either takes about a
+        minute to book.</div>
+      <button class="btn btn-emphasis" style="margin-top:16px" onclick="go('getcare')">Get care</button>
+    </div>`,
+    '<div class="empty">Nothing in progress right now.</div>',
+    '<div class="empty">Your history builds here after your first visit.</div>'];
+    return `
+  ${bar('Visits')}
+  <div class="scroll">
+    <div class="tabs">
+      ${vtabs.map((n, i) => `
+        <button class="tabx" aria-selected="${t === i}" onclick="state.vtab=${i};render()">${n}</button>`).join('')}
+    </div>
+    ${fempty[t]}
+  </div>
+  ${tabbar('visits')}`;
+  }
   const vrow = (act, avatar, pillCls, pillTxt, title, sub) => `
     <button class="row" onclick="${act}" style="align-items:flex-start;padding:16px">
       ${avatar}
@@ -1174,6 +1288,35 @@ function Visits(qForce) {
   ${tabbar('visits')}`;
 }
 
+/* R2.2d — #loading: the board's window onto Visits mid-fetch.
+   Skeletons mirror the exact row they become (disc, pill, two
+   lines = a visit row), the chrome renders instantly, and no
+   spinner exists anywhere in the app. In production this appears
+   only after a 300ms grace period — a fast load shows nothing at
+   all; whether returning users see cached data instead is the
+   board's open question (DEV-FAQ open decision #1). */
+function VisitsLoading() {
+  const skelrow = `
+      <div class="skelrow"><span class="skel disc"></span><span style="flex:1"><span
+        class="skel pill" style="display:block"></span><span class="skel l1" style="display:block"></span><span
+        class="skel l2" style="display:block"></span></span></div>`;
+  return `
+  ${bar('Visits')}
+  <div class="scroll">
+    <label class="vsearch">
+      <input type="search" placeholder="Doctor, test, or month" aria-label="Search your visits" disabled>
+    </label>
+    <div class="tabs">
+      ${['Upcoming', 'In progress', 'Past'].map((n, i) => `
+        <button class="tabx" aria-selected="${i === 0}">${n}</button>`).join('')}
+    </div>
+    <div style="margin-top:12px" aria-busy="true" aria-label="Loading your visits">
+      ${skelrow}${skelrow}${skelrow}
+    </div>
+  </div>
+  ${tabbar('visits')}`;
+}
+
 /* Search typing re-renders, then puts the caret back. From the
    board's #vsearch demo route, the first interaction hands over
    to the live #visits screen. */
@@ -1191,6 +1334,17 @@ function vqClear() {
 }
 
 function Msgs() {
+  /* R2.2d — day zero: same grammar, one line. */
+  if (state.fresh) return `
+  ${bar('Messages', 'you')}
+  <div class="scroll">
+    <div class="empty">
+      <img class="glyph" src="img/icons/ph-line/chat.svg" alt="">
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">No messages yet.</div>
+      <div>Your care team writes here &mdash; threads start after your first
+        visit, named by people, never by ticket.</div>
+    </div>
+  </div>`;
   /* No longer a tab (the Notifications tab replaced it); message
      notis land in the feed, and this list lives under You. */
   return `
@@ -1317,6 +1471,18 @@ function Profile() {
    Values + status pills in D2's fill+ink grammar.
    ============================================================ */
 function Results(tab = 0) {
+  /* R2.2d — day zero: the first-run truth, no tabs to sell. */
+  if (state.fresh) return `
+  ${bar('', 'you')}
+  <div class="scroll" style="padding-top:0">
+    <h1 class="display">Lab results</h1>
+    <div class="empty">
+      <img class="glyph" src="img/icons/ph-line/flask.svg" alt="">
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">No results yet.</div>
+      <div>They land here after your first draw &mdash; usually 2 to 3 days after
+        the lab receives it, reviewed by your doctor first.</div>
+    </div>
+  </div>`;
   /* All three tabs are real now (All + Trends were stubs). Each
      tab is its own route so the back button and the gallery both
      behave; the data below is one history, told three ways. */
@@ -1404,6 +1570,29 @@ function Results(tab = 0) {
     </div>
 
     ${panels[tab]}
+  </div>`;
+}
+
+/* R2.2d — #cantload: the server failed, the phone is fine. Blame
+   lands on us, the data is declared safe, and the shape matches
+   the search empty state (glyph, one truth, one reassurance, one
+   action) so failure never feels like a different app. No error
+   codes on the surface — the code goes to telemetry. Retry is
+   manual as drafted (the board's open question); in the demo,
+   Try again succeeds. */
+function ResultsFail() {
+  return `
+  ${bar('Lab results', 'you')}
+  <div class="scroll">
+    <div class="empty">
+      <img class="glyph" src="img/icons/ph-line/flask.svg" alt="">
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Your results didn&rsquo;t load.</div>
+      <div>That&rsquo;s on us, not your phone. Nothing is lost &mdash; this screen
+        just didn&rsquo;t arrive.</div>
+      <button class="btn btn-secondary" style="margin-top:16px" onclick="go('results')">Try again</button>
+      <p class="tiny" style="margin-top:12px">If it keeps failing, we&rsquo;re probably
+        already fixing it. Check back in a few minutes.</p>
+    </div>
   </div>`;
 }
 
@@ -1707,6 +1896,22 @@ function newCode() {
    real; nothing nags.
    ============================================================ */
 function Notifs() {
+  /* R2.2d — day zero: the empty feed is where the no-marketing
+     promise gets said out loud. No action on purpose — an empty
+     feed is a good state, not a dead end; the reassurance IS the
+     content, and "never marketing" is a product promise stated
+     where it is testable. */
+  if (state.fresh) return `
+  ${bar('Notifications')}
+  <div class="scroll">
+    <div class="empty">
+      <img class="glyph" src="img/icons/ph-line/bell.svg" alt="">
+      <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">All quiet.</div>
+      <div>We only ping you about your care &mdash; visit updates, results, and
+        messages from your team. Never marketing.</div>
+    </div>
+  </div>
+  ${tabbar('notifs')}`;
   /* V1 (pricing -> V2): the payment-receipt item is hidden with the
      receipt screen; restore both together. */
   const fresh = [
@@ -2377,7 +2582,7 @@ function Reschedule() {
 
   <div class="ctabar">
     <button class="btn btn-primary" ${s === null ? 'disabled style="opacity:.4"' : ''}
-            onclick="${s === null ? '' : `state.moved=true;go('moved')`}">
+            onclick="${s === null ? '' : `state.moved=true;busyGo(this,'Moving&hellip;','moved')`}">
       ${s === null ? 'Choose a time' : `Move to ${VDAYS[d][0]} ${VDAYS[d][1]}, ${VSLOTS[s]}`}
     </button>
     <p class="tiny">Your note moves with the visit. The old time goes back to the practice.</p>
@@ -2631,6 +2836,21 @@ const routes = {
   nodraw: () => { state.nodraw = true; return NoDraw(); },
   /* R2.2c — the board's window onto Visits search mid-query. */
   vsearch: () => Visits('lipid'),
+  /* R2.2d — the system states (built 2026-07-21, reviewed on
+     mock-system-states.html). Pure routes like #late: #loading,
+     #cantload, #offline and #offtrack render states without
+     touching the demo. #fresh (or ?fresh in the URL) is the one
+     switch that flips the whole app to day zero; the three empty*
+     routes are the board's windows onto its feeds. Busy buttons
+     are behavior, not a screen: #busy lands on Book the draw,
+     where picking a window and tapping the CTA shows the grammar. */
+  loading: VisitsLoading, cantload: ResultsFail,
+  offline: () => Home(1), offtrack: OffTrack,
+  fresh: () => { state.fresh = true; return Home(); },
+  busy: () => Collect(),
+  emptyvisits: () => { state.fresh = true; state.vtab = 0; return Visits(); },
+  emptynotifs: () => { state.fresh = true; return Notifs(); },
+  emptyfam: () => { state.fresh = true; return Results(0); },
 };
 
 function render() {
