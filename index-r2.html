@@ -103,6 +103,7 @@
     .toc .todo{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 10px 6px 24px;color:#5A6069;font-size:13px;line-height:1.3}
     .stchip{flex:none;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px}
     .st-stub{background:#3A3113;color:#FFD54A}
+    .st-draft{background:#3A3113;color:#FFD54A}
     .st-planned{background:#1E2228;color:#868D97}
     .st-parked{background:transparent;border:1px solid #2A2F38;color:#5A6069}
     .st-v2{background:#1E2228;color:#9DA96A}
@@ -173,7 +174,7 @@
 <div class="head">
   <p class="eyebrow">Teleport MD &middot; Patient app &middot; Direction 02 &middot; Revision 2</p>
   <h1>Care that comes to you.</h1>
-  <p class="lede">Patient app R2, rebuilt to the team feedback of July 15. Last updated July 17, 2026.</p>
+  <p class="lede">Patient app R2, rebuilt to the team feedback of July 15. Last updated July 21, 2026.</p>
   <div class="cards">
     <a class="cardbtn cb-electric" href="app-r2.html" target="_blank">
       <span class="art"><img src="img/card-prototype.jpg" alt=""></span>
@@ -202,7 +203,7 @@
   <rect x="76" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
   <rect x="113" y="34" width="33" height="26" rx="6" fill="#1E2228" stroke="#2A2F38"/>
 </svg></span>
-      <span class="meta"><span class="mtxt"><span class="t">Screen gallery</span><span class="s">49 built screens with annotations and status</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
+      <span class="meta"><span class="mtxt"><span class="t">Screen gallery</span><span class="s">49 built screens + 8 drafted states, annotated</span></span><span class="go" aria-hidden="true"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12M10 4l5 5-5 5"/></svg></span></span>
     </button>
   </div>
 </div>
@@ -229,7 +230,7 @@ const V2STACK = location.hostname.endsWith('github.io')
    2026-07-17 night): the gray veil is the signifier. */
 grid.innerHTML = SECTIONS.map(([sec, list]) => {
   return `
-  <h2 class="gtitle">${sec}</h2>` + list.map(([hash,title,sub,fix,isNew,isV2]) => { gn++; return `
+  <h2 class="gtitle">${sec}</h2>` + list.map(([hash,title,sub,fix,isNew,isV2,src]) => { gn++; return `
   <figure id="s-${hash}">
     ${V2STACK.has(hash) ? `
     <div class="stack" id="stk-${hash}">
@@ -238,13 +239,13 @@ grid.innerHTML = SECTIONS.map(([sec, list]) => {
       <span class="v2tag">V2 behind</span>
       <button class="swapbtn" onclick="flipV2('stk-${hash}', this)">See the V2 version</button>
     </div>` : `
-    <div class="phone"><iframe src="app-r2.html#${hash}" loading="lazy" title="${title}"></iframe>${isV2 ? `
+    <div class="phone"><iframe src="${src || `app-r2.html#${hash}`}" loading="lazy" title="${title}"></iframe>${isV2 ? `
       <button class="veil" aria-label="Show the ${title} design (hidden in V1)"
               onclick="this.classList.add('off')">
         <span class="vlab">Hidden in V1</span><span class="vbtn">View design</span>
       </button>` : ''}</div>`}
     <figcaption>
-      <div class="cap-t"><span class="num">${String(gn).padStart(2,'0')}</span> ${title}${isNew ? ' <span class="newtag">new</span>' : ''}</div>
+      <div class="cap-t"><span class="num">${String(gn).padStart(2,'0')}</span> ${title}${isNew ? ` <span class="newtag">${src ? 'draft' : 'new'}</span>` : ''}</div>
       <div class="cap-s">${sub}</div>
       <div class="fix${isNew ? ' new' : ''}">${fix}</div>
     </figcaption>
@@ -254,13 +255,13 @@ grid.innerHTML = SECTIONS.map(([sec, list]) => {
 let tn = 0;
 const BMAP = Object.fromEntries(BACKLOG);
 const tocSection = (sec, list) => `<details open><summary>${sec}</summary>` +
-  (list || []).map(([h, t2, , , , isV2]) => { tn++; return `<a href="#s-${h}"${isV2 ? ' class="hasv2"' : ''}><span class="ttxt"><span class="num">${String(tn).padStart(2,'0')}</span> ${t2}</span>${isV2 ? '<span class="stchip st-v2">V2</span>' : ''}</a>`; }).join('') +
+  (list || []).map(([h, t2, , , , isV2, src]) => { tn++; return `<a href="#s-${h}"${(isV2 || src) ? ' class="hasv2"' : ''}><span class="ttxt"><span class="num">${String(tn).padStart(2,'0')}</span> ${t2}</span>${isV2 ? '<span class="stchip st-v2">V2</span>' : src ? '<span class="stchip st-draft">draft</span>' : ''}</a>`; }).join('') +
   (BMAP[sec] || []).map(([lb, st]) => `<div class="todo"><span>${lb}</span><span class="stchip st-${st}">${st}</span></div>`).join('') +
   '</details>';
 document.getElementById('toc').innerHTML = '<p class="toc-t">Screens</p>' +
   SECTIONS.map(([sec, list]) => tocSection(sec, list)).join('') +
   BACKLOG.filter(([sec]) => !SECTIONS.some(([s2]) => s2 === sec)).map(([sec]) => tocSection(sec, [])).join('') +
-  '<p class="toc-leg">V2: built and grayed in place, hidden from V1 flows (pricing, July 17 team call) &middot; planned: not designed yet &middot; parked: deliberately out. The full deferral list lives in V2-FEATURES.md.</p>';
+  '<p class="toc-leg">V2: built and grayed in place, hidden from V1 flows (pricing, July 17 team call) &middot; draft: on its review board (mock-system-states.html), open questions in coral, not yet ported into the live prototype. The full deferral list lives in V2-FEATURES.md.</p>';
 const tocObs = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   document.querySelectorAll('.toc a').forEach(a =>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System states — review</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-r2.css">
+<style>
+  /* Review-board chrome, same grammar as the other mock boards. */
+  html { background:#0B0D10; }
+  body { background:#0B0D10; padding:40px 32px 80px; }
+  .head { max-width:840px; margin:0 auto 12px; }
+  .head h1 { color:#fff; font:700 30px/1.15 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0 0 10px; }
+  .head p { color:#868D97; font:400 14px/1.55 Inter; margin:0; max-width:640px; }
+  .head b { color:#D8FF47; font-weight:600; }
+  .sect { max-width:1400px; margin:56px auto 0; }
+  .sect > h2 { color:#D8FF47; font:600 13px/1 Inter; letter-spacing:.14em; text-transform:uppercase; margin:0 0 20px; }
+  .frames { display:flex; flex-wrap:wrap; gap:36px; align-items:flex-start; }
+  .frame { width:390px; }
+  .lab { color:#fff; font:600 15px/1.3 Inter; margin:0 0 4px; }
+  .lab b { color:#D8FF47; font-weight:700; }
+  .sub2 { color:#868D97; font:400 13px/1.5 Inter; margin:0 0 12px; }
+  .note { color:#868D97; font:400 13px/1.55 Inter; margin:12px 0 0; }
+  .note b { color:#C9CED6; font-weight:600; }
+  .note .q { color:#FFB4A8; }
+  .ph {
+    position:relative; width:390px; height:844px;
+    background:var(--surface-page); border-radius:26px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(255,255,255,.09);
+  }
+  .strip { background:var(--surface-page); border-radius:18px; padding:16px; }
+  .strip + .strip { margin-top:12px; }
+
+  /* --- Proposed system-state grammar ------------------------- */
+
+  /* Skeletons: the row/card geometry, in motion. Never a spinner. */
+  .skel {
+    background: linear-gradient(90deg, var(--chip-idle, #E8E8E3) 25%, #F1F1EC 50%, var(--chip-idle, #E8E8E3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: 8px;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+  .skelrow { display:flex; gap:14px; align-items:flex-start; background:var(--surface-card);
+    border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; margin-bottom:12px; }
+  .skel.disc { width:44px; height:44px; border-radius:50%; flex-shrink:0; }
+  .skel.pill { width:96px; height:22px; border-radius:999px; margin-bottom:8px; }
+  .skel.l1 { width:60%; height:16px; margin-bottom:8px; }
+  .skel.l2 { width:85%; height:13px; }
+
+  /* Offline: a quiet ink strip pinned under the top bar. System
+     truth, not an alarm — no coral, no yellow. */
+  .offbar {
+    background: var(--raw-ink); color:#fff;
+    font-size:13.5px; font-weight:600;
+    padding:10px 20px; display:flex; gap:8px; align-items:center;
+  }
+  .offbar .sub { font-weight:400; color:#A7ADB6; }
+
+  /* Empty states: glyph, one truth, one reassurance, one action. */
+  .empty .glyph { width:44px; height:44px; object-fit:contain; opacity:.45; margin:0 auto 14px; display:block; }
+
+  /* Solo-frame mode (?frame=<id>): the R2 gallery embeds one frame
+     per phone shell (see the System states section in screens-r2.js).
+     Board chrome hides; the chosen frame sits at 390px, top-left. */
+  body.solo { padding:0; }
+  body.solo .head, body.solo .sect > h2, body.solo .lab, body.solo .sub2,
+  body.solo .note, body.solo .frame { display:none; }
+  body.solo .sect { margin:0; max-width:none; }
+  body.solo .frame.on { display:block; margin:0; }
+  body.solo .frame.on .ph { border-radius:0; box-shadow:none; }
+  body.solo .frame.on.stripframe { padding:14px 14px 0; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>System states, drafted for review.</h1>
+  <p>The last backlog item: loading, can&rsquo;t-load, offline, and empty &mdash; one grammar
+     for each, applied to the screens that need them. Static and self-contained;
+     <b>nothing in the prototype is touched</b>. Mark up or approve, then I port.</p>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Loading — the shape arrives first</h2>
+  <div class="frames">
+
+    <!-- 1 · SKELETON -->
+    <div class="frame" id="f-skel">
+      <p class="lab"><b>1</b> &middot; Skeleton, not spinner</p>
+      <p class="sub2">Visits loading: the row geometry in motion, so nothing jumps when data lands.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <label class="vsearch">
+            <input type="search" placeholder="Doctor, test, or month" aria-label="Search your visits" disabled>
+          </label>
+          <div class="tabs">
+            <button class="tabx" aria-selected="true">Upcoming</button>
+            <button class="tabx" aria-selected="false">In progress</button>
+            <button class="tabx" aria-selected="false">Past</button>
+          </div>
+          <div style="margin-top:12px" aria-busy="true" aria-label="Loading your visits">
+            <div class="skelrow"><span class="skel disc"></span><span style="flex:1"><span class="skel pill" style="display:block"></span><span class="skel l1" style="display:block"></span><span class="skel l2" style="display:block"></span></span></div>
+            <div class="skelrow"><span class="skel disc"></span><span style="flex:1"><span class="skel pill" style="display:block"></span><span class="skel l1" style="display:block"></span><span class="skel l2" style="display:block"></span></span></div>
+            <div class="skelrow"><span class="skel disc"></span><span style="flex:1"><span class="skel pill" style="display:block"></span><span class="skel l1" style="display:block"></span><span class="skel l2" style="display:block"></span></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>The rules:</b> skeletons mirror the exact layout they become (disc,
+        pill, two lines = a visit row), the chrome (tabs, search) renders instantly, and no
+        spinner exists anywhere in the app. Shimmer respects
+        <b>prefers-reduced-motion</b>. Skeletons appear only after a <b>300ms</b> grace
+        period &mdash; a fast load shows nothing at all.
+        <span class="q">For review: do we cache last-known data so returning users see
+        yesterday&rsquo;s truth instantly instead of skeletons? (Recommended, but it&rsquo;s a
+        platform/PWA call &mdash; DEV-FAQ open decision #1.)</span></p>
+    </div>
+
+    <!-- 2 · BUSY BUTTONS -->
+    <div class="frame stripframe" id="f-busy">
+      <p class="lab"><b>2</b> &middot; Busy buttons</p>
+      <p class="sub2">Action pending: the label becomes the verb in progress. The button never shrinks to a spinner.</p>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Idle &rarr; busy &rarr; done is the existing tick moment</p>
+        <button class="btn btn-emphasis">Request the visit</button>
+        <button class="btn btn-emphasis" disabled style="opacity:.55;margin-top:10px">Requesting&hellip;</button>
+        <p class="tiny" style="margin:10px 0 0">Same size, same place; label swaps to present-progressive; disabled kills double-submit. Success is the existing full-screen moment (Requested / Booked / You&rsquo;re moved) &mdash; no toast needed.</p>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">When the action fails, the button tells you where it failed</p>
+        <button class="btn btn-emphasis">Request the visit</button>
+        <span class="errline" role="alert">That didn&rsquo;t go through. Nothing was booked &mdash; try once more.</span>
+        <p class="tiny" style="margin:10px 0 0">The wrong-code grammar reused: danger text under the control, the button returns to idle, the truth (&ldquo;nothing was booked&rdquo;) stated outright.</p>
+      </div>
+
+      <p class="note"><b>One grammar for every CTA</b> &mdash; Request the visit, Confirm
+        booking, Move to Thu, Save. The failure line is the same <b>.errline</b> the
+        wrong-code screen shipped; no new components.</p>
+    </div>
+
+    <!-- 3 · CAN'T LOAD -->
+    <div class="frame" id="f-cantload">
+      <p class="lab"><b>3</b> &middot; Can&rsquo;t load</p>
+      <p class="sub2">The server failed, the phone is fine. Blame lands on us, data is declared safe.</p>
+      <div class="ph">
+        <header class="topbar">
+          <button class="back" aria-label="Back"><img src="img/icons/ph-line/chevron.svg" alt="" style="width:20px;height:20px;object-fit:contain;transform:rotate(180deg)"></button>
+          <h1>Lab results</h1>
+        </header>
+        <div class="scroll">
+          <div class="empty">
+            <img class="glyph" src="img/icons/ph-line/flask.svg" alt="">
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Your results didn&rsquo;t load.</div>
+            <div>That&rsquo;s on us, not your phone. Nothing is lost &mdash; this screen
+              just didn&rsquo;t arrive.</div>
+            <button class="btn btn-secondary" style="margin-top:16px">Try again</button>
+            <p class="tiny" style="margin-top:12px">If it keeps failing, we&rsquo;re probably
+              already fixing it. Check back in a few minutes.</p>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Same shape as the search empty state</b> (glyph, one truth, one
+        reassurance, one action) so failure never feels like a different app. No error codes
+        on the surface; the code goes to telemetry.
+        <span class="q">For review: retry policy &mdash; manual only as drafted, or one silent
+        auto-retry before the state shows? And do we want a status-page link for long
+        outages?</span></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Offline — the truth bar</h2>
+  <div class="frames">
+
+    <!-- 4 · OFFLINE BROWSING -->
+    <div class="frame" id="f-offline">
+      <p class="lab"><b>4</b> &middot; Offline, still browsing</p>
+      <p class="sub2">The ink strip under the top bar; cached content stays readable, never grayed out.</p>
+      <div class="ph">
+        <div class="offbar">You&rsquo;re offline.<span class="sub">Showing the latest we have.</span></div>
+        <div class="scroll">
+          <p class="greet" style="margin-top:8px">Hi Maya.</p>
+          <h1 class="display">How can we help?</h1>
+          <div class="card" style="display:flex;gap:16px;align-items:center">
+            <img class="avatar lg" src="img/dr-anand-avatar.png" alt="">
+            <div>
+              <div style="font-weight:700;font-size:19px">Dr. Priya Anand</div>
+              <div class="tiny">Video visit &middot; Tomorrow, 10:15 AM</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:12px">
+            <div style="font-weight:700;margin-bottom:4px">What still works</div>
+            <div class="tiny">Everything you have already loaded &mdash; visits, results,
+              addresses. Booking and messages will send the moment you are back;
+              calling never needed the app.</div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>Offline is a place, not an error</b> &mdash; ink, not coral; no
+        yellow banner. Cached content stays fully readable. The strip disappears on
+        reconnect and anything queued (a booking, a message) sends itself &mdash; with the
+        existing notification grammar confirming it went.</p>
+    </div>
+
+    <!-- 5 · OFFLINE DURING THE LIVE VISIT -->
+    <div class="frame" id="f-offtrack">
+      <p class="lab"><b>5</b> &middot; Offline while Jennifer drives</p>
+      <p class="sub2">The one moment offline is scary. The screen answers the fear directly.</p>
+      <div class="ph">
+        <div class="offbar">You&rsquo;re offline.<span class="sub">The map is paused, not the visit.</span></div>
+        <div class="scroll">
+          <span class="pill pill-en-route" style="margin-top:8px">On the way</span>
+          <h1 class="display" style="margin-top:12px">Jennifer is still<br>coming.</h1>
+
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:4px">Being offline changes nothing for her</div>
+            <div class="tiny">Jennifer has your address and the visit is unaffected. The
+              live map and ETA will catch up when you reconnect &mdash; last update 2:31 PM,
+              arriving about 2:40 PM. Calling and texting work without the app.</div>
+          </div>
+
+          <div class="card" style="display:flex;gap:16px;align-items:center;margin-top:12px">
+            <img class="avatar lg" src="img/crew-jennifer-face.png" alt="">
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:19px">Jennifer Reyes</div>
+              <div class="tiny">Licensed phlebotomist &middot; 1,240 draws</div>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:12px">
+            <button class="btn btn-secondary">Call</button>
+            <button class="btn btn-secondary">Message</button>
+          </div>
+
+          <div class="card" style="margin-top:12px;background:var(--raw-ink);color:#fff;border:0">
+            <div style="font-weight:700;font-size:17px;margin-bottom:6px">At the door</div>
+            <div style="font-size:15px;color:#A7ADB6">
+              Jennifer will show a code that matches yours: <strong style="color:var(--raw-volt);font-size:19px">4B-7291</strong>.
+              Saved to your phone &mdash; it works offline.
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>The headline answers the fear</b>, not the network. The door code is
+        explicitly declared offline-safe (it must actually be cached &mdash; a real engineering
+        requirement this screen creates). Call/Message are dialer-level and stay live.
+        <span class="q">For review: crew-side behavior when the PATIENT drops offline &mdash;
+        does Jennifer&rsquo;s app tell her? Depends on the crew persona (not started) and
+        dispatch mechanics (DEV-FAQ #4, #6).</span></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<div class="sect">
+  <h2>Empty — the first-run truths</h2>
+  <div class="frames">
+
+    <!-- 6 · VISITS EMPTY -->
+    <div class="frame" id="f-emptyvisits">
+      <p class="lab"><b>6</b> &middot; Visits, before the first visit</p>
+      <p class="sub2">The search box hides until there is something to search.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Visits</h1></header>
+        <div class="scroll">
+          <div class="tabs">
+            <button class="tabx" aria-selected="true">Upcoming</button>
+            <button class="tabx" aria-selected="false">In progress</button>
+            <button class="tabx" aria-selected="false">Past</button>
+          </div>
+          <div class="empty">
+            <img class="glyph" src="img/icons/ph-line/calendar.svg" alt="">
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">Nothing booked yet.</div>
+            <div>A nurse at your door or a doctor on video &mdash; either takes about a
+              minute to book.</div>
+            <button class="btn btn-emphasis" style="margin-top:16px">Get care</button>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>The action is the real door</b> (Get care, the four-tile screen),
+        not a generic &ldquo;browse&rdquo;. Past&rsquo;s own empty line is quieter:
+        &ldquo;Your history builds here after your first visit.&rdquo; &mdash; no button,
+        nothing to sell.</p>
+    </div>
+
+    <!-- 7 · NOTIFICATIONS EMPTY -->
+    <div class="frame" id="f-emptynotifs">
+      <p class="lab"><b>7</b> &middot; Notifications, all clear</p>
+      <p class="sub2">The empty feed is where the no-marketing promise gets said out loud.</p>
+      <div class="ph">
+        <header class="topbar"><h1>Notifications</h1></header>
+        <div class="scroll">
+          <div class="empty">
+            <img class="glyph" src="img/icons/ph-line/bell.svg" alt="">
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">All quiet.</div>
+            <div>We only ping you about your care &mdash; visit updates, results, and
+              messages from your team. Never marketing.</div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><b>No action on purpose:</b> an empty feed is a good state, not a
+        dead end &mdash; the reassurance IS the content. &ldquo;Never marketing&rdquo; is a
+        product promise stated where it is testable.
+        <span class="q">For review: is that promise policy? It constrains growth/lifecycle
+        pings forever, and it should.</span></p>
+    </div>
+
+    <!-- 8 · THE REST OF THE FAMILY -->
+    <div class="frame stripframe" id="f-emptyfam">
+      <p class="lab"><b>8</b> &middot; The rest of the family</p>
+      <p class="sub2">Same grammar, one line each — shown as strips, built as states.</p>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Lab results &middot; first run</p>
+        <div class="empty" style="padding:24px 16px">
+          <img class="glyph" src="img/icons/ph-line/flask.svg" alt="">
+          <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">No results yet.</div>
+          <div>They land here after your first draw &mdash; usually 2 to 3 days after
+            the lab receives it, reviewed by your doctor first.</div>
+        </div>
+      </div>
+
+      <div class="strip">
+        <p class="tiny" style="margin:0 0 10px;font-weight:600;color:var(--text-primary)">Messages &middot; first run</p>
+        <div class="empty" style="padding:24px 16px">
+          <img class="glyph" src="img/icons/ph-line/chat.svg" alt="">
+          <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px">No messages yet.</div>
+          <div>Your care team writes here &mdash; threads start after your first
+            visit, named by people, never by ticket.</div>
+        </div>
+      </div>
+
+      <p class="note"><b>Demo wiring when this ports:</b> a single <b>#fresh</b> route flips
+        the whole app to first-run (empty Visits, Notifications, Results, Messages, a Home
+        without the live cards) &mdash; one switch, so the board can show a new user&rsquo;s
+        day zero honestly. Loading and offline live at <b>#loading</b> / <b>#offline</b> /
+        <b>#offtrack</b> the same pure-route way #late does.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* Solo-frame mode: ?frame=<id> shows exactly one frame for the
+   gallery's phone shells. No param = the full review board. */
+const fr = new URLSearchParams(location.search).get('frame');
+if (fr) {
+  document.body.classList.add('solo');
+  const el = document.getElementById('f-' + fr);
+  if (el) el.classList.add('on');
+}
+</script>
+</body>
+</html>
