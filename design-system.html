@@ -102,7 +102,7 @@ code{font:500 13.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:
 /* logo */
 .logogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
 .logo-t{display:grid;place-items:center;height:150px;border-radius:16px;border:1px solid var(--line)}
-.logo-t img{width:64px;height:64px;object-fit:contain}
+.logo-t img{max-width:74%;max-height:96px;object-fit:contain}
 .logo-t.on-ink{background:var(--ink);border-color:var(--ink)}
 .logo-t.on-electric{background:var(--electric);border-color:var(--electric)}
 .logo-t.on-paper{background:var(--card)}
@@ -149,7 +149,7 @@ section[id]{scroll-margin-top:70px}
 
 <div class="mast">
   <div class="in">
-    <div class="brand"><img src="img/logo-f20-w.png" alt=""><span>Teleport MD</span></div>
+    <div class="brand"><img src="img/logo-original/teleportmd-mark-dark.svg" alt=""><span>Teleport MD</span></div>
     <p class="eyebrow">Direction 02 · Modern Consumer</p>
     <h1>Care, on demand.<br>The design system.</h1>
     <p>One system across the patient app and the provider portal: five colors, two typefaces, a two-weight icon set, and a small number of hard rules that every screen passes through an automated gate. Last updated July 20, 2026.</p>
@@ -166,13 +166,16 @@ section[id]{scroll-margin-top:70px}
 <section id="logo">
   <p class="sec-eyebrow">01 · Brand</p>
   <h2>The mark</h2>
-  <p class="sec-lede">F20 "speed streaks": a medical cross whose right arm extends into three motion bars. Care, moving toward you. Chosen from 47 explored concepts.</p>
+  <p class="sec-lede">The original TeleportMD caduceus — a winged staff wrapped in a teleport spiral, green arrows carrying the motion. Restored July 2026, replacing the F20 speed-streaks exploration.</p>
   <div class="logogrid">
-    <div><div class="logo-t on-paper"><img src="img/logo-f20.png" alt="Logo on white"></div><p class="logocap">Full color, on white or paper. The default.</p></div>
-    <div><div class="logo-t on-ink"><img src="img/logo-f20-w.png" alt="Logo on ink"></div><p class="logocap">White, on ink. Sidebars, dark surfaces, splash.</p></div>
-    <div><div class="logo-t on-electric"><img src="img/logo-f20-w.png" alt="Logo on electric"></div><p class="logocap">White, on electric. The splash screen moment.</p></div>
+    <div><div class="logo-t on-paper"><img src="img/logo-original/teleportmd-full.svg" alt="Full lockup on white"></div><p class="logocap">Full lockup, on white or paper. The default.</p></div>
+    <div><div class="logo-t on-ink"><img src="img/logo-original/teleportmd-full-dark.svg" alt="Full lockup on ink"></div><p class="logocap">Reversed, on ink. Sidebars, dark surfaces, the splash moment.</p></div>
+    <div><div class="logo-t on-electric"><img src="img/logo-original/teleportmd-full-dark.svg" alt="Full lockup on electric"></div><p class="logocap">Reversed, on electric. Hero cards and banners.</p></div>
+    <div><div class="logo-t on-paper"><img src="img/logo-original/teleportmd-horizontal.svg" alt="Horizontal lockup"></div><p class="logocap">Horizontal lockup, no subtext. Nav bars, headers, footers.</p></div>
+    <div><div class="logo-t on-paper"><img src="img/logo-original/teleportmd-wordmark.svg" alt="Wordmark only"></div><p class="logocap">Wordmark alone. Tight horizontal spaces.</p></div>
+    <div><div class="logo-t on-paper"><img src="img/logo-original/teleportmd-mark.svg" alt="Mark only"></div><p class="logocap">Mark alone. Favicon, avatar, 24&ndash;40px uses.</p></div>
   </div>
-  <div class="note">Wordmark: <b>Teleport MD</b> in Bricolage Grotesque 700, always beside the mark, never stacked under it. Files: <code>img/logo-f20.png</code> · <code>logo-f20-w.png</code> · <code>logo-f20-ink.png</code>. Production wants an SVG redraw of all three.</div>
+  <div class="note">Wordmark: <b>TeleportMD</b> in the original drawn letterforms &mdash; &ldquo;Tele&rdquo; bold, &ldquo;port&rdquo; light, &ldquo;MD&rdquo; in brand green <code>#79EE12</code>; the &ldquo;telehealth portal&rdquo; subtext appears only in the full and text lockups. Files in <code>img/logo-original/</code>: <code>teleportmd-full.svg</code> · <code>-horizontal</code> · <code>-wordmark</code> · <code>-text</code> · <code>-mark</code>, each with a <code>-dark</code> reverse for ink and electric surfaces. All vector; the PNG-redraw request is retired.</div>
 </section>
 
 <section id="color">

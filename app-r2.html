@@ -288,9 +288,9 @@ function Home(offline) {
   ${tabbar('home')}`;
   return `
   <div class="scroll">
-    <!-- Brand row (June's pick, placement 1 of 4): the F20 mark +
+    <!-- Brand row (June's pick, placement 1 of 4): the original caduceus mark +
          wordmark, HOME ONLY - no other screen carries it. -->
-    <div class="brandrow"><img src="img/logo-f20.png" alt=""><span class="bw">Teleport&nbsp;MD</span></div>
+    <div class="brandrow"><img src="img/logo-original/teleportmd-mark.svg" alt=""><span class="bw">Teleport&nbsp;MD</span></div>
     <p class="greet">Hi ${firstName()}.</p>
     <h1 class="display">How can we help?</h1>
 
@@ -1712,14 +1712,14 @@ function Summary() {
    LAUNCH SPLASH + ONBOARDING — net new (2026-07-17), the two
    "planned" chips from the backlog. June's direction "D" from the
    intro-options mock (A's electric splash + B's editorial slides
-   with a full photo card), carrying the F20 mark: the medical
-   cross with speed streaks. A tap moves past the splash, so the
+   with a full photo card), carrying the original
+   caduceus mark. A tap moves past the splash, so the
    gallery's live frames never drift on their own.
    ============================================================ */
 function Splash() {
   return `
   <button class="splash" aria-label="Continue to Teleport MD" onclick="go('onboard')">
-    <img class="mark" src="img/logo-f20-w.png" alt="">
+    <img class="mark" src="img/logo-original/teleportmd-mark-dark.svg" alt="">
     <span class="wm">Teleport&nbsp;MD</span>
     <span class="bar" aria-hidden="true"><i></i></span>
   </button>`;
@@ -1751,7 +1751,7 @@ function Onboard() {
   <div class="ob">
     <div class="ob-bg"><img src="${img}" alt="${alt}"></div>
     <div class="ob-top">
-      <img src="img/logo-f20-w.png" alt="Teleport MD">
+      <img src="img/logo-original/teleportmd-mark-dark.svg" alt="Teleport MD">
       <button class="ob-skip" onclick="state.ob=0;go('welcome')">Skip</button>
     </div>
     <div class="ob-num"><b>0${i + 1}</b> / 03</div>

@@ -872,11 +872,11 @@ textarea.input {
 /* ---------- Launch splash + onboarding (2026-07-17) -----------
    June's direction "D" from the intro-options mock: A's electric
    splash + B's editorial numbered slides with a full photo card.
-   Mark = F20 (the cross with speed streaks), white variant on
-   electric, blue on paper. */
+   Mark = the original caduceus, white on the ink
+   splash (2026-07-22, was electric), colored on paper. */
 .splash {
   flex: 1; border: 0; cursor: pointer; width: 100%;
-  background: var(--surface-brand);
+  background: var(--surface-inverse);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--space-5); font-family: var(--font-ui);
 }

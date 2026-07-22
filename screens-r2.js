@@ -8,7 +8,7 @@
 const SECTIONS = [
   ['Sign in & sign up', [
   ['splash','Launch','The brand moment while the app wakes.',
-   'Net new, was the "App launch loading" chip. The F20 mark (the cross with speed streaks, June\'s pick from 25 logo concepts + 22 developments) teleports in on electric; a tap moves on.', true],
+   'Net new, was the "App launch loading" chip. The original caduceus mark (restored July 2026, replacing the F20 exploration) teleports in on ink; a tap moves on.', true],
   ['onboard','Onboarding','Three full-bleed slides before sign-in.',
    'Net new, was the "Onboarding intro screens" chip. June\'s direction E: the photo fills the screen, an ink scrim keeps the light editorial type readable, volt carries the key phrase. Skip is always one tap; nothing is collected here.', true],
   ['welcome','Sign in','One step: phone number, code by text.',
