@@ -8,6 +8,12 @@ const SECTIONS = [
   ['The working day', [
   ['today', 'Today', 'One page: what is next, and what needs you.',
    'Replaces the shared "Hello, {Name}!" template (audit finding 1: all three personas got the same home). A clinician needs a worklist: the next visit as an ink hero with <b>Open call preview</b> (the old file\'s best screen, kept alive), the day as rows, and a rail where a patient\'s honest "Requested" state from the patient app lands as <b>Needs your confirmation</b>: Confirm or Propose a time, no approval hourglass.', true],
+  ['call', 'Call preview', 'Identity, consent and readiness before a single frame is sent.',
+   'The old file\'s best-written screen, kept alive — its disclosure voice survives nearly verbatim in <b>Before you join</b>. Who you are about to see and what she shared (A1C flagged, meds, allergy, her booking note), your own camera and sound checked against a real preview ("This is what Maya will see"), and the waiting-room mirror: "In the waiting room · joined 8:56" is the provider side of the patient\'s "Dr. Anand has been told you are here."', true],
+  ['incall', 'In-call, provider side', 'The screen the old file never had.',
+   'The old file had no in-call UI anywhere — "Start Appointment" led nowhere. Dark surface carries white and volt only (electric is illegal at small sizes on ink). The chart rides in a rail: a <b>live note</b> that saves to the record, her reason for booking, results, meds — the provider never leaves the patient\'s face to check a number. End call is coral with an ink glyph, never white-on-coral.', true],
+  ['wrap', 'Wrap-up', 'A visit that ends in a dead screen teaches nothing.',
+   'The patient app\'s rule, applied provider-side. The note drafted in-call arrives here to be signed ("Once signed, Maya can read this note in her app, in these words"). The three next steps — order the repeat draw, book the follow-up, send a message — are exactly what feeds the patient\'s "What happens next" tracker, and the rail shows her tracker filling in as you finish. Nothing on her side says "pending approval": it names what you are doing, as you do it.', true],
   ]],
   ['Schedule', [
   ['schedule', 'Schedule & availability', 'The week at a glance, availability beside it.',
@@ -23,14 +29,20 @@ const SECTIONS = [
   ['preview', 'Patient preview', 'The chart peek, without leaving the roster.',
    'Click any row: recent results, upcoming visits, and the two actions a provider actually takes from here: book a visit, order an at-home draw. A full chart is a later screen; this is the 80% case.', true],
   ]],
+  ['Messages', [
+  ['messages', 'Messages', 'One inbox: patients and crew, labeled by role.',
+   'The sidebar badge said 4 and the route was dead. Threads left, conversation right; opening a thread marks it read and the badge follows, live. Crew threads sit beside patient threads, labeled by role, never a codename. The composer says where words go: patient replies join the record; crew messages stay between you and the crew.', true],
+  ]],
+  ['Results', [
+  ['results', 'Results inbox', 'Every result lands here flagged, and leaves reviewed.',
+   'The worklist the roster only hinted at. Chips reuse the tint grammar — green settled, coral needs you. The slide-over answers "what do I do about it": values with goal and reference lines, the previous value for trend, lab provenance, then the same three verbs as the wrap-up: message her, book the follow-up, order the repeat draw. "Maya was told her result is in. She sees it with the same flag, in plain words, once you mark it reviewed."', true],
+  ]],
 ];
 
 /* Not built yet — the honest list, same status grammar as the
    patient board (planned: next up; parked: deliberately out for R1). */
 const BACKLOG = [
   ['The working day', [
-    ['Call preview (identity + audit trail)', 'planned'],
-    ['In-call UI, provider side', 'planned'],
     ['New visit composer', 'planned'],
   ]],
   ['Schedule', [
@@ -48,8 +60,6 @@ const BACKLOG = [
   ['Account & practice', [
     ['Sign in (identity only, no funnel)', 'planned'],
     ['Practice settings', 'planned'],
-    ['Messages', 'planned'],
-    ['Results inbox', 'planned'],
     ['Provider onboarding (the 8-step funnel, collapsed)', 'planned'],
     ['Earnings / payouts', 'parked'],
   ]],
@@ -59,8 +69,10 @@ const BACKLOG = [
 const FLOWS = [
   ['A draw request, end to end', ['today', 'visit'],
    'Patient requests at home → Needs your confirmation → Confirm → dispatch → track to Dropped off.'],
-  ['The video visit', ['today', 'preview'],
-   'Today hero → Open call preview → in-call → summary (call screens are planned).'],
+  ['The video visit', ['today', 'call', 'incall', 'wrap'],
+   'Today hero → call preview → in-call → wrap-up: sign the note, order the draw, book the follow-up.'],
+  ['A result, reviewed', ['results'],
+   'Flagged in the inbox → the slide-over → message her, book the follow-up, or order the repeat draw.'],
   ['Managing the week', ['schedule'],
    'Week grid + availability; editing hours never touches existing bookings.'],
   ['Knowing your panel', ['patients', 'preview', 'visit'],

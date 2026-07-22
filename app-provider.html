@@ -204,19 +204,149 @@ body.pop .panel{transform:none}
 .res:first-of-type{border-top:none;padding-top:2px}
 .res span{color:var(--mut)}
 
+/* ---------- wrap-up ---------- */
+.bigcheck{width:56px;height:56px;border-radius:50%;background:var(--electric);display:grid;place-items:center;margin-bottom:14px}
+.bigcheck img{width:28px;height:28px}
+.notepad{font-size:15px;line-height:1.6;white-space:pre-line}
+.nx{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.nx:first-of-type{border-top:none;padding-top:4px}
+.nx .disc{width:40px;height:40px;border-radius:12px;background:var(--paper);display:grid;place-items:center;flex:none}
+.nx .disc img{width:20px;height:20px}
+.nx .t{flex:1;min-width:0}
+.nx b{display:block;font-size:15px;font-weight:600}
+.nx span{font-size:14px;color:var(--mut)}
+
+/* ---------- results inbox ---------- */
+.filters{display:flex;gap:8px;margin-bottom:18px}
+.fchip{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 18px;border-radius:99px;border:1px solid #C9C9C2;font-size:14px;font-weight:600;color:var(--ink)}
+.fchip:hover{border-color:var(--ink)}
+.fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.fchip .n{background:var(--volt);color:var(--ink);border-radius:99px;font-size:13px;padding:0 8px;font-weight:700}
+table.rst{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.rst th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);text-align:left;padding:13px 18px;border-bottom:1px solid var(--line);font-weight:600}
+.rst td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:middle}
+.rst tr:last-child td{border-bottom:none}
+.rst tbody tr{cursor:pointer}
+.rst tbody tr:hover{background:#FAFAF7}
+.rst .pcell{display:flex;align-items:center;gap:12px;font-weight:600}
+.rst td .sub{color:var(--mut);font-size:14px;display:block;font-weight:400}
+.vals{width:100%;border-collapse:collapse;font-size:15px}
+.vals td{padding:9px 0;border-top:1px solid var(--line)}
+.vals tr:first-child td{border-top:none}
+.vals td:last-child{text-align:right}
+.vals .ref{color:var(--mut);font-size:14px;display:block}
+.vals b.hi{color:var(--danger)}
+/* second slide-over (result detail) rides the same scrim, its own body class */
+body.pop2 .scrim{opacity:1;pointer-events:auto}
+body.pop2 .panel.p2{transform:none}
+
+/* ---------- call preview ---------- */
+.wait{display:flex;gap:18px;align-items:center;background:var(--ink);color:#fff;border-radius:var(--r);padding:24px;margin-bottom:20px}
+.wait img.face{width:64px;height:64px;border-radius:16px;object-fit:cover}
+.wait .t{flex:1;min-width:0}
+.wait .when{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--volt);margin-bottom:3px}
+.wait h3{font-size:22px;font-weight:800}
+.wait p{color:rgba(255,255,255,.75);font-size:14px;margin-top:2px}
+.selfcam{position:relative;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.selfcam img{width:100%;height:280px;object-fit:cover;object-position:50% 18%}
+.selfcam .you{position:absolute;left:12px;bottom:12px;background:rgba(17,20,24,.78);color:#fff;font-size:13px;font-weight:600;padding:4px 11px;border-radius:99px}
+.chk{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-weight:500;font-size:15px}
+.chk:first-of-type{border-top:none}
+.chk img{width:20px;height:20px}
+.chk span{margin-left:auto;color:var(--mut);font-weight:400;font-size:14px}
+.disc-card{background:var(--ink);color:#fff;border-radius:var(--r);padding:20px}
+.disc-card h2{font-size:17px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.disc-card h2 img{width:18px;height:18px}
+.disc-card p{color:rgba(255,255,255,.78);font-size:14px;line-height:1.55}
+.disc-card p+p{margin-top:8px}
+.quote{border-left:3px solid var(--electric);padding:2px 0 2px 14px;font-size:15px;color:var(--ink);font-style:italic}
+
+/* ---------- in-call (full takeover; dark surface carries white + volt only) ---------- */
+.callui{position:fixed;inset:0;background:#0B0D10;z-index:30;display:flex}
+.stage{flex:1;position:relative;min-width:0}
+.stage>img.feed{width:100%;height:100%;object-fit:cover}
+.stage .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,16,.45),transparent 20%,transparent 72%,rgba(11,13,16,.6))}
+.tagline{position:absolute;top:20px;left:20px;display:flex;gap:8px;align-items:center}
+.ctag{display:inline-flex;align-items:center;gap:7px;background:rgba(17,20,24,.78);color:#fff;font-size:13.5px;font-weight:600;padding:8px 14px;border-radius:99px}
+.ctag img{width:15px;height:15px}
+.ctag .volt{color:var(--volt)}
+.timer{position:absolute;top:20px;right:20px;display:flex;gap:8px;align-items:center}
+.selfview{position:absolute;right:20px;bottom:112px;width:180px;border-radius:14px;overflow:hidden;border:1.5px solid rgba(255,255,255,.25);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.selfview img{width:100%;height:112px;object-fit:cover}
+.tray{position:absolute;left:0;right:0;bottom:22px;display:flex;justify-content:center;gap:14px}
+.tbtn{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.tbtn:hover{background:rgba(255,255,255,.24)}
+.tbtn img{width:24px;height:24px}
+.tbtn.end{background:var(--coral)}
+.tbtn.end:hover{background:#FF8071}
+.tbtn.tog.off{background:rgba(255,255,255,.9)}
+.chartrail{width:360px;background:#16191E;color:#fff;border-left:1px solid #23262C;display:flex;flex-direction:column;padding:20px;overflow-y:auto}
+.chartrail.hide{display:none}
+.chartrail .who{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.chartrail .who img{width:44px;height:44px;border-radius:12px;object-fit:cover}
+.chartrail .who b{display:block;font-size:15px;font-weight:700}
+.chartrail .who span{font-size:13px;color:#A7ADB6}
+.chartrail h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--volt);margin:18px 0 8px}
+.chartrail h2:first-of-type{margin-top:0}
+.dres{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #23262C;font-size:14px}
+.dres:first-of-type{border-top:none;padding-top:2px}
+.dres span{color:#A7ADB6}
+.dres b{font-weight:600;color:#fff}
+.notebox{width:100%;min-height:150px;background:#0B0D10;border:1px solid #2A2F38;border-radius:12px;color:#fff;font:400 15px/1.55 Inter;padding:12px 14px;resize:vertical;outline:none}
+.notebox:focus{border-color:var(--volt)}
+.notebox::placeholder{color:#868D97}
+.savehint{font-size:13px;color:#A7ADB6;margin-top:8px}
+
+/* ---------- messages ---------- */
+.msgs{display:grid;grid-template-columns:340px minmax(0,1fr);background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-height:560px}
+.threads{border-right:1px solid var(--line);display:flex;flex-direction:column}
+.thread{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-top:1px solid var(--line);text-align:left;width:100%;min-height:44px}
+.thread:first-child{border-top:none}
+.thread:hover{background:#FAFAF7}
+.thread.on{background:var(--paper)}
+.thread img,.thread .avi{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.thread .avi{display:grid;place-items:center}
+.thread .t{flex:1;min-width:0}
+.thread b{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600}
+.thread b .dot{width:8px;height:8px;border-radius:50%;background:var(--electric);flex:none}
+.thread .roleln{display:block;font-size:13px;color:var(--mut)}
+.thread .prev{display:block;font-size:14px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.thread.unread .prev{color:var(--ink);font-weight:500}
+.thread time{font-size:13px;color:var(--mut);flex:none;padding-top:2px}
+.convo{display:flex;flex-direction:column}
+.convo .chead{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.convo .chead img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.convo .chead .avi{width:40px;height:40px}
+.convo .chead b{display:block;font-size:15px;font-weight:700}
+.convo .chead span{font-size:13px;color:var(--mut)}
+.convo .chead .btn{margin-left:auto}
+.bubbles{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.bub{max-width:72%;padding:11px 15px;border-radius:16px;font-size:15px;line-height:1.5}
+.bub.them{background:var(--paper);border-bottom-left-radius:6px;align-self:flex-start}
+.bub.me{background:var(--electric);color:#fff;border-bottom-right-radius:6px;align-self:flex-end}
+.bub .bt{display:block;font-size:13px;color:var(--mut);margin-top:4px}
+.bub.me .bt{color:#fff}
+.daysep{align-self:center;font-size:13px;color:var(--mut);font-weight:500}
+.composer{border-top:1px solid var(--line);padding:14px 20px 8px}
+.composer .row{display:flex;gap:10px}
+.composer input{flex:1;border:1.5px solid var(--line);border-radius:99px;min-height:48px;padding:0 18px;font:inherit;font-size:15px;color:var(--ink);outline:none;background:var(--card)}
+.composer input:focus{border-color:var(--electric)}
+.composer input::placeholder{color:var(--mut)}
+.composer .fine{font-size:13px;color:var(--mut);margin-top:8px;padding-bottom:6px}
+
 </style>
 </head>
 <body class="calm">
 
 <div class="shell">
   <aside class="side">
-    <div class="brand"><img src="img/logo-f20-w.png" alt=""><span>Teleport MD</span></div>
+    <div class="brand"><img src="img/logo-original/teleportmd-mark-dark.svg" alt=""><span>Teleport MD</span></div>
     <nav class="nav">
       <a href="#today" data-r="today"><img src="img/icons/ph-line/home-w.svg" alt="">Today</a>
       <a href="#schedule" data-r="schedule"><img src="img/icons/ph-line/calendar-w.svg" alt="">Schedule</a>
       <a href="#patients" data-r="patients"><img src="img/icons/ph-line/users-w.svg" alt="">Patients</a>
-      <a href="#today" class="dead"><img src="img/icons/ph-line/chat-w.svg" alt="">Messages<span class="cnt">4</span></a>
-      <a href="#today" class="dead"><img src="img/icons/ph-line/flask-w.svg" alt="">Results</a>
+      <a href="#messages" data-r="messages"><img src="img/icons/ph-line/chat-w.svg" alt="">Messages<span class="cnt" id="unread-cnt">4</span></a>
+      <a href="#results" data-r="results"><img src="img/icons/ph-line/flask-w.svg" alt="">Results<span class="cnt">3</span></a>
     </nav>
     <div class="grow"></div>
     <nav class="nav">
@@ -255,8 +385,8 @@ body.pop .panel{transform:none}
               <p>Follow-up on Monday's blood draw results</p>
             </div>
             <div class="acts">
-              <button class="btn pri">Open call preview</button>
-              <button class="btn ghost">Message</button>
+              <a class="btn pri" href="#call">Open call preview</a>
+              <a class="btn ghost" href="#messages">Message</a>
             </div>
           </div>
 
@@ -458,8 +588,8 @@ body.pop .panel{transform:none}
             <div class="orow" style="border-top:1px solid var(--line)"><button class="btn ghost sm">+ Add an order</button></div>
           </div>
 
-          <h2 class="sechead">Instructions for the crew</h2>
-          <div class="card">
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">Instructions for the crew</h2>
             <p style="font-size:15px">Patient is anxious about needles, please take it slow. Use the butterfly if the first stick fails.</p>
             <div style="margin-top:12px"><button class="btn ghost sm">Edit note</button></div>
           </div>
@@ -515,8 +645,280 @@ body.pop .panel{transform:none}
         </tbody>
       </table>
     </section>
+
+    <!-- ================= CALL PREVIEW ================= -->
+    <section id="r-call" hidden>
+      <div class="crumb"><a href="#today">‹ Today</a></div>
+      <div class="pagehead">
+        <div>
+          <div class="eyebrow">9:00 AM · Video visit</div>
+          <h1>Ready to see Maya?</h1>
+          <div class="sub">Follow-up on Monday's blood draw results · 30 minutes</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="wait">
+            <img class="face" src="img/maya.png" alt="">
+            <div class="t">
+              <div class="when">In the waiting room · joined 8:56 AM</div>
+              <h3>Maya Reyes</h3>
+              <p>34 · she/her · BlueCross PPO on file · waiting 4 minutes</p>
+            </div>
+            <div class="acts"><a class="btn pri" href="#incall" style="background:var(--electric)">Join the call</a></div>
+          </div>
+
+          <h2 class="sechead">Your camera and sound</h2>
+          <div class="card">
+            <div class="selfcam">
+              <img src="img/dr-anand.png" alt="Your camera preview">
+              <span class="you">This is what Maya will see</span>
+            </div>
+            <div class="chk"><img src="img/icons/ph-line/check-g.svg" alt="">Camera<span>Working</span></div>
+            <div class="chk"><img src="img/icons/ph-line/check-g.svg" alt="">Microphone<span>Working</span></div>
+            <div class="chk"><img src="img/icons/ph-line/check-g.svg" alt="">Connection<span>Strong</span></div>
+          </div>
+
+          <div class="disc-card" style="margin-top:26px">
+            <h2><img src="img/icons/ph-line/lock-w.svg" alt="">Before you join</h2>
+            <p>This call is end-to-end encrypted and becomes part of Maya's visit record. She can see that
+            you have viewed the records she shared.</p>
+            <p>Nothing is recorded unless you both agree to it during the call.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">What Maya shared</h2>
+            <div class="res"><span>A1C · Jul 14</span><span class="pill coral">High · 8.1%</span></div>
+            <div class="res"><span>Lipid panel · Jul 14</span><span class="pill volt">Normal</span></div>
+            <div class="res"><span>Atorvastatin 20 mg</span><span>daily, current</span></div>
+            <div class="res"><span>Allergy</span><span>Penicillin</span></div>
+            <h2 class="sechead">Her note when booking</h2>
+            <p class="quote">"A bit dizzy in the mornings since the new dose. Otherwise feeling fine."</p>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+              <a class="btn pri" href="#incall">Join the call</a>
+              <button class="btn ghost">Running late? Let Maya know</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WRAP-UP ================= -->
+    <section id="r-wrap" hidden>
+      <div class="pagehead">
+        <div>
+          <div class="bigcheck"><img src="img/icons/ph-line/check-w.svg" alt=""></div>
+          <h1>Visit complete</h1>
+          <div class="sub">12 minutes with Maya Reyes · ended 9:12 AM</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Your note</h2>
+            <p class="notepad">Morning dizziness likely tied to the higher atorvastatin dose taken on waking.
+Moved the dose to evenings; no change to the prescription itself.
+A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the follow-up below.</p>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn pri">Sign and add to Maya's record</button>
+              <button class="btn ghost">Keep editing</button>
+            </div>
+            <p style="font-size:14px;color:var(--mut);margin-top:12px">Once signed, Maya can read this note in her app, in these words.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">What happens next</h2>
+            <div class="nx">
+              <span class="disc"><img src="img/icons/ph-line/drop.svg" alt=""></span>
+              <span class="t"><b>Order the repeat draw</b><span>A1C recheck · at her home, like last time</span></span>
+              <button class="btn pri sm">Order</button>
+            </div>
+            <div class="nx">
+              <span class="disc"><img src="img/icons/ph-line/calendar.svg" alt=""></span>
+              <span class="t"><b>Book the follow-up</b><span>Video visit in 6 weeks · your Thursday mornings are open</span></span>
+              <button class="btn ghost sm">Pick a time</button>
+            </div>
+            <div class="nx">
+              <span class="disc"><img src="img/icons/ph-line/chat.svg" alt=""></span>
+              <span class="t"><b>Send Maya a message</b><span>Anything you didn't get to say on the call</span></span>
+              <a class="btn ghost sm" href="#messages">Write it</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">This visit</h2>
+            <dl class="kv" style="grid-template-columns:92px 1fr">
+              <dt>Patient</dt><dd>Maya Reyes</dd>
+              <dt>Type</dt><dd>Video visit · follow-up</dd>
+              <dt>Started</dt><dd>Today, 9:00 AM</dd>
+              <dt>Length</dt><dd>12 minutes</dd>
+            </dl>
+          </div>
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">What Maya sees</h2>
+            <ul class="tl">
+              <li class="done"><b>Visit complete</b><span>12 minutes with Dr. Anand</span></li>
+              <li class="now"><b>Visit notes on their way</b><span>appears the moment you sign</span></li>
+              <li class="todo"><b>Blood draw ordered</b><span>appears when you order it</span></li>
+              <li class="todo"><b>Results in 2 to 3 days</b><span>after the draw</span></li>
+            </ul>
+            <p style="font-size:14px;color:var(--mut)">Her tracker fills in as you finish here. Nothing on her side says "pending approval" — it names what you are doing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MESSAGES ================= -->
+    <section id="r-messages" hidden>
+      <div class="pagehead">
+        <div><h1>Messages</h1><div class="sub">4 unread</div></div>
+      </div>
+
+      <div class="msgs">
+        <div class="threads" id="threads">
+          <button class="thread unread on" data-t="sofia">
+            <span class="avi">SP</span>
+            <span class="t"><b><span class="dot"></span>Sofia Park</b><span class="roleln">Patient</span><span class="prev">Does fasting mean no coffee either?</span></span>
+            <time>8:41 AM</time>
+          </button>
+          <button class="thread unread" data-t="jennifer">
+            <img src="img/crew-jennifer-face.png" alt="">
+            <span class="t"><b><span class="dot"></span>Jennifer Cole</b><span class="roleln">Crew · phlebotomist</span><span class="prev">Running about 10 minutes behind, sorry!</span></span>
+            <time>8:37 AM</time>
+          </button>
+          <button class="thread unread" data-t="robert">
+            <span class="avi">RK</span>
+            <span class="t"><b><span class="dot"></span>Robert Kim</b><span class="roleln">Patient</span><span class="prev">My daughter will let the nurse in, is that OK?</span></span>
+            <time>8:12 AM</time>
+          </button>
+          <button class="thread unread" data-t="daniel">
+            <span class="avi">DR</span>
+            <span class="t"><b><span class="dot"></span>Daniel Ross</b><span class="roleln">Patient · new</span><span class="prev">Uploaded my old records ahead of the visit.</span></span>
+            <time>7:58 AM</time>
+          </button>
+          <button class="thread" data-t="maya">
+            <img src="img/maya.png" alt="">
+            <span class="t"><b>Maya Reyes</b><span class="roleln">Patient</span><span class="prev">Thanks — see you at 9.</span></span>
+            <time>Yesterday</time>
+          </button>
+        </div>
+
+        <div class="convo">
+          <div class="chead" id="chead">
+            <span class="avi">SP</span>
+            <div><b>Sofia Park</b><span>Patient · blood draw requested for tomorrow morning</span></div>
+            <a class="btn ghost sm" href="#patients">Open chart</a>
+          </div>
+          <div class="bubbles" id="bubbles">
+            <span class="daysep">Today</span>
+            <div class="bub them">Hi Dr. Anand — quick question before tomorrow. The booking said to fast from 10 PM.<span class="bt">Sofia · 8:40 AM</span></div>
+            <div class="bub them">Does fasting mean no coffee either?<span class="bt">Sofia · 8:41 AM</span></div>
+          </div>
+          <div class="composer">
+            <div class="row">
+              <input id="say" type="text" placeholder="Reply to Sofia" aria-label="Reply to Sofia">
+              <button class="btn pri" id="send" style="background:var(--electric)">Send</button>
+            </div>
+            <p class="fine">Replies go to Sofia's app and become part of her record.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RESULTS INBOX ================= -->
+    <section id="r-results" hidden>
+      <div class="pagehead">
+        <div><h1>Results</h1><div class="sub">3 need your review · newest first</div></div>
+      </div>
+
+      <div class="filters">
+        <button class="fchip on">Needs review <span class="n">3</span></button>
+        <button class="fchip">Reviewed</button>
+        <button class="fchip">Everything</button>
+      </div>
+
+      <table class="rst">
+        <thead><tr><th>Patient</th><th>Result</th><th>Collected</th><th>Lab</th><th></th></tr></thead>
+        <tbody>
+          <tr onclick="openResult()">
+            <td><span class="pcell"><span class="avi">TA</span>Tom Alvarez<span class="sub">52</span></span></td>
+            <td>Metabolic panel<span class="sub">14 values · 2 out of range</span></td>
+            <td>Today, 8:52 AM<span class="sub">at home · Jennifer Cole</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="pill coral">Needs review</span></td>
+          </tr>
+          <tr onclick="openResult()">
+            <td><span class="pcell"><span class="avi photo"><img src="img/maya.png" alt=""></span>Maya Reyes<span class="sub">34</span></span></td>
+            <td>A1C<span class="sub">1 value · 1 out of range</span></td>
+            <td>Jul 14<span class="sub">at home · Jennifer Cole</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="pill coral">Needs review</span></td>
+          </tr>
+          <tr onclick="openResult()">
+            <td><span class="pcell"><span class="avi">LF</span>Lena Fischer<span class="sub">45</span></span></td>
+            <td>Thyroid panel<span class="sub">4 values · all in range</span></td>
+            <td>Jul 12<span class="sub">at home</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="pill coral">Needs review</span></td>
+          </tr>
+          <tr onclick="openResult()">
+            <td><span class="pcell"><span class="avi">AD</span>Amara Diallo<span class="sub">58</span></span></td>
+            <td>Lipid panel<span class="sub">5 values · all in range</span></td>
+            <td>Jul 10<span class="sub">at home</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="pill volt">Reviewed Jul 11</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </main>
 </div>
+
+<!-- ================= IN-CALL (full takeover) ================= -->
+<section id="r-incall" hidden>
+  <div class="callui">
+    <div class="stage">
+      <img class="feed" src="img/maya.png" alt="Maya Reyes on video">
+      <div class="shade"></div>
+      <div class="tagline">
+        <span class="ctag">Maya Reyes · 34</span>
+        <span class="ctag"><img src="img/icons/ph-line/lock-w.svg" alt=""><span class="volt">End-to-end encrypted</span></span>
+      </div>
+      <div class="timer"><span class="ctag" id="ctimer">04:12</span></div>
+      <div class="selfview"><img src="img/dr-anand.png" alt="Your camera"></div>
+      <div class="tray">
+        <button class="tbtn tog" aria-label="Mute microphone"><img src="img/icons/ph-line/mic-w.svg" data-on="img/icons/ph-line/mic-w.svg" data-off="img/icons/ph-line/mic.svg" alt=""></button>
+        <button class="tbtn tog" aria-label="Turn camera off"><img src="img/icons/ph-line/camera-w.svg" data-on="img/icons/ph-line/camera-w.svg" data-off="img/icons/ph-line/camera.svg" alt=""></button>
+        <button class="tbtn tog" aria-label="Turn on captions"><img src="img/icons/ph-line/cc-w.svg" data-on="img/icons/ph-line/cc-w.svg" data-off="img/icons/ph-line/cc.svg" alt=""></button>
+        <button class="tbtn" aria-label="Toggle the chart panel" onclick="document.querySelector('.chartrail').classList.toggle('hide')"><img src="img/icons/ph-line/profile-w.svg" alt=""></button>
+        <a class="tbtn end" aria-label="End the call" href="#wrap"><img src="img/icons/ph-line/end.svg" alt=""></a>
+      </div>
+    </div>
+    <aside class="chartrail">
+      <div class="who">
+        <img src="img/maya.png" alt="">
+        <div><b>Maya Reyes</b><span>34 · she/her · follow-up</span></div>
+      </div>
+      <h2>Live note</h2>
+      <textarea class="notebox" placeholder="Type as you talk. This becomes the visit note.">Morning dizziness likely tied to the higher atorvastatin dose taken on waking. Moved the dose to evenings.</textarea>
+      <p class="savehint">Saves as you type · lands on the wrap-up screen to be signed</p>
+      <h2>Why she's here</h2>
+      <p style="font-size:14.5px;color:#C9CED6;line-height:1.55">"A bit dizzy in the mornings since the new dose. Otherwise feeling fine."</p>
+      <h2>Recent results</h2>
+      <div class="dres"><b>A1C</b><span style="color:#FFB4A8">8.1% · high</span></div>
+      <div class="dres"><b>Lipid panel</b><span>normal · Jul 14</span></div>
+      <div class="dres"><b>CBC</b><span>normal · Jun 02</span></div>
+      <h2>Current meds</h2>
+      <div class="dres"><b>Atorvastatin 20 mg</b><span>daily</span></div>
+    </aside>
+  </div>
+</section>
 
 <!-- patient slide-over -->
 <div class="scrim" onclick="closePanel()"></div>
@@ -548,18 +950,109 @@ body.pop .panel{transform:none}
 </aside>
 
 
+<!-- result detail slide-over -->
+<aside class="panel p2" aria-label="Result detail">
+  <button class="x" onclick="closePanel()" aria-label="Close">×</button>
+  <div class="pt">
+    <img src="img/maya.png" alt="">
+    <div><b>Maya Reyes</b><span>A1C · collected Jul 14 at home</span></div>
+  </div>
+  <span class="pill coral">1 value out of range</span>
+  <h2 class="sechead">Values</h2>
+  <table class="vals">
+    <tr><td>Hemoglobin A1C<span class="ref">goal below 7.0% · ref below 5.7%</span></td><td><b class="hi">8.1%</b></td></tr>
+    <tr><td>Previous · Apr 02<span class="ref">same lab</span></td><td><b>7.4%</b></td></tr>
+  </table>
+  <h2 class="sechead">From the lab</h2>
+  <p style="font-size:14px;color:var(--mut);line-height:1.5">Quest Diagnostics · final report · specimen acceptable. Collected at home by Jennifer Cole, dropped 11:02 AM.</p>
+  <div class="acts">
+    <button class="btn pri" onclick="closePanel()">Mark as reviewed</button>
+    <a class="btn ghost" href="#messages" onclick="closePanel()">Message Maya</a>
+    <button class="btn ghost">Book a follow-up</button>
+    <button class="btn ghost">Order a repeat draw</button>
+  </div>
+  <p style="font-size:14px;color:var(--mut);margin-top:14px">Maya was told her result is in. She sees it with the same flag, in plain words, once you mark it reviewed.</p>
+</aside>
+
 <script>
-const ROUTES=['today','schedule','visit','patients','preview'];
+const ROUTES=['today','schedule','visit','patients','preview','call','incall','messages','wrap','results'];
 function route(){
   let h=(location.hash||'#today').slice(1);
   if(!ROUTES.includes(h))h='today';
   const show=(h==='preview')?'patients':h;
-  ['today','schedule','visit','patients'].forEach(r=>document.getElementById('r-'+r).hidden=(r!==show));
+  ['today','schedule','visit','patients','call','incall','messages','wrap','results'].forEach(r=>document.getElementById('r-'+r).hidden=(r!==show));
   document.body.classList.toggle('pop',h==='preview');
-  document.querySelectorAll('.nav a[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r===show||(show==='visit'&&a.dataset.r==='today')));
+  document.body.classList.remove('pop2');
+  document.querySelectorAll('.nav a[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r===show||((show==='visit'||show==='call'||show==='wrap')&&a.dataset.r==='today')));
   window.scrollTo(0,0);
 }
 addEventListener('hashchange',route);route();
+
+/* in-call: timer ticks while visible; toggles go ink-on-white when off */
+let callSecs=252;
+setInterval(()=>{
+  if(document.getElementById('r-incall').hidden)return;
+  callSecs++;
+  document.getElementById('ctimer').textContent=
+    String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0');
+},1000);
+document.querySelectorAll('.tbtn.tog').forEach(b=>b.addEventListener('click',()=>{
+  b.classList.toggle('off');
+  const i=b.querySelector('img');
+  i.src=b.classList.contains('off')?i.dataset.off:i.dataset.on;
+}));
+
+/* messages: swap thread, mark read, append sent bubble */
+const CONVOS={
+  sofia:{n:'Sofia Park',s:'Patient · blood draw requested for tomorrow morning',av:'SP',msgs:[
+    ['them','Hi Dr. Anand — quick question before tomorrow. The booking said to fast from 10 PM.','Sofia · 8:40 AM'],
+    ['them','Does fasting mean no coffee either?','Sofia · 8:41 AM']]},
+  jennifer:{n:'Jennifer Cole',s:'Crew · phlebotomist · with Maya Reyes at 10:30',av:null,img:'img/crew-jennifer-face.png',msgs:[
+    ['them','Running about 10 minutes behind, sorry! Accident on 8th Ave.','Jennifer · 8:37 AM'],
+    ['me','No problem — Maya has the 10 to 12 window, you\'re still well inside it.','You · 8:39 AM']]},
+  robert:{n:'Robert Kim',s:'Patient · vitals check today, 2:30 PM window',av:'RK',msgs:[
+    ['them','My daughter will let the nurse in, is that OK?','Robert · 8:12 AM']]},
+  daniel:{n:'Daniel Ross',s:'Patient · new · video visit today 11:15 AM',av:'DR',msgs:[
+    ['them','Uploaded my old records ahead of the visit. See you at 11:15.','Daniel · 7:58 AM']]},
+  maya:{n:'Maya Reyes',s:'Patient · seen today 9:00 AM',av:null,img:'img/maya.png',msgs:[
+    ['me','See you tomorrow at 9 — we\'ll go over the results together.','You · yesterday'],
+    ['them','Thanks — see you at 9.','Maya · yesterday']]}
+};
+function drawConvo(k){
+  const c=CONVOS[k];
+  document.getElementById('chead').innerHTML=
+    (c.img?`<img src="${c.img}" alt="">`:`<span class="avi">${c.av}</span>`)+
+    `<div><b>${c.n}</b><span>${c.s}</span></div><a class="btn ghost sm" href="#patients">Open chart</a>`;
+  document.getElementById('bubbles').innerHTML='<span class="daysep">Today</span>'+
+    c.msgs.map(([w,tx,bt])=>`<div class="bub ${w}">${tx}<span class="bt">${bt}</span></div>`).join('');
+  document.getElementById('say').placeholder='Reply to '+c.n.split(' ')[0];
+  document.querySelector('.composer .fine').textContent=
+    c.s.startsWith('Crew')?'Crew messages stay between you and the crew — they are not part of a patient record.'
+    :`Replies go to ${c.n.split(' ')[0]}'s app and become part of ${c.n.split(' ')[0]==='Robert'?'his':'her'} record.`;
+}
+document.querySelectorAll('.thread').forEach(th=>th.addEventListener('click',()=>{
+  document.querySelectorAll('.thread').forEach(x=>x.classList.remove('on'));
+  th.classList.add('on');
+  if(th.classList.contains('unread')){
+    th.classList.remove('unread');th.querySelector('.dot')?.remove();
+    const left=document.querySelectorAll('.thread.unread').length;
+    document.getElementById('unread-cnt').textContent=left;
+    if(!left)document.getElementById('unread-cnt').remove();
+    document.querySelector('#r-messages .sub').textContent=left?left+' unread':'All read';
+  }
+  drawConvo(th.dataset.t);
+}));
+function sendMsg(){
+  const i=document.getElementById('say');if(!i.value.trim())return;
+  const d=document.createElement('div');d.className='bub me';
+  d.textContent=i.value.trim();
+  const bt=document.createElement('span');bt.className='bt';bt.textContent='You · just now';
+  d.appendChild(bt);
+  document.getElementById('bubbles').appendChild(d);
+  d.scrollIntoView({behavior:'smooth'});i.value='';
+}
+document.getElementById('send').addEventListener('click',sendMsg);
+document.getElementById('say').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()});
 
 
 /* patients: live filter + slide-over */
@@ -571,7 +1064,8 @@ document.querySelectorAll('#plist tr').forEach(tr=>tr.addEventListener('click',(
   document.getElementById('pp-name').textContent=tr.dataset.n.replace(/\b\w/g,c=>c.toUpperCase());
   document.body.classList.add('pop');
 }));
-function closePanel(){document.body.classList.remove('pop')}
+function closePanel(){document.body.classList.remove('pop');document.body.classList.remove('pop2')}
+function openResult(){document.body.classList.add('pop2')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
 </script>
 </body>

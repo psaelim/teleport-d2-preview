@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teleport MD — Provider portal · Backlog drafts, batch 1 · for review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Same board chrome as index-provider.html so this reads as the same product. */
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#0B0D10; color:#fff;
+    font-family:Inter,system-ui,sans-serif; font-size:17px;
+    padding:56px 40px 140px;
+  }
+  .head{max-width:1200px;margin:0 auto 48px}
+  .eyebrow{font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#D8FF47;margin:0 0 12px}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-size:52px;line-height:1.05;letter-spacing:-.03em;margin:0 0 16px;font-weight:700}
+  .lede{color:#A7ADB6;max-width:680px;line-height:1.55;margin:0}
+  .lede b{color:#fff;font-weight:600}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:28px;max-width:560px}
+  .cardbtn{display:flex;align-items:center;gap:12px;background:#16191E;border:1px solid #2A2F38;border-radius:18px;cursor:pointer;padding:16px 18px;color:#fff;font:inherit;text-decoration:none;transition:border-color .15s ease,transform .15s ease}
+  .cardbtn:hover{transform:translateY(-2px);border-color:#8FA8FF}
+  .cardbtn .t{display:block;font-weight:700;font-size:16px}
+  .cardbtn .s{display:block;color:#868D97;font-size:13.5px;margin-top:2px;line-height:1.35}
+  .cardbtn.volt{background:#D8FF47;border-color:#D8FF47;color:#111418}
+  .cardbtn.volt .s{color:#454D19}
+  .cardbtn.volt:hover{border-color:#111418}
+  @media (prefers-reduced-motion: reduce){.cardbtn{transition:none}}
+
+  /* minmax(0,1fr), not bare 1fr: the pre-transform 1440px iframe would
+     otherwise blow the track out past the grid's max-width. */
+  .grid{display:grid;gap:72px;max-width:1200px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
+  figure{margin:0}
+  .shot{
+    position:relative; width:100%; aspect-ratio:1440/900;
+    border-radius:16px; overflow:hidden;
+    border:6px solid #23262C; background:#000;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  iframe{width:1440px;height:900px;border:0;transform-origin:0 0;display:block}
+  figcaption{margin-top:16px;max-width:760px}
+  .cap-t{font-weight:700;font-size:19px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .num{color:#D8FF47;font-variant-numeric:tabular-nums;margin-right:2px}
+  .drafttag{display:inline-block;vertical-align:2px;margin-left:6px;background:#D8FF47;color:#111418;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+  .drafttag.held{background:#FF6857}
+  .openfs{margin-left:auto;font-size:14px;font-weight:500;color:#868D97;text-decoration:none}
+  .openfs:hover{color:#fff}
+  .cap-s{color:#868D97;font-size:15px;line-height:1.5;margin-top:4px}
+  .fix{
+    margin-top:10px;padding:10px 12px;border-radius:10px;
+    background:#16191E;border-left:3px solid #D8FF47;
+    font-size:14px;line-height:1.5;color:#C9CCD2;
+  }
+  .fix b{color:#fff}
+  .fix.q{border-left-color:#FF6857}
+  .fix.q b{color:#FFB4A8}
+
+  /* the decision row */
+  .decide{display:flex;gap:10px;margin-top:14px;align-items:center}
+  .dbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:99px;border:1px solid #2A2F38;background:#16191E;color:#fff;font:600 14px Inter;cursor:pointer}
+  .dbtn:hover{border-color:#8FA8FF}
+  .dbtn.port.on{background:#D8FF47;border-color:#D8FF47;color:#111418}
+  .dbtn.hold.on{background:#FF6857;border-color:#FF6857;color:#111418}
+  .dhint{color:#5A6069;font-size:13.5px}
+
+  /* sticky verdict bar */
+  .verdict{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:rgba(11,13,16,.92);backdrop-filter:blur(8px);
+    border-top:1px solid #23262C;
+    display:flex;gap:16px;align-items:center;justify-content:center;
+    padding:14px 24px;flex-wrap:wrap;
+  }
+  .verdict .sum{color:#A7ADB6;font-size:14.5px}
+  .verdict .sum b{color:#fff;font-weight:600}
+  .vbtn{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:99px;background:#D8FF47;border:none;color:#111418;font:600 14px Inter;cursor:pointer}
+  .vbtn:hover{background:#E9FF7E}
+  .vbtn.ghost{background:transparent;border:1px solid #2A2F38;color:#A7ADB6}
+  .vbtn.ghost:hover{border-color:#868D97;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <p class="eyebrow">Teleport MD &middot; Provider portal &middot; Backlog drafts &middot; Batch 1</p>
+  <h1>Five drafts. Your call on each.</h1>
+  <p class="lede"><b>Batch 1 complete (July 22): all five drafts ported</b> — the portal is at ten screens,
+  the video-visit flow runs Today &rarr; call preview &rarr; in-call &rarr; wrap-up, and both nav badges
+  (Messages, Results) open real screens. This board stays as the record of the batch; every frame below
+  is the shipped screen. Next cluster when you want it: the composers (new visit + dispatch).</p>
+  <div class="cards">
+    <a class="cardbtn volt" href="mock-provider-backlog.html" target="_blank">
+      <span><span class="t">Drive the live drafts</span><span class="s">All five, wired end to end</span></span>
+    </a>
+    <a class="cardbtn" href="index-provider.html">
+      <span><span class="t">Back to the gallery</span><span class="s">The five shipped screens</span></span>
+    </a>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="verdict">
+  <span class="sum" id="sum">No picks yet — mark each draft above.</span>
+  <button class="vbtn" id="copy">Copy picks</button>
+  <button class="vbtn ghost" id="clear">Clear</button>
+</div>
+
+<script>
+/* [hash, title, sub, note, question, status]
+   status: 'open' = picker shown · 'ported' = shipped, picker off · 'held' = held with changes, picker shown */
+const DRAFTS = [
+  ['call', 'Call preview', 'Identity, consent and readiness before a single frame is sent.',
+   'The old file\'s best-written screen, kept alive. Who you are about to see and what she shared (A1C flagged, meds, allergy, her booking note), your own camera and sound checked, and the disclosure in plain words: encrypted, part of her record, she can see you viewed what she shared. "In the waiting room · joined 8:56" mirrors the patient side\'s "Dr. Anand has been told you are here." The Today hero\'s <b>Open call preview</b> button now lands here, for real.<br><b>July 22:</b> camera crop fixed per your note, then ported on your call.', null, 'ported'],
+  ['incall', 'In-call, provider side', 'The screen the old file never had. Dark surface: white and volt only.',
+   'Patient video full-bleed, self-view, ticking timer, encrypted pill. The chart rides along in a rail — a <b>live note</b> that saves to the record, her reason for booking, results, meds — so you never leave her face to check a number. Tray: mute / camera / captions toggles (ink-on-white when off), chart toggle, and a coral end-call with an ink glyph. Never white-on-coral.', null, 'ported'],
+  ['wrap', 'Wrap-up', 'A visit that ends in a dead screen teaches nothing — the patient rule, applied provider-side.',
+   'The in-call note arrives here to be signed ("Once signed, Maya can read this note in her app, in these words"). Three next steps — order the repeat draw, book the follow-up, message — are exactly what feeds the patient\'s "What happens next" tracker, and the rail shows her tracker filling in as you finish. End call now lands here, closing the loop.', null, 'ported'],
+  ['messages', 'Messages', 'The badge said 4; the route was dead.',
+   'Threads left, conversation right. Opening a thread marks it read and the sidebar badge follows. Crew threads sit beside patient threads, labeled by role, never a codename. The composer says out loud where words go: patient replies join the record.',
+   'Ported as drafted: crew messages stay <b>out</b> of the patient record ("Crew messages stay between you and the crew"). If clinical context in crew chatter should be chartable, say so and it flips.', 'ported'],
+  ['results', 'Results inbox', 'Every result lands here flagged, and leaves reviewed.',
+   'The worklist the roster hints at. Chips reuse the tint grammar — green settled, coral needs you. The slide-over answers "what do I do about it": values with goal and reference lines, the previous value for trend, lab provenance, then the same three verbs as the wrap-up — message, follow up, repeat the draw. "Maya was told her result is in… once you mark it reviewed." The Results nav badge now opens it.', null, 'ported'],
+];
+
+const grid = document.getElementById('grid');
+const TAGS={open:'draft',ported:'ported to R1',held:'held · updated'};
+grid.innerHTML = DRAFTS.map(([hash,title,sub,note,q,st], i) => `
+  <figure id="d-${hash}">
+    <div class="shot"><iframe src="${st==='ported'?`app-provider.html#${hash}`:`mock-provider-backlog.html?board#${hash}`}" loading="lazy" title="${title}"></iframe></div>
+    <figcaption>
+      <div class="cap-t"><span><span class="num">D${i+1}</span> ${title}<span class="drafttag${st==='held'?' held':''}">${TAGS[st]}</span></span>
+        <a class="openfs" href="${st==='ported'?`app-provider.html#${hash}`:`mock-provider-backlog.html#${hash}`}" target="_blank">Open full size ↗</a></div>
+      <div class="cap-s">${sub}</div>
+      <div class="fix">${note}</div>
+      ${q ? `<div class="fix q"><b>Your call:</b> ${q}</div>` : ''}
+      ${st==='ported'
+        ? `<div class="decide"><span class="dhint">Ported July 22 — live in the prototype and the gallery. This frame is the shipped screen.</span></div>`
+        : `<div class="decide">
+        <button class="dbtn port" data-h="${hash}" data-v="port">Port to R1</button>
+        <button class="dbtn hold" data-h="${hash}" data-v="hold">Hold</button>
+        <span class="dhint">or tell me what to change and I'll redraft</span>
+      </div>`}
+    </figcaption>
+  </figure>`).join('');
+
+/* picks: local only, survives reloads, pasteable */
+const KEY='provider-batch1-picks';
+const picks=JSON.parse(localStorage.getItem(KEY)||'{}');
+const TITLES=Object.fromEntries(DRAFTS.map(([h,t],i)=>[h,`D${i+1} ${t}`]));
+function paint(){
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('on',picks[b.dataset.h]===b.dataset.v));
+  const port=Object.keys(picks).filter(h=>picks[h]==='port').map(h=>TITLES[h]);
+  const hold=Object.keys(picks).filter(h=>picks[h]==='hold').map(h=>TITLES[h]);
+  document.getElementById('sum').innerHTML=
+    (port.length||hold.length)
+      ? `<b>Port:</b> ${port.join(', ')||'—'} &nbsp;·&nbsp; <b>Hold:</b> ${hold.join(', ')||'—'}`
+      : 'No picks yet — mark each draft above.';
+}
+document.querySelectorAll('.dbtn').forEach(b=>b.addEventListener('click',()=>{
+  const h=b.dataset.h;
+  picks[h]=(picks[h]===b.dataset.v)?undefined:b.dataset.v;
+  if(!picks[h])delete picks[h];
+  localStorage.setItem(KEY,JSON.stringify(picks));paint();
+}));
+document.getElementById('clear').addEventListener('click',()=>{
+  Object.keys(picks).forEach(k=>delete picks[k]);
+  localStorage.setItem(KEY,'{}');paint();
+});
+document.getElementById('copy').addEventListener('click',async()=>{
+  const line='Provider batch 1 picks — port: ['+
+    (Object.keys(picks).filter(h=>picks[h]==='port').map(h=>TITLES[h]).join(', ')||'none')+
+    '], hold: ['+(Object.keys(picks).filter(h=>picks[h]==='hold').map(h=>TITLES[h]).join(', ')||'none')+']';
+  try{await navigator.clipboard.writeText(line);document.getElementById('copy').textContent='Copied';}
+  catch(e){prompt('Copy this:',line);}
+  setTimeout(()=>document.getElementById('copy').textContent='Copy picks',1600);
+});
+paint();
+/* whole batch decided: no pickers left, so the verdict bar retires */
+if(!document.querySelector('.dbtn'))document.querySelector('.verdict').style.display='none';
+
+/* scale each 1440px iframe into its shell (same fit as the gallery) */
+function fit(){
+  document.querySelectorAll('.shot').forEach(p=>{
+    const f=p.querySelector('iframe');
+    const s=p.clientWidth/1440;
+    f.style.transform=`scale(${s})`;
+    f.style.height=(p.clientHeight/s)+'px';
+  });
+}
+addEventListener('resize',fit); addEventListener('load',fit); fit();
+</script>
+</body>
+</html>
