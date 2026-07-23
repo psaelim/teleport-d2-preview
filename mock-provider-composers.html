@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teleport MD — Provider backlog drafts (batch 2: the composers)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Base grammar copied verbatim from app-provider.html so a port is a paste. */
+:root{
+  --ink:#111418; --electric:#2D5BFF; --electric-hover:#093FFF; --electric-dark:#4C73FF;
+  --coral:#FF6857; --volt:#D8FF47; --paper:#F4F4F0; --card:#FFFFFF;
+  --mut:#4C535C; --line:#E3E3DE; --danger:#DE1600;
+  --pill-blue:#DCE4FF; --pill-volt:#D8FF47; --pill-green:#E2F59B; --pill-coral:#FFDDD8; --pill-gray:#E8E8E3;
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--paper);font-size:15px;line-height:1.5}
+img{display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:15px;color:inherit}
+h1,h2,h3,.brico{font-family:"Bricolage Grotesque",Inter,sans-serif}
+
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.side{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:22px 0 18px;position:sticky;top:0;height:100vh}
+.side .brand{display:flex;align-items:center;gap:10px;padding:0 24px 24px}
+.side .brand img{width:28px;height:28px;object-fit:contain}
+.side .brand span{font-family:"Bricolage Grotesque";font-weight:700;font-size:17px;letter-spacing:.01em}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px 24px;min-height:48px;color:rgba(255,255,255,.72);text-decoration:none;font-weight:500;font-size:15px;border-left:4px solid transparent}
+.nav a img{width:20px;height:20px;object-fit:contain;opacity:.62}
+.nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav a.on{color:#fff;background:rgba(255,255,255,.07);border-left-color:var(--volt)}
+.nav a.on img{opacity:1}
+.nav a .cnt{margin-left:auto;background:var(--electric);color:#fff;font-size:13px;font-weight:600;border-radius:99px;padding:1px 8px}
+.side .grow{flex:1}
+.me{display:flex;align-items:center;gap:11px;margin:8px 14px 0;padding:10px 8px;border-radius:12px}
+.me:hover{background:rgba(255,255,255,.06)}
+.me img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.me b{display:block;font-size:14px;font-weight:600}
+.me span{font-size:13px;color:rgba(255,255,255,.62)}
+
+.main{padding:24px 36px 64px;max-width:1220px;width:100%}
+.crumb{font-size:14px;color:var(--mut);margin-bottom:10px}
+.crumb a{color:var(--electric);text-decoration:none;font-weight:500;display:inline-flex;align-items:center;min-height:44px}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+.pagehead .eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.pagehead h1{font-size:30px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.pagehead .sub{color:var(--mut);margin-top:5px;font-size:15px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:99px;font-weight:600;font-size:15px;text-decoration:none}
+.btn.pri{background:var(--electric);color:#fff}
+.btn.pri:hover{background:var(--electric-hover)}
+.card .btn.pri{background:var(--ink)}
+.card .btn.pri:hover{background:#000}
+.btn.pri:disabled{background:var(--pill-gray);color:var(--mut);cursor:not-allowed}
+.btn.pri:disabled:hover{background:var(--pill-gray)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid #C9C9C2}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.sm{min-height:44px;padding:0 16px;font-size:14px;border-radius:99px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card+.card{margin-top:20px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.sechead{font-size:17px;font-weight:700;margin:26px 0 12px}
+.grid .sechead:first-child,.col .sechead:first-child{margin-top:0}
+.card .sechead{margin-top:0}
+
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:2px 11px;border-radius:99px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.pill.blue{background:var(--pill-blue)} .pill.volt{background:var(--pill-green)}
+.pill.coral{background:var(--pill-coral)} .pill.gray{background:var(--pill-gray)}
+
+.pt{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.pt img{width:56px;height:56px;border-radius:12px;object-fit:cover}
+.pt b{font-size:17px;font-weight:700;display:block}
+.pt span{font-size:14px;color:var(--mut)}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:15px}
+.kv dt{color:var(--mut)}
+.kv dd{font-weight:500}
+.kv dd .rode{display:block;font-weight:400;font-size:14px;color:var(--mut)}
+.avi{width:36px;height:36px;border-radius:50%;background:var(--pill-blue);color:var(--ink);display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
+.avi.photo{background:none} .avi img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.crew{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.crew img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+.crew b{display:block;font-size:15px;font-weight:600}
+.crew span{font-size:14px;color:var(--mut)}
+.res{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:15px;gap:10px}
+.res:first-of-type{border-top:none;padding-top:2px}
+.res span{color:var(--mut)}
+.quote{border-left:3px solid var(--electric);padding:2px 0 2px 14px;font-size:15px;color:var(--ink);font-style:italic}
+.note{background:#FFF4D6;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;margin-top:14px}
+
+.tl{list-style:none;margin:6px 0 4px}
+.tl li{position:relative;padding:0 0 18px 26px;font-size:15px}
+.tl li::before{content:"";position:absolute;left:6px;top:5px;width:9px;height:9px;border-radius:50%;background:#C9C9C2}
+.tl li::after{content:"";position:absolute;left:10px;top:16px;bottom:-2px;width:1.5px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.done::before{background:var(--ink)}
+.tl li.now::before{background:var(--electric);box-shadow:0 0 0 4px var(--pill-blue)}
+.tl li.now b{color:var(--electric)}
+.tl li b{font-weight:600;display:block}
+.tl li span{color:var(--mut);font-size:14px}
+.tl li.todo{color:var(--mut)}
+
+.orders .orow{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-weight:500;font-size:15px;min-height:56px}
+.orders .orow:first-of-type{border-top:none}
+.orders .orow img{width:18px;height:18px}
+.orders .orow span{margin-left:auto;color:var(--mut);font-weight:400;font-size:14px;text-align:right}
+.orow .rm{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--mut);font-size:20px;flex:none;margin-left:2px}
+.orow .rm:hover{background:var(--paper);color:var(--danger)}
+.addrow{display:flex;gap:10px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* rail preview: the schedule row, stacked to fit the rail */
+.rows{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pv{padding:14px 16px}
+.pv b{display:block;font-size:15px;font-weight:600}
+.pv .s{display:block;font-size:14px;color:var(--mut);margin-top:1px}
+.pv .pill{margin-top:10px}
+
+/* ---------- composer grammar (new in this draft) ---------- */
+.search{display:flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 16px;min-height:48px;margin-bottom:6px}
+.search input{border:none;outline:none;background:none;font:inherit;font-size:15px;width:100%;color:var(--ink);min-height:44px}
+.search input::placeholder{color:var(--mut)}
+.prow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 10px;border-top:1px solid var(--line);min-height:60px;font-size:15px}
+.prow:first-of-type{border-top:none}
+.prow:hover{background:#FAFAF7}
+.prow.on{background:#F3F6FF}
+.prow .t{flex:1;min-width:0}
+.prow b{display:block;font-weight:600}
+.prow .s{display:block;font-size:14px;color:var(--mut)}
+.prow .sel{width:24px;height:24px;border-radius:50%;border:1.5px solid #C9C9C2;display:grid;place-items:center;flex:none}
+.prow.on .sel{background:var(--electric);border-color:var(--electric)}
+.prow.on .sel::after{content:"";width:9px;height:9px;border-radius:50%;background:#fff}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;border:1.5px solid #C9C9C2;border-radius:16px;padding:16px;min-height:96px;text-decoration:none;color:inherit;background:var(--card)}
+.tile:hover{border-color:var(--ink)}
+.tile.on{border-color:var(--electric);background:#F3F6FF;box-shadow:inset 0 0 0 1px var(--electric)}
+.tile b{font-size:15px;font-weight:700;display:flex;gap:9px;align-items:center}
+.tile b img{width:20px;height:20px}
+.tile span{font-size:14px;color:var(--mut)}
+.tile .go{font-size:14px;color:var(--electric);font-weight:600;margin-top:3px}
+
+.days{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.day{min-height:52px;min-width:76px;padding:6px 14px;border-radius:12px;border:1.5px solid #C9C9C2;font-weight:600;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25;background:var(--card)}
+.day span{font-weight:500;font-size:13px;color:var(--mut)}
+.day:hover{border-color:var(--ink)}
+.day.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.day.on span{color:rgba(255,255,255,.72)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.slot{min-height:48px;border:1.5px solid #C9C9C2;border-radius:12px;font-weight:600;font-size:15px;background:var(--card)}
+.slot:hover{border-color:var(--ink)}
+.slot.on{background:var(--electric);border-color:var(--electric);color:#fff}
+.slot.on:hover{border-color:var(--electric)}
+.slot:disabled{background:var(--pill-gray);border-color:var(--pill-gray);color:var(--mut);cursor:not-allowed;font-weight:500}
+
+.fchip{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 18px;border-radius:99px;border:1px solid #C9C9C2;font-size:14px;font-weight:600;color:var(--ink);background:var(--card)}
+.fchip:hover{border-color:var(--ink)}
+.fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.fchip:disabled{opacity:.45;cursor:not-allowed}
+.fchip:disabled:hover{border-color:#C9C9C2}
+
+.tickrow{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 0;min-height:48px;border-top:1px solid var(--line);margin-top:12px}
+.tickrow .box{width:24px;height:24px;border-radius:7px;border:1.5px solid #9BA0A8;display:grid;place-items:center;flex:none;margin-top:1px;font-size:15px;font-weight:700;color:transparent}
+.tickrow.on .box{background:var(--volt);border-color:var(--ink);color:var(--ink)}
+.tickrow .t{flex:1}
+.tickrow b{font-weight:600;font-size:15px;display:block}
+.tickrow .s{display:block;font-size:14px;color:var(--mut)}
+
+.notein{width:100%;min-height:88px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);font:400 15px/1.55 Inter;padding:12px 14px;resize:vertical;outline:none}
+.notein:focus{border-color:var(--electric)}
+.notein::placeholder{color:var(--mut)}
+
+.actrow{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.finep{font-size:14px;color:var(--mut);margin-top:12px}
+.card .finep:last-child{margin-bottom:0}
+
+/* ---------- review chrome (mock only — never ported) ---------- */
+body.board .draft{display:none}
+.draft{background:var(--ink);color:#fff;border-radius:var(--r);padding:16px 20px;margin-bottom:20px}
+.draft .dtag{display:inline-block;background:var(--volt);color:var(--ink);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 10px;border-radius:999px;margin-right:8px;vertical-align:1px}
+.draft p{display:inline;color:rgba(255,255,255,.75);font-size:14px;line-height:1.55}
+.draft b{color:#fff;font-weight:600}
+.draft .tabs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.draft .tabs a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid rgba(255,255,255,.3);color:#fff;text-decoration:none;font-size:14px;font-weight:600}
+.draft .tabs a:hover{border-color:#fff}
+.draft .tabs a.on{background:var(--volt);border-color:var(--volt);color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><img src="img/logo-original/teleportmd-mark-dark.svg" alt=""><span>Teleport MD</span></div>
+    <nav class="nav">
+      <a href="app-provider.html#today" class="on"><img src="img/icons/ph-line/home-w.svg" alt="">Today</a>
+      <a href="app-provider.html#schedule"><img src="img/icons/ph-line/calendar-w.svg" alt="">Schedule</a>
+      <a href="app-provider.html#patients"><img src="img/icons/ph-line/users-w.svg" alt="">Patients</a>
+      <a href="app-provider.html#messages"><img src="img/icons/ph-line/chat-w.svg" alt="">Messages<span class="cnt">4</span></a>
+      <a href="app-provider.html#results"><img src="img/icons/ph-line/flask-w.svg" alt="">Results<span class="cnt">3</span></a>
+    </nav>
+    <div class="grow"></div>
+    <nav class="nav">
+      <a href="app-provider.html#today" class="dead"><img src="img/icons/ph-line/homecare-w.svg" alt="">Practice</a>
+    </nav>
+    <div class="me"><img src="img/dr-anand-avatar.png" alt=""><div><b>Dr. Priya Anand</b><span>Internal medicine</span></div></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ================= NEW VISIT COMPOSER ================= -->
+    <section id="r-newvisit">
+      <div class="draft">
+        <span class="dtag">Draft 1 of 2</span>
+        <p><b>New visit composer.</b> "+ New visit" has been a wiring shortcut since batch 1 — both buttons
+        just jump to the schedule. This is the real thing: availability is the interface (the patient app's
+        booking rule, applied provider-side), and the visit lands in the patient's app to confirm.
+        Your row says <b>Unconfirmed</b> until she does; hers never says "pending approval."</p>
+        <div class="tabs">
+          <a href="#newvisit" class="on">1 · New visit</a><a href="#dispatch">2 · Dispatch a draw</a>
+        </div>
+      </div>
+
+      <div class="crumb"><a href="app-provider.html#today">‹ Today</a></div>
+      <div class="pagehead">
+        <div>
+          <div class="eyebrow">Thursday, July 17</div>
+          <h1>Book a visit</h1>
+          <div class="sub">Pick the patient, the kind, and a time from your open hours.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Who is this for?</h2>
+            <label class="search"><input id="nv-q" type="search" placeholder="Search your patients" aria-label="Search your patients"></label>
+            <div id="nv-plist">
+              <button class="prow on" data-n="maya reyes" data-f="Maya">
+                <span class="avi photo"><img src="img/maya.png" alt=""></span>
+                <span class="t"><b>Maya Reyes</b><span class="s">34 · seen today, 9:00 AM · follow-up due in 6 weeks</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="daniel ross" data-f="Daniel">
+                <span class="avi">DR</span>
+                <span class="t"><b>Daniel Ross</b><span class="s">41 · new patient · video today, 11:15 AM</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="sofia park" data-f="Sofia">
+                <span class="avi">SP</span>
+                <span class="t"><b>Sofia Park</b><span class="s">29 · last seen May 12 · draw tomorrow morning</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="lena fischer" data-f="Lena">
+                <span class="avi">LF</span>
+                <span class="t"><b>Lena Fischer</b><span class="s">45 · last seen July 8 · video today, 4:00 PM</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="sechead">What kind of visit</h2>
+            <div class="tiles">
+              <button class="tile on">
+                <b><img src="img/icons/ph-line/video.svg" alt="">Video visit</b>
+                <span>You meet in the app — she gets the link and a device check.</span>
+              </button>
+              <a class="tile" href="#dispatch">
+                <b><img src="img/icons/ph-line/drop.svg" alt="">At-home blood draw</b>
+                <span>Orders, a window, a crew — it has its own composer.</span>
+                <span class="go">Open the draw composer ›</span>
+              </a>
+            </div>
+            <div class="chips" style="margin-top:14px" id="nv-durs">
+              <button class="fchip">15 minutes</button>
+              <button class="fchip on">30 minutes</button>
+              <button class="fchip">45 minutes</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="sechead">Pick a time</h2>
+            <div class="days" id="nv-days"></div>
+            <div class="slots" id="nv-slots"></div>
+            <p class="finep" id="nv-daynote">Your open hours, with the booked slots grayed and named. Booking here never changes your availability.</p>
+          </div>
+
+          <div class="card">
+            <h2 class="sechead">A note in the invite</h2>
+            <textarea class="notein" placeholder="Why you're booking — one or two plain sentences." aria-label="A note in the invite"></textarea>
+            <p class="finep"><span class="nm">Maya</span> reads this in the invite, in these words.</p>
+          </div>
+
+          <div class="actrow">
+            <button class="btn pri" id="nv-book" disabled>Pick a time to book</button>
+            <a class="btn ghost" href="app-provider.html#today">Cancel</a>
+          </div>
+          <p class="finep"><span class="nm">Maya</span> can cancel or move it free up to 10 hours before — the same rule she reads on her side.</p>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">What <span class="nm">Maya</span> sees</h2>
+            <ul class="tl">
+              <li class="now"><b>It lands in her app</b><span>a visit in plain words — your name and face, the time, how to join</span></li>
+              <li class="todo"><b>She confirms</b><span>your row says Unconfirmed until she does; hers never says "pending approval"</span></li>
+              <li class="todo"><b>She's reminded twice</b><span>the evening before, and 10 minutes before the call</span></li>
+            </ul>
+            <p class="finep">If the time doesn't work, she proposes another — and that lands on Today, under Needs your confirmation.</p>
+          </div>
+          <div class="card">
+            <h2 class="sechead">Where it lands</h2>
+            <div class="rows">
+              <div class="pv">
+                <b id="pv-name">Maya Reyes</b>
+                <span class="s" id="pv-time">Pick a time and it slots into your list</span>
+                <span class="pill gray">Unconfirmed</span>
+              </div>
+            </div>
+            <p class="finep" id="pv-cap">Your schedule, the moment you book it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DISPATCH COMPOSER (at-home draw) ================= -->
+    <section id="r-dispatch" hidden>
+      <div class="draft">
+        <span class="dtag">Draft 2 of 2</span>
+        <p><b>Dispatch composer.</b> The screen the old app called "creating a work order" — the birthplace of
+        <b>#WO1</b>, WORK TYPE and "Pending Crew" — rebuilt as what it is: ordering a draw at a patient's home.
+        Prefilled from this morning's wrap-up (the A1C recheck). Once ported it wires <b>Order</b> on the
+        wrap-up, <b>Order an at-home draw</b> in the patient preview, and <b>+ Add an order</b> on the job card.
+        <br><b>July 23:</b> redrafted to your answers — Maya picks the window from the ones you offer (her pick
+        is the confirmation); the lab and the requisition became dispatch-side facts, stated under Orders.</p>
+        <div class="tabs">
+          <a href="#newvisit">1 · New visit</a><a href="#dispatch" class="on">2 · Dispatch a draw</a>
+        </div>
+      </div>
+
+      <div class="crumb"><a href="app-provider.html#wrap">‹ Wrap-up</a></div>
+      <div class="pagehead">
+        <div>
+          <div class="eyebrow">At-home blood draw</div>
+          <h1>Order a draw at Maya's home</h1>
+          <div class="sub">The A1C recheck from this morning's visit — six weeks out, like your note says.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Who and where</h2>
+            <div class="pt" style="margin-bottom:16px">
+              <img src="img/maya.png" alt="">
+              <div><b>Maya Reyes</b><span>34 · she/her · BlueCross PPO on file</span></div>
+            </div>
+            <dl class="kv">
+              <dt>Where</dt><dd>418 Cedar Lane, Apt 2B, Nashville TN <span class="rode">her home, same as the last draw</span></dd>
+              <dt>Access note</dt><dd>"Gate code 4415, second door on the left." <span class="rode">rides along from her last draw</span></dd>
+            </dl>
+            <div style="margin-top:14px"><button class="btn ghost sm">Different address</button></div>
+          </div>
+
+          <h2 class="sechead">Orders</h2>
+          <div class="card orders">
+            <div class="orow" id="d-a1c"><img src="img/icons/ph-line/flask.svg" alt="">Hemoglobin A1C<span>recheck · from your wrap-up note</span><button class="rm" aria-label="Remove the A1C" title="Remove">×</button></div>
+            <div class="orow" id="d-vitals"><img src="img/icons/ph-line/vitals.svg" alt="">Blood pressure and pulse<span>while on site</span><button class="rm" aria-label="Remove blood pressure and pulse" title="Remove">×</button></div>
+            <div class="addrow">
+              <button class="btn ghost sm" id="d-addlipid">+ Lipid panel</button>
+              <button class="btn ghost sm">+ Another test</button>
+            </div>
+            <div class="note" id="d-fastnote" hidden>The lipid panel fasts. Maya will be told, in her app: nothing but
+            water after 10 PM the night before — and the afternoon windows leave the offer. Remove the lipid
+            panel and both rules go with it.</div>
+            <p class="finep">The sample goes to the lab Maya's plan covers — you'll see it named on the job card.
+            The signed order rides with the crew; there are no forms to attach.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">The window</h2>
+            <div class="winwrap" id="d-winwrap">
+              <div class="days">
+                <button class="day">Wed<span>Aug 27</span></button>
+                <button class="day on">Thu<span>Aug 28</span></button>
+                <button class="day">Fri<span>Aug 29</span></button>
+                <button class="day">Mon<span>Sep 1</span></button>
+              </div>
+              <div class="chips" id="d-wins">
+                <button class="fchip on" aria-pressed="true">8 to 10 AM</button>
+                <button class="fchip on" aria-pressed="true">10 AM to 12 PM</button>
+                <button class="fchip on" aria-pressed="true">12 to 2 PM</button>
+                <button class="fchip on" aria-pressed="true">2 to 4 PM</button>
+              </div>
+              <p class="finep" id="d-winhint">Maya chooses from these in her app — tap a window to withhold it.</p>
+            </div>
+            <button class="tickrow" id="d-selfpick" aria-pressed="false">
+              <span class="box" aria-hidden="true">✓</span>
+              <span class="t"><b>Pick the window yourself instead</b><span class="s">for a time you've already agreed on — she confirms it instead of choosing</span></span>
+            </button>
+            <p class="finep">A window, not a clock time — on the day, live tracking narrows it to a real arrival estimate for both of you.</p>
+          </div>
+
+          <div class="card">
+            <h2 class="sechead">The crew</h2>
+            <div class="crew">
+              <img src="img/crew-jennifer-face.png" alt="">
+              <div><b>Jennifer Cole</b><span>Phlebotomist · 214 draws · 4.9 · did Maya's last two</span></div>
+            </div>
+            <button class="tickrow on" id="d-askjen" aria-pressed="true" style="margin-top:0">
+              <span class="box" aria-hidden="true">✓</span>
+              <span class="t"><b>Ask Jennifer first</b><span class="s">if she can't take it, the job opens to the full crew</span></span>
+            </button>
+            <p class="finep">No one is booked until Maya confirms. Until a crew accepts, your rows say
+            <b>Finding crew</b>, in those words — and the moment someone does, a name.</p>
+          </div>
+
+          <div class="card">
+            <h2 class="sechead">Instructions for the crew</h2>
+            <textarea class="notein" aria-label="Instructions for the crew">Maya is anxious about needles — please take it slow. Use the butterfly if the first stick fails.</textarea>
+            <p class="finep">Rides along from her last draw. Edit it if something changed.</p>
+          </div>
+
+          <div class="actrow">
+            <button class="btn pri" id="d-send">Send to Maya to choose a window</button>
+            <a class="btn ghost" href="app-provider.html#wrap">Back to the wrap-up</a>
+          </div>
+          <p class="finep" id="d-sendnote">It lands in her app now, in plain words. Nothing is scheduled and no crew is
+          contacted until she chooses her window.</p>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Why this draw</h2>
+            <div class="res"><span>A1C · Jul 14</span><span class="pill coral">High · 8.1%</span></div>
+            <div class="res"><span>Previous · Apr 02</span><span>7.4%</span></div>
+            <div class="res"><span>Goal</span><span>below 7.0%</span></div>
+            <p class="quote" style="margin-top:14px">"A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the follow-up."</p>
+            <p class="finep">Your note, from this morning's wrap-up.</p>
+          </div>
+          <div class="card">
+            <h2 class="sechead">What Maya sees</h2>
+            <ul class="tl">
+              <li class="now"><b>She picks her window and confirms</b><span>the tests, the windows you offered, any fasting rule — plain words, no order codes</span></li>
+              <li class="todo"><b>A crew accepts</b><span>Finding crew until then — the same words on her side and yours</span></li>
+              <li class="todo"><b>Live tracking on the day</b><span>who is coming and when — she sees the same map you do</span></li>
+              <li class="todo"><b>Results land flagged</b><span>your inbox in 2 to 3 days; she's told the moment you mark them reviewed</span></li>
+            </ul>
+            <p class="finep">Nothing on her side ever says work order, dispatch, or "Pending Crew."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* hash routing, same shape as the app */
+const ROUTES=['newvisit','dispatch'];
+function route(){
+  let h=(location.hash||'#newvisit').slice(1);
+  if(!ROUTES.includes(h))h='newvisit';
+  ROUTES.forEach(r=>document.getElementById('r-'+r).hidden=(r!==h));
+  window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);route();
+
+/* ?board — clean frames for the drafts board: hide the draft strips */
+if(location.search.includes('board'))document.body.classList.add('board');
+
+/* ---------- new visit: the state that matters is patient + slot ---------- */
+/* slots come from availability (Wed & Fri end at noon) minus what's booked, and say so */
+const NVDAYS=[
+  ['Thu','Jul 17',[['9:30 AM'],['11:45 AM'],['1:30 PM','booked'],['3:30 PM']],''],
+  ['Fri','Jul 18',[['8:15 AM'],['9:30 AM'],['11:00 AM','booked'],['11:30 AM']],'Your Friday ends at noon.'],
+  ['Mon','Jul 21',[['8:30 AM'],['10:00 AM'],['11:15 AM'],['2:00 PM']],''],
+  ['Tue','Jul 22',[['9:00 AM'],['10:30 AM','booked'],['1:00 PM'],['3:00 PM']],''],
+  ['Wed','Jul 23',[['8:30 AM'],['9:45 AM'],['11:30 AM']],'Your Wednesday ends at noon.'],
+];
+const nv={patient:'Maya Reyes',first:'Maya',day:0,slot:null};
+const daysEl=document.getElementById('nv-days'),slotsEl=document.getElementById('nv-slots');
+function drawDays(){
+  daysEl.innerHTML=NVDAYS.map(([d,dt],i)=>`<button class="day${i===nv.day?' on':''}" data-i="${i}">${d}<span>${dt}</span></button>`).join('');
+  daysEl.querySelectorAll('.day').forEach(b=>b.addEventListener('click',()=>{nv.day=+b.dataset.i;nv.slot=null;drawDays();paintNV();}));
+  const note=NVDAYS[nv.day][3];
+  document.getElementById('nv-daynote').textContent=
+    (note?note+' ':'')+'Your open hours, with the booked slots grayed and named. Booking here never changes your availability.';
+  slotsEl.innerHTML=NVDAYS[nv.day][2].map(([t,x],i)=>
+    `<button class="slot${nv.slot===i?' on':''}" data-i="${i}" ${x?'disabled':''}>${t}${x?' · '+x:''}</button>`).join('');
+  slotsEl.querySelectorAll('.slot:not(:disabled)').forEach(b=>b.addEventListener('click',()=>{nv.slot=+b.dataset.i;drawDays();paintNV();}));
+}
+function paintNV(){
+  const book=document.getElementById('nv-book');
+  const [d,dt,slots]=NVDAYS[nv.day];
+  document.querySelectorAll('.nm').forEach(s=>s.textContent=nv.first);
+  document.getElementById('pv-name').textContent=nv.patient;
+  if(nv.slot===null){
+    book.disabled=true;book.textContent='Pick a time to book';
+    document.getElementById('pv-time').textContent='Pick a time and it slots into your list';
+    document.getElementById('pv-cap').textContent='Your schedule, the moment you book it.';
+  }else{
+    book.disabled=false;book.textContent=`Book for ${d} ${dt.split(' ')[1]}, ${slots[nv.slot][0]}`;
+    document.getElementById('pv-time').textContent=`${d} ${dt} · ${slots[nv.slot][0]} · video`;
+    document.getElementById('pv-cap').textContent=`${d} ${dt}'s list, the moment you book it.`;
+  }
+}
+drawDays();paintNV();
+
+/* patient rows: search filters, click selects */
+document.getElementById('nv-q').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#nv-plist .prow').forEach(r=>r.style.display=r.dataset.n.includes(q)?'':'none');
+});
+document.querySelectorAll('#nv-plist .prow').forEach(r=>r.addEventListener('click',()=>{
+  document.querySelectorAll('#nv-plist .prow').forEach(x=>x.classList.remove('on'));
+  r.classList.add('on');
+  nv.patient=r.dataset.n.replace(/\b\w/g,c=>c.toUpperCase());
+  nv.first=r.dataset.f;
+  paintNV();
+}));
+
+/* duration chips */
+document.querySelectorAll('#nv-durs .fchip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('#nv-durs .fchip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+}));
+
+/* ---------- dispatch: orders, the window offer, the hand-off ---------- */
+/* Default (June's call, July 23): Maya picks from the windows you offer — her pick IS the
+   confirmation, no counter-proposal loop. "Pick it yourself" stays for times agreed live.
+   A fasting order keeps mornings only, automatically. */
+const dw={self:false,fasting:false,sel:0,offered:[true,true,true,true]};
+const dWins=[...document.querySelectorAll('#d-wins .fchip')];
+function dPaint(){
+  dWins.forEach((c,i)=>{
+    const blocked=dw.fasting&&i>=2;
+    c.disabled=blocked;
+    c.classList.toggle('on', dw.self ? (dw.sel===i&&!blocked) : (dw.offered[i]&&!blocked));
+    c.setAttribute('aria-pressed',c.classList.contains('on'));
+  });
+  const offerCount=dw.offered.filter((o,i)=>o&&!(dw.fasting&&i>=2)).length;
+  const fastTail=dw.fasting?' The fasting rule keeps mornings only.':'';
+  document.getElementById('d-winhint').textContent=dw.self
+    ? 'You picked it — Maya confirms this window in her app.'+fastTail
+    : (offerCount?'Maya chooses from these in her app — tap a window to withhold it.':'Offer at least one window.')+fastTail;
+  const send=document.getElementById('d-send');
+  send.textContent=dw.self?'Send to Maya to confirm':'Send to Maya to choose a window';
+  send.disabled=!dw.self&&!offerCount;
+  document.getElementById('d-sendnote').textContent=
+    'It lands in her app now, in plain words. Nothing is scheduled and no crew is contacted until she '
+    +(dw.self?'confirms the window.':'chooses her window.');
+}
+dWins.forEach((c,i)=>c.addEventListener('click',()=>{
+  if(dw.self)dw.sel=i;else dw.offered[i]=!dw.offered[i];
+  dPaint();
+}));
+document.getElementById('d-selfpick').addEventListener('click',function(){
+  dw.self=this.classList.toggle('on');
+  this.setAttribute('aria-pressed',dw.self);
+  if(dw.self&&dw.fasting&&dw.sel>=2)dw.sel=0;
+  dPaint();
+});
+document.querySelectorAll('#d-winwrap .day').forEach(d=>d.addEventListener('click',()=>{
+  document.querySelectorAll('#d-winwrap .day').forEach(x=>x.classList.remove('on'));d.classList.add('on');
+}));
+function setFasting(on){
+  dw.fasting=on;
+  if(on&&dw.self&&dw.sel>=2)dw.sel=0;
+  document.getElementById('d-fastnote').hidden=!on;
+  dPaint();
+}
+document.querySelectorAll('#r-dispatch .orow .rm').forEach(b=>b.addEventListener('click',()=>{
+  b.closest('.orow').remove();
+}));
+document.getElementById('d-addlipid').addEventListener('click',function(){
+  const r=document.createElement('div');r.className='orow';r.id='d-lipid';
+  r.innerHTML='<img src="img/icons/ph-line/flask.svg" alt="">Lipid panel<span>fasting</span><button class="rm" aria-label="Remove the lipid panel" title="Remove">×</button>';
+  this.closest('.addrow').before(r);
+  r.querySelector('.rm').addEventListener('click',()=>{r.remove();setFasting(false);this.hidden=false;});
+  setFasting(true);
+  this.hidden=true;
+});
+document.getElementById('d-askjen').addEventListener('click',function(){
+  const on=this.classList.toggle('on');
+  this.setAttribute('aria-pressed',on);
+});
+dPaint();
+</script>
+</body>
+</html>

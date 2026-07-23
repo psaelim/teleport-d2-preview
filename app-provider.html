@@ -16,6 +16,7 @@
   --r:16px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--paper);font-size:15px;line-height:1.5}
 img{display:block}
@@ -236,6 +237,69 @@ table.rst{width:100%;border-collapse:collapse;background:var(--card);border:1px 
 .vals td:last-child{text-align:right}
 .vals .ref{color:var(--mut);font-size:14px;display:block}
 .vals b.hi{color:var(--danger)}
+
+/* ---------- new visit composer ---------- */
+.btn.pri:disabled{background:var(--pill-gray);color:var(--mut);cursor:not-allowed}
+.btn.pri:disabled:hover{background:var(--pill-gray)}
+.search.nvwide{max-width:none;margin-bottom:6px}
+.prow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 10px;border-top:1px solid var(--line);min-height:60px;font-size:15px}
+.prow:first-of-type{border-top:none}
+.prow:hover{background:#FAFAF7}
+.prow.on{background:#F3F6FF}
+.prow .t{flex:1;min-width:0}
+.prow b{display:block;font-weight:600}
+.prow .s{display:block;font-size:14px;color:var(--mut)}
+.prow .sel{width:24px;height:24px;border-radius:50%;border:1.5px solid #C9C9C2;display:grid;place-items:center;flex:none}
+.prow.on .sel{background:var(--electric);border-color:var(--electric)}
+.prow.on .sel::after{content:"";width:9px;height:9px;border-radius:50%;background:#fff}
+.nvnone{padding:16px 10px;border-top:1px solid var(--line)}
+.nvnone b{display:block;font-weight:600}
+.nvnone .s{display:block;font-size:14px;color:var(--mut);margin-top:2px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;border:1.5px solid #C9C9C2;border-radius:16px;padding:16px;min-height:96px;text-decoration:none;color:inherit;background:var(--card)}
+.tile:hover{border-color:var(--ink)}
+.tile.on{border-color:var(--electric);background:#F3F6FF;box-shadow:inset 0 0 0 1px var(--electric)}
+.tile b{font-size:15px;font-weight:700;display:flex;gap:9px;align-items:center}
+.tile b img{width:20px;height:20px}
+.tile span{font-size:14px;color:var(--mut)}
+.days{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.day{min-height:52px;min-width:76px;padding:6px 14px;border-radius:12px;border:1.5px solid #C9C9C2;font-weight:600;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25;background:var(--card)}
+.day span{font-weight:500;font-size:13px;color:var(--mut)}
+.day:hover{border-color:var(--ink)}
+.day.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.day.on span{color:rgba(255,255,255,.72)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.slot{min-height:48px;border:1.5px solid #C9C9C2;border-radius:12px;font-weight:600;font-size:15px;background:var(--card)}
+.slot:hover{border-color:var(--ink)}
+.slot.on{background:var(--electric);border-color:var(--electric);color:#fff}
+.slot.on:hover{border-color:var(--electric)}
+.slot:disabled{background:var(--pill-gray);border-color:var(--pill-gray);color:var(--mut);cursor:not-allowed;font-weight:500}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.notein{width:100%;min-height:88px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);font:400 15px/1.55 Inter;padding:12px 14px;resize:vertical;outline:none}
+.notein:focus{border-color:var(--electric)}
+.notein::placeholder{color:var(--mut)}
+.actrow{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.finep{font-size:14px;color:var(--mut);margin-top:12px}
+.pv{padding:14px 16px}
+.pv b{display:block;font-size:15px;font-weight:600}
+.pv .s{display:block;font-size:14px;color:var(--mut);margin-top:1px}
+.pv .pill{margin-top:10px}
+.pvrows{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tile .go{font-size:14px;color:var(--electric);font-weight:600;margin-top:3px}
+
+/* ---------- dispatch composer (at-home draw) ---------- */
+.fchip:disabled{opacity:.45;cursor:not-allowed}
+.fchip:disabled:hover{border-color:#C9C9C2}
+.kv dd .rode{display:block;font-weight:400;font-size:14px;color:var(--mut)}
+.orow .rm{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--mut);font-size:20px;flex:none;margin-left:2px}
+.orow .rm:hover{background:var(--paper);color:var(--danger)}
+.addrow{display:flex;gap:10px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.tickrow{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 0;min-height:48px;border-top:1px solid var(--line);margin-top:12px}
+.tickrow .box{width:24px;height:24px;border-radius:7px;border:1.5px solid #9BA0A8;display:grid;place-items:center;flex:none;margin-top:1px;font-size:15px;font-weight:700;color:transparent}
+.tickrow.on .box{background:var(--volt);border-color:var(--ink);color:var(--ink)}
+.tickrow .t{flex:1}
+.tickrow b{font-weight:600;font-size:15px;display:block}
+.tickrow .s{display:block;font-size:14px;color:var(--mut)}
 /* second slide-over (result detail) rides the same scrim, its own body class */
 body.pop2 .scrim{opacity:1;pointer-events:auto}
 body.pop2 .panel.p2{transform:none}
@@ -365,7 +429,7 @@ body.pop2 .panel.p2{transform:none}
           <h1>Good morning, Dr. Anand</h1>
           <div class="sub">6 visits on your schedule. 2 requests need your confirmation.</div>
         </div>
-        <div class="headacts"><a class="btn pri" href="#schedule">+ New visit</a></div>
+        <div class="headacts"><a class="btn pri" href="#newvisit">+ New visit</a></div>
       </div>
 
       <div class="stats">
@@ -483,7 +547,7 @@ body.pop2 .panel.p2{transform:none}
         </div>
         <div class="headacts">
           <button class="btn ghost">‹</button><button class="btn ghost">This week</button><button class="btn ghost">›</button>
-          <button class="btn pri">+ New visit</button>
+          <a class="btn pri" href="#newvisit">+ New visit</a>
         </div>
       </div>
 
@@ -551,6 +615,232 @@ body.pop2 .panel.p2{transform:none}
       </div>
     </section>
 
+    <!-- ================= NEW VISIT COMPOSER ================= -->
+    <section id="r-newvisit" hidden>
+      <div class="crumb"><a href="#today">‹ Today</a></div>
+      <div class="pagehead">
+        <div>
+          <div class="eyebrow">Thursday, July 17</div>
+          <h1>Book a visit</h1>
+          <div class="sub">Pick the patient, the kind, and a time from your open hours.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Who is this for?</h2>
+            <label class="search nvwide"><input id="nv-q" type="search" placeholder="Search your patients" aria-label="Search your patients"></label>
+            <div id="nv-plist">
+              <button class="prow on" data-n="maya reyes" data-f="Maya">
+                <span class="avi photo"><img src="img/maya.png" alt=""></span>
+                <span class="t"><b>Maya Reyes</b><span class="s">34 · seen today, 9:00 AM · follow-up due in 6 weeks</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="daniel ross" data-f="Daniel">
+                <span class="avi">DR</span>
+                <span class="t"><b>Daniel Ross</b><span class="s">41 · new patient · video today, 11:15 AM</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="sofia park" data-f="Sofia">
+                <span class="avi">SP</span>
+                <span class="t"><b>Sofia Park</b><span class="s">29 · last seen May 12 · draw tomorrow morning</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+              <button class="prow" data-n="lena fischer" data-f="Lena">
+                <span class="avi">LF</span>
+                <span class="t"><b>Lena Fischer</b><span class="s">45 · last seen July 8 · video today, 4:00 PM</span></span>
+                <span class="sel" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="nvnone" id="nv-none" hidden>
+              <b>No one by that name is in your care yet.</b>
+              <span class="s">Adding a patient is its own screen — it starts the record her visits land in.</span>
+              <button class="btn ghost sm" style="margin-top:12px">+ Add a patient</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">What kind of visit</h2>
+            <div class="tiles">
+              <button class="tile on">
+                <b><img src="img/icons/ph-line/video.svg" alt="">Video visit</b>
+                <span>You meet in the app — she gets the link and a device check.</span>
+              </button>
+              <a class="tile" href="#dispatch">
+                <b><img src="img/icons/ph-line/drop.svg" alt="">At-home blood draw</b>
+                <span>Orders, a window, a crew — it has its own composer.</span>
+                <span class="go">Open the draw composer ›</span>
+              </a>
+            </div>
+            <div class="chips" style="margin-top:14px" id="nv-durs">
+              <button class="fchip">15 minutes</button>
+              <button class="fchip on">30 minutes</button>
+              <button class="fchip">45 minutes</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">Pick a time</h2>
+            <div class="days" id="nv-days"></div>
+            <div class="slots" id="nv-slots"></div>
+            <p class="finep" id="nv-daynote">Your open hours, with the booked slots grayed and named. Booking here never changes your availability.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">A note in the invite</h2>
+            <textarea class="notein" placeholder="Why you're booking — one or two plain sentences." aria-label="A note in the invite"></textarea>
+            <p class="finep"><span class="nm">Maya</span> reads this in the invite, in these words.</p>
+          </div>
+
+          <div class="actrow">
+            <button class="btn pri" id="nv-book" disabled>Pick a time to book</button>
+            <a class="btn ghost" href="#today">Cancel</a>
+          </div>
+          <p class="finep"><span class="nm">Maya</span> can cancel or move it free up to 10 hours before — the same rule she reads on her side.</p>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">What <span class="nm">Maya</span> sees</h2>
+            <ul class="tl">
+              <li class="now"><b>It lands in her app</b><span>a visit in plain words — your name and face, the time, how to join</span></li>
+              <li class="todo"><b>She confirms</b><span>your row says Unconfirmed until she does; hers never says "pending approval"</span></li>
+              <li class="todo"><b>She's reminded twice</b><span>the evening before, and 10 minutes before the call</span></li>
+            </ul>
+            <p class="finep">If the time doesn't work, she proposes another — and that lands on Today, under Needs your confirmation.</p>
+          </div>
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">Where it lands</h2>
+            <div class="pvrows">
+              <div class="pv">
+                <b id="pv-name">Maya Reyes</b>
+                <span class="s" id="pv-time">Pick a time and it slots into your list</span>
+                <span class="pill gray">Unconfirmed</span>
+              </div>
+            </div>
+            <p class="finep" id="pv-cap">Your schedule, the moment you book it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DISPATCH COMPOSER (at-home draw) ================= -->
+    <section id="r-dispatch" hidden>
+      <div class="crumb"><a href="#wrap">‹ Wrap-up</a></div>
+      <div class="pagehead">
+        <div>
+          <div class="eyebrow">At-home blood draw</div>
+          <h1>Order a draw at Maya's home</h1>
+          <div class="sub">The A1C recheck from this morning's visit — six weeks out, like your note says.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Who and where</h2>
+            <div class="pt" style="margin-bottom:16px">
+              <img src="img/maya.png" alt="">
+              <div><b>Maya Reyes</b><span>34 · she/her · BlueCross PPO on file</span></div>
+            </div>
+            <dl class="kv">
+              <dt>Where</dt><dd>418 Cedar Lane, Apt 2B, Nashville TN <span class="rode">her home, same as the last draw</span></dd>
+              <dt>Access note</dt><dd>"Gate code 4415, second door on the left." <span class="rode">rides along from her last draw</span></dd>
+            </dl>
+            <div style="margin-top:14px"><button class="btn ghost sm">Different address</button></div>
+          </div>
+
+          <h2 class="sechead">Orders</h2>
+          <div class="card orders">
+            <div class="orow" id="d-a1c"><img src="img/icons/ph-line/flask.svg" alt="">Hemoglobin A1C<span>recheck · from your wrap-up note</span><button class="rm" aria-label="Remove the A1C" title="Remove">×</button></div>
+            <div class="orow" id="d-vitals"><img src="img/icons/ph-line/vitals.svg" alt="">Blood pressure and pulse<span>while on site</span><button class="rm" aria-label="Remove blood pressure and pulse" title="Remove">×</button></div>
+            <div class="addrow">
+              <button class="btn ghost sm" id="d-addlipid">+ Lipid panel</button>
+              <button class="btn ghost sm">+ Another test</button>
+            </div>
+            <div class="note" id="d-fastnote" hidden>The lipid panel fasts. Maya will be told, in her app: nothing but
+            water after 10 PM the night before — and the afternoon windows leave the offer. Remove the lipid
+            panel and both rules go with it.</div>
+            <p class="finep">The sample goes to the lab Maya's plan covers — you'll see it named on the job card.
+            The signed order rides with the crew; there are no forms to attach.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">The window</h2>
+            <div class="winwrap" id="d-winwrap">
+              <div class="days">
+                <button class="day">Wed<span>Aug 27</span></button>
+                <button class="day on">Thu<span>Aug 28</span></button>
+                <button class="day">Fri<span>Aug 29</span></button>
+                <button class="day">Mon<span>Sep 1</span></button>
+              </div>
+              <div class="chips" id="d-wins">
+                <button class="fchip on" aria-pressed="true">8 to 10 AM</button>
+                <button class="fchip on" aria-pressed="true">10 AM to 12 PM</button>
+                <button class="fchip on" aria-pressed="true">12 to 2 PM</button>
+                <button class="fchip on" aria-pressed="true">2 to 4 PM</button>
+              </div>
+              <p class="finep" id="d-winhint">Maya chooses from these in her app — tap a window to withhold it.</p>
+            </div>
+            <button class="tickrow" id="d-selfpick" aria-pressed="false">
+              <span class="box" aria-hidden="true">✓</span>
+              <span class="t"><b>Pick the window yourself instead</b><span class="s">for a time you've already agreed on — she confirms it instead of choosing</span></span>
+            </button>
+            <p class="finep">A window, not a clock time — on the day, live tracking narrows it to a real arrival estimate for both of you.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">The crew</h2>
+            <div class="crew">
+              <img src="img/crew-jennifer-face.png" alt="">
+              <div><b>Jennifer Cole</b><span>Phlebotomist · 214 draws · 4.9 · did Maya's last two</span></div>
+            </div>
+            <button class="tickrow on" id="d-askjen" aria-pressed="true" style="margin-top:0">
+              <span class="box" aria-hidden="true">✓</span>
+              <span class="t"><b>Ask Jennifer first</b><span class="s">if she can't take it, the job opens to the full crew</span></span>
+            </button>
+            <p class="finep">No one is booked until Maya confirms. Until a crew accepts, your rows say
+            <b>Finding crew</b>, in those words — and the moment someone does, a name.</p>
+          </div>
+
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">Instructions for the crew</h2>
+            <textarea class="notein" aria-label="Instructions for the crew">Maya is anxious about needles — please take it slow. Use the butterfly if the first stick fails.</textarea>
+            <p class="finep">Rides along from her last draw. Edit it if something changed.</p>
+          </div>
+
+          <div class="actrow">
+            <button class="btn pri" id="d-send">Send to Maya to choose a window</button>
+            <a class="btn ghost" href="#wrap">Back to the wrap-up</a>
+          </div>
+          <p class="finep" id="d-sendnote">It lands in her app now, in plain words. Nothing is scheduled and no crew is
+          contacted until she chooses her window.</p>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2 class="sechead">Why this draw</h2>
+            <div class="res"><span>A1C · Jul 14</span><span class="pill coral">High · 8.1%</span></div>
+            <div class="res"><span>Previous · Apr 02</span><span>7.4%</span></div>
+            <div class="res"><span>Goal</span><span>below 7.0%</span></div>
+            <p class="quote" style="margin-top:14px">"A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the follow-up."</p>
+            <p class="finep">Your note, from this morning's wrap-up.</p>
+          </div>
+          <div class="card" style="margin-top:20px">
+            <h2 class="sechead">What Maya sees</h2>
+            <ul class="tl">
+              <li class="now"><b>She picks her window and confirms</b><span>the tests, the windows you offered, any fasting rule — plain words, no order codes</span></li>
+              <li class="todo"><b>A crew accepts</b><span>Finding crew until then — the same words on her side and yours</span></li>
+              <li class="todo"><b>Live tracking on the day</b><span>who is coming and when — she sees the same map you do</span></li>
+              <li class="todo"><b>Results land flagged</b><span>your inbox in 2 to 3 days; she's told the moment you mark them reviewed</span></li>
+            </ul>
+            <p class="finep">Nothing on her side ever says work order, dispatch, or "Pending Crew."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ================= VISIT DETAIL ================= -->
     <section id="r-visit" hidden>
       <div class="crumb"><a href="#today">‹ Today</a></div>
@@ -585,7 +875,7 @@ body.pop2 .panel.p2{transform:none}
             <div class="orow"><img src="img/icons/ph-line/flask.svg" alt="">Lipid panel<span>fasting</span></div>
             <div class="orow"><img src="img/icons/ph-line/flask.svg" alt="">Complete blood count<span></span></div>
             <div class="orow"><img src="img/icons/ph-line/vitals.svg" alt="">Blood pressure and pulse<span>while on site</span></div>
-            <div class="orow" style="border-top:1px solid var(--line)"><button class="btn ghost sm">+ Add an order</button></div>
+            <div class="orow" style="border-top:1px solid var(--line)"><a class="btn ghost sm" href="#dispatch">+ Add an order</a></div>
           </div>
 
           <div class="card" style="margin-top:20px">
@@ -735,7 +1025,7 @@ A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the 
             <div class="nx">
               <span class="disc"><img src="img/icons/ph-line/drop.svg" alt=""></span>
               <span class="t"><b>Order the repeat draw</b><span>A1C recheck · at her home, like last time</span></span>
-              <button class="btn pri sm">Order</button>
+              <a class="btn pri sm" href="#dispatch">Order</a>
             </div>
             <div class="nx">
               <span class="disc"><img src="img/icons/ph-line/calendar.svg" alt=""></span>
@@ -943,8 +1233,8 @@ A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the 
     <div class="res"><span>Blood draw · today 10:30 AM</span><span class="pill blue">En route</span></div>
   </div>
   <div class="acts">
-    <button class="btn pri">Book a visit</button>
-    <button class="btn ghost">Order an at-home draw</button>
+    <a class="btn pri" href="#newvisit" onclick="closePanel()">Book a visit</a>
+    <a class="btn ghost" href="#dispatch" onclick="closePanel()">Order an at-home draw</a>
     <a class="btn ghost" href="#visit" onclick="closePanel()">Open today's draw</a>
   </div>
 </aside>
@@ -969,21 +1259,21 @@ A1C at 8.1 needs a recheck — ordering a repeat draw in 6 weeks along with the 
     <button class="btn pri" onclick="closePanel()">Mark as reviewed</button>
     <a class="btn ghost" href="#messages" onclick="closePanel()">Message Maya</a>
     <button class="btn ghost">Book a follow-up</button>
-    <button class="btn ghost">Order a repeat draw</button>
+    <a class="btn ghost" href="#dispatch" onclick="closePanel()">Order a repeat draw</a>
   </div>
   <p style="font-size:14px;color:var(--mut);margin-top:14px">Maya was told her result is in. She sees it with the same flag, in plain words, once you mark it reviewed.</p>
 </aside>
 
 <script>
-const ROUTES=['today','schedule','visit','patients','preview','call','incall','messages','wrap','results'];
+const ROUTES=['today','schedule','visit','patients','preview','call','incall','messages','wrap','results','newvisit','dispatch'];
 function route(){
   let h=(location.hash||'#today').slice(1);
   if(!ROUTES.includes(h))h='today';
   const show=(h==='preview')?'patients':h;
-  ['today','schedule','visit','patients','call','incall','messages','wrap','results'].forEach(r=>document.getElementById('r-'+r).hidden=(r!==show));
+  ['today','schedule','visit','patients','call','incall','messages','wrap','results','newvisit','dispatch'].forEach(r=>document.getElementById('r-'+r).hidden=(r!==show));
   document.body.classList.toggle('pop',h==='preview');
   document.body.classList.remove('pop2');
-  document.querySelectorAll('.nav a[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r===show||((show==='visit'||show==='call'||show==='wrap')&&a.dataset.r==='today')));
+  document.querySelectorAll('.nav a[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r===show||((show==='visit'||show==='call'||show==='wrap'||show==='newvisit'||show==='dispatch')&&a.dataset.r==='today')));
   window.scrollTo(0,0);
 }
 addEventListener('hashchange',route);route();
@@ -1067,6 +1357,126 @@ document.querySelectorAll('#plist tr').forEach(tr=>tr.addEventListener('click',(
 function closePanel(){document.body.classList.remove('pop');document.body.classList.remove('pop2')}
 function openResult(){document.body.classList.add('pop2')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+
+/* ---------- new visit composer ---------- */
+/* slots come from availability (Wed & Fri end at noon) minus what's booked, and say so */
+const NVDAYS=[
+  ['Thu','Jul 17',[['9:30 AM'],['11:45 AM'],['1:30 PM','booked'],['3:30 PM']],''],
+  ['Fri','Jul 18',[['8:15 AM'],['9:30 AM'],['11:00 AM','booked'],['11:30 AM']],'Your Friday ends at noon.'],
+  ['Mon','Jul 21',[['8:30 AM'],['10:00 AM'],['11:15 AM'],['2:00 PM']],''],
+  ['Tue','Jul 22',[['9:00 AM'],['10:30 AM','booked'],['1:00 PM'],['3:00 PM']],''],
+  ['Wed','Jul 23',[['8:30 AM'],['9:45 AM'],['11:30 AM']],'Your Wednesday ends at noon.'],
+];
+const nv={patient:'Maya Reyes',first:'Maya',day:0,slot:null};
+const nvDaysEl=document.getElementById('nv-days'),nvSlotsEl=document.getElementById('nv-slots');
+function nvDrawDays(){
+  nvDaysEl.innerHTML=NVDAYS.map(([d,dt],i)=>`<button class="day${i===nv.day?' on':''}" data-i="${i}">${d}<span>${dt}</span></button>`).join('');
+  nvDaysEl.querySelectorAll('.day').forEach(b=>b.addEventListener('click',()=>{nv.day=+b.dataset.i;nv.slot=null;nvDrawDays();nvPaint();}));
+  const note=NVDAYS[nv.day][3];
+  document.getElementById('nv-daynote').textContent=
+    (note?note+' ':'')+'Your open hours, with the booked slots grayed and named. Booking here never changes your availability.';
+  nvSlotsEl.innerHTML=NVDAYS[nv.day][2].map(([t,x],i)=>
+    `<button class="slot${nv.slot===i?' on':''}" data-i="${i}" ${x?'disabled':''}>${t}${x?' · '+x:''}</button>`).join('');
+  nvSlotsEl.querySelectorAll('.slot:not(:disabled)').forEach(b=>b.addEventListener('click',()=>{nv.slot=+b.dataset.i;nvDrawDays();nvPaint();}));
+}
+function nvPaint(){
+  const book=document.getElementById('nv-book');
+  const [d,dt,slots]=NVDAYS[nv.day];
+  document.querySelectorAll('.nm').forEach(s=>s.textContent=nv.first);
+  document.getElementById('pv-name').textContent=nv.patient;
+  if(nv.slot===null){
+    book.disabled=true;book.textContent='Pick a time to book';
+    document.getElementById('pv-time').textContent='Pick a time and it slots into your list';
+    document.getElementById('pv-cap').textContent='Your schedule, the moment you book it.';
+  }else{
+    book.disabled=false;book.textContent=`Book for ${d} ${dt.split(' ')[1]}, ${slots[nv.slot][0]}`;
+    document.getElementById('pv-time').textContent=`${d} ${dt} · ${slots[nv.slot][0]} · video`;
+    document.getElementById('pv-cap').textContent=`${d} ${dt}'s list, the moment you book it.`;
+  }
+}
+nvDrawDays();nvPaint();
+
+/* patient rows: search filters, click selects; no match = the honest stub */
+document.getElementById('nv-q').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  let vis=0;
+  document.querySelectorAll('#nv-plist .prow').forEach(r=>{
+    const hit=r.dataset.n.includes(q);
+    r.style.display=hit?'':'none';if(hit)vis++;
+  });
+  document.getElementById('nv-none').hidden=vis>0;
+});
+document.querySelectorAll('#nv-plist .prow').forEach(r=>r.addEventListener('click',()=>{
+  document.querySelectorAll('#nv-plist .prow').forEach(x=>x.classList.remove('on'));
+  r.classList.add('on');
+  nv.patient=r.dataset.n.replace(/\b\w/g,c=>c.toUpperCase());
+  nv.first=r.dataset.f;
+  nvPaint();
+}));
+document.querySelectorAll('#nv-durs .fchip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('#nv-durs .fchip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+}));
+
+/* ---------- dispatch composer: orders, the window offer, the hand-off ---------- */
+/* Default (June's call, July 23): Maya picks from the windows you offer — her pick IS the
+   confirmation, no counter-proposal loop. "Pick it yourself" stays for times agreed live.
+   A fasting order keeps mornings only, automatically. */
+const dw={self:false,fasting:false,sel:0,offered:[true,true,true,true]};
+const dWins=[...document.querySelectorAll('#d-wins .fchip')];
+function dPaint(){
+  dWins.forEach((c,i)=>{
+    const blocked=dw.fasting&&i>=2;
+    c.disabled=blocked;
+    c.classList.toggle('on', dw.self ? (dw.sel===i&&!blocked) : (dw.offered[i]&&!blocked));
+    c.setAttribute('aria-pressed',c.classList.contains('on'));
+  });
+  const offerCount=dw.offered.filter((o,i)=>o&&!(dw.fasting&&i>=2)).length;
+  const fastTail=dw.fasting?' The fasting rule keeps mornings only.':'';
+  document.getElementById('d-winhint').textContent=dw.self
+    ? 'You picked it — Maya confirms this window in her app.'+fastTail
+    : (offerCount?'Maya chooses from these in her app — tap a window to withhold it.':'Offer at least one window.')+fastTail;
+  const send=document.getElementById('d-send');
+  send.textContent=dw.self?'Send to Maya to confirm':'Send to Maya to choose a window';
+  send.disabled=!dw.self&&!offerCount;
+  document.getElementById('d-sendnote').textContent=
+    'It lands in her app now, in plain words. Nothing is scheduled and no crew is contacted until she '
+    +(dw.self?'confirms the window.':'chooses her window.');
+}
+dWins.forEach((c,i)=>c.addEventListener('click',()=>{
+  if(dw.self)dw.sel=i;else dw.offered[i]=!dw.offered[i];
+  dPaint();
+}));
+document.getElementById('d-selfpick').addEventListener('click',function(){
+  dw.self=this.classList.toggle('on');
+  this.setAttribute('aria-pressed',dw.self);
+  if(dw.self&&dw.fasting&&dw.sel>=2)dw.sel=0;
+  dPaint();
+});
+document.querySelectorAll('#d-winwrap .day').forEach(d=>d.addEventListener('click',()=>{
+  document.querySelectorAll('#d-winwrap .day').forEach(x=>x.classList.remove('on'));d.classList.add('on');
+}));
+function setFasting(on){
+  dw.fasting=on;
+  if(on&&dw.self&&dw.sel>=2)dw.sel=0;
+  document.getElementById('d-fastnote').hidden=!on;
+  dPaint();
+}
+document.querySelectorAll('#r-dispatch .orow .rm').forEach(b=>b.addEventListener('click',()=>{
+  b.closest('.orow').remove();
+}));
+document.getElementById('d-addlipid').addEventListener('click',function(){
+  const r=document.createElement('div');r.className='orow';r.id='d-lipid';
+  r.innerHTML='<img src="img/icons/ph-line/flask.svg" alt="">Lipid panel<span>fasting</span><button class="rm" aria-label="Remove the lipid panel" title="Remove">×</button>';
+  this.closest('.addrow').before(r);
+  r.querySelector('.rm').addEventListener('click',()=>{r.remove();setFasting(false);this.hidden=false;});
+  setFasting(true);
+  this.hidden=true;
+});
+document.getElementById('d-askjen').addEventListener('click',function(){
+  const on=this.classList.toggle('on');
+  this.setAttribute('aria-pressed',on);
+});
+dPaint();
 </script>
 </body>
 </html>

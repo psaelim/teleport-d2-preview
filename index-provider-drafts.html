@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Teleport MD — Provider portal · Backlog drafts, batch 1 · for review</title>
+<title>Teleport MD — Provider portal · Backlog drafts, batch 2 · for review</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -85,18 +85,20 @@
 <body>
 
 <div class="head">
-  <p class="eyebrow">Teleport MD &middot; Provider portal &middot; Backlog drafts &middot; Batch 1</p>
-  <h1>Five drafts. Your call on each.</h1>
-  <p class="lede"><b>Batch 1 complete (July 22): all five drafts ported</b> — the portal is at ten screens,
-  the video-visit flow runs Today &rarr; call preview &rarr; in-call &rarr; wrap-up, and both nav badges
-  (Messages, Results) open real screens. This board stays as the record of the batch; every frame below
-  is the shipped screen. Next cluster when you want it: the composers (new visit + dispatch).</p>
+  <p class="eyebrow">Teleport MD &middot; Provider portal &middot; Backlog drafts &middot; Batch 2</p>
+  <h1>Two composers. Your call on each.</h1>
+  <p class="lede"><b>Batch 2 complete (July 23): both composers ported on your calls</b> — the portal is at
+  twelve screens. D6 books a video visit from your open hours (Unconfirmed until the patient says yes);
+  D7 orders a draw at her home (Maya picks the window from the ones you offer — her pick is the
+  confirmation). The five coral questions below record your answers; the requisition edge case moved to
+  DEV-FAQ §2 #11. Next cluster when you want it: <b>batch 3 — add a patient + cancel/reschedule</b>.
+  Batch 1 stays below as the shipped record.</p>
   <div class="cards">
-    <a class="cardbtn volt" href="mock-provider-backlog.html" target="_blank">
-      <span><span class="t">Drive the live drafts</span><span class="s">All five, wired end to end</span></span>
+    <a class="cardbtn volt" href="mock-provider-composers.html" target="_blank">
+      <span><span class="t">Drive the live drafts</span><span class="s">Both composers, wired end to end</span></span>
     </a>
     <a class="cardbtn" href="index-provider.html">
-      <span><span class="t">Back to the gallery</span><span class="s">The five shipped screens</span></span>
+      <span><span class="t">Back to the gallery</span><span class="s">The twelve shipped screens</span></span>
     </a>
   </div>
 </div>
@@ -110,47 +112,60 @@
 </div>
 
 <script>
-/* [hash, title, sub, note, question, status]
-   status: 'open' = picker shown · 'ported' = shipped, picker off · 'held' = held with changes, picker shown */
+/* [num, src, hash, title, sub, note, question, status]
+   status: 'open' = picker shown · 'ported' = shipped, picker off · 'held' = held with changes, picker shown
+   src: which file carries the screen — drafts live in their mock, ported screens in the app.
+   Numbering is portal-wide and never reused: batch 1 = D1–D5, batch 2 = D6–D7. */
+const MOCK2='mock-provider-composers.html', APP='app-provider.html';
 const DRAFTS = [
-  ['call', 'Call preview', 'Identity, consent and readiness before a single frame is sent.',
+  [6, MOCK2, 'newvisit', 'New visit composer', 'Availability is the interface — the patient app\'s booking rule, applied provider-side.',
+   '"+ New visit" had been a wiring shortcut since batch 1: both buttons (Today, Schedule) just jumped to the schedule. The real thing: pick the patient (search filters as you type), the kind, and a time from <b>your open hours</b> — booked slots are grayed and say "booked", short days say why ("Your Friday ends at noon"). The rail is the honesty contract: it lands in her app in plain words, your row says <b>Unconfirmed</b> until she confirms, and a counter-proposal comes back to Today as Needs your confirmation.<br><b>July 23:</b> ported on your call — the no-match search state gained the honest <b>+ Add a patient</b> stub, and "Add a patient" moved up to batch 3. The draw tile deliberately goes nowhere until D7 is decided.',
+   'Answered July 23: <b>Unconfirmed stays</b> — it\'s descriptive, not a gate (instant-confirm would put a volt pill on a time the patient never saw). The new-patient path stays sequenced behind the honest stub.', 'ported', 'July 23'],
+  [7, MOCK2, 'dispatch', 'Dispatch composer (window + crew)', 'The old app\'s "create work order," rebuilt as ordering a draw at Maya\'s home.',
+   'Prefilled from this morning\'s wrap-up: the A1C recheck, six weeks out, with "Why this draw" in the rail quoting your own note. Orders are editable rows — adding a lipid panel surfaces the fasting rule in plain words and trims the afternoon windows; removing it takes both away. The crew card asks Jennifer first and says out loud that no one is booked until Maya confirms — <b>Finding crew</b>, never "Pending Crew".<br><b>July 23:</b> redrafted to your answers, then ported — <b>Maya picks the window</b> from the ones you offer (her pick is the confirmation; "pick it yourself" stays for times agreed live), and the lab + requisition became dispatch-side facts stated under Orders. Wired: <b>Order</b> on the wrap-up, the draw tile in the visit composer, <b>Order an at-home draw</b> in the patient preview and result panel, <b>+ Add an order</b> on the job card.',
+   'Answered July 23: hand-off flipped to the default (one round-trip — her pick is the confirmation); no lab picker (dispatch decides, the provider sees it named on the job card); no requisition upload (the signed order is the paperwork — the external-document edge is logged as DEV-FAQ §2 #11); "Ask Jennifer first" stays as a preference, one row to remove if the dispatch decisions land against it.', 'ported', 'July 23'],
+  [1, APP, 'call', 'Call preview', 'Identity, consent and readiness before a single frame is sent.',
    'The old file\'s best-written screen, kept alive. Who you are about to see and what she shared (A1C flagged, meds, allergy, her booking note), your own camera and sound checked, and the disclosure in plain words: encrypted, part of her record, she can see you viewed what she shared. "In the waiting room · joined 8:56" mirrors the patient side\'s "Dr. Anand has been told you are here." The Today hero\'s <b>Open call preview</b> button now lands here, for real.<br><b>July 22:</b> camera crop fixed per your note, then ported on your call.', null, 'ported'],
-  ['incall', 'In-call, provider side', 'The screen the old file never had. Dark surface: white and volt only.',
+  [2, APP, 'incall', 'In-call, provider side', 'The screen the old file never had. Dark surface: white and volt only.',
    'Patient video full-bleed, self-view, ticking timer, encrypted pill. The chart rides along in a rail — a <b>live note</b> that saves to the record, her reason for booking, results, meds — so you never leave her face to check a number. Tray: mute / camera / captions toggles (ink-on-white when off), chart toggle, and a coral end-call with an ink glyph. Never white-on-coral.', null, 'ported'],
-  ['wrap', 'Wrap-up', 'A visit that ends in a dead screen teaches nothing — the patient rule, applied provider-side.',
+  [3, APP, 'wrap', 'Wrap-up', 'A visit that ends in a dead screen teaches nothing — the patient rule, applied provider-side.',
    'The in-call note arrives here to be signed ("Once signed, Maya can read this note in her app, in these words"). Three next steps — order the repeat draw, book the follow-up, message — are exactly what feeds the patient\'s "What happens next" tracker, and the rail shows her tracker filling in as you finish. End call now lands here, closing the loop.', null, 'ported'],
-  ['messages', 'Messages', 'The badge said 4; the route was dead.',
+  [4, APP, 'messages', 'Messages', 'The badge said 4; the route was dead.',
    'Threads left, conversation right. Opening a thread marks it read and the sidebar badge follows. Crew threads sit beside patient threads, labeled by role, never a codename. The composer says out loud where words go: patient replies join the record.',
    'Ported as drafted: crew messages stay <b>out</b> of the patient record ("Crew messages stay between you and the crew"). If clinical context in crew chatter should be chartable, say so and it flips.', 'ported'],
-  ['results', 'Results inbox', 'Every result lands here flagged, and leaves reviewed.',
+  [5, APP, 'results', 'Results inbox', 'Every result lands here flagged, and leaves reviewed.',
    'The worklist the roster hints at. Chips reuse the tint grammar — green settled, coral needs you. The slide-over answers "what do I do about it": values with goal and reference lines, the previous value for trend, lab provenance, then the same three verbs as the wrap-up — message, follow up, repeat the draw. "Maya was told her result is in… once you mark it reviewed." The Results nav badge now opens it.', null, 'ported'],
 ];
 
 const grid = document.getElementById('grid');
 const TAGS={open:'draft',ported:'ported to R1',held:'held · updated'};
-grid.innerHTML = DRAFTS.map(([hash,title,sub,note,q,st], i) => `
+let sep=false;
+grid.innerHTML = DRAFTS.map(([n,src,hash,title,sub,note,q,st,when]) => {
+  const head=(st==='ported'&&!sep)?(sep=true,
+    `<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:26px;letter-spacing:-.02em;margin:24px 0 -24px;color:#868D97">Batch 1 — the shipped record</h2>`):'';
+  return head+`
   <figure id="d-${hash}">
-    <div class="shot"><iframe src="${st==='ported'?`app-provider.html#${hash}`:`mock-provider-backlog.html?board#${hash}`}" loading="lazy" title="${title}"></iframe></div>
+    <div class="shot"><iframe src="${st==='ported'?`app-provider.html#${hash}`:`${src}?board#${hash}`}" loading="lazy" title="${title}"></iframe></div>
     <figcaption>
-      <div class="cap-t"><span><span class="num">D${i+1}</span> ${title}<span class="drafttag${st==='held'?' held':''}">${TAGS[st]}</span></span>
-        <a class="openfs" href="${st==='ported'?`app-provider.html#${hash}`:`mock-provider-backlog.html#${hash}`}" target="_blank">Open full size ↗</a></div>
+      <div class="cap-t"><span><span class="num">D${n}</span> ${title}<span class="drafttag${st==='held'?' held':''}">${TAGS[st]}</span></span>
+        <a class="openfs" href="${st==='ported'?`app-provider.html#${hash}`:`${src}#${hash}`}" target="_blank">Open full size ↗</a></div>
       <div class="cap-s">${sub}</div>
       <div class="fix">${note}</div>
-      ${q ? `<div class="fix q"><b>Your call:</b> ${q}</div>` : ''}
+      ${(Array.isArray(q)?q:q?[q]:[]).map(x=>`<div class="fix q"><b>Your call:</b> ${x}</div>`).join('')}
       ${st==='ported'
-        ? `<div class="decide"><span class="dhint">Ported July 22 — live in the prototype and the gallery. This frame is the shipped screen.</span></div>`
+        ? `<div class="decide"><span class="dhint">Ported ${when||'July 22'} — live in the prototype and the gallery. This frame is the shipped screen.</span></div>`
         : `<div class="decide">
         <button class="dbtn port" data-h="${hash}" data-v="port">Port to R1</button>
         <button class="dbtn hold" data-h="${hash}" data-v="hold">Hold</button>
         <span class="dhint">or tell me what to change and I'll redraft</span>
       </div>`}
     </figcaption>
-  </figure>`).join('');
+  </figure>`}).join('');
 
 /* picks: local only, survives reloads, pasteable */
-const KEY='provider-batch1-picks';
+const KEY='provider-batch2-picks';
 const picks=JSON.parse(localStorage.getItem(KEY)||'{}');
-const TITLES=Object.fromEntries(DRAFTS.map(([h,t],i)=>[h,`D${i+1} ${t}`]));
+const TITLES=Object.fromEntries(DRAFTS.map(([n,,h,t])=>[h,`D${n} ${t}`]));
 function paint(){
   document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('on',picks[b.dataset.h]===b.dataset.v));
   const port=Object.keys(picks).filter(h=>picks[h]==='port').map(h=>TITLES[h]);
@@ -171,7 +186,7 @@ document.getElementById('clear').addEventListener('click',()=>{
   localStorage.setItem(KEY,'{}');paint();
 });
 document.getElementById('copy').addEventListener('click',async()=>{
-  const line='Provider batch 1 picks — port: ['+
+  const line='Provider batch 2 picks — port: ['+
     (Object.keys(picks).filter(h=>picks[h]==='port').map(h=>TITLES[h]).join(', ')||'none')+
     '], hold: ['+(Object.keys(picks).filter(h=>picks[h]==='hold').map(h=>TITLES[h]).join(', ')||'none')+']';
   try{await navigator.clipboard.writeText(line);document.getElementById('copy').textContent='Copied';}

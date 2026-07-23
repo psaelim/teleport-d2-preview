@@ -8,6 +8,8 @@ const SECTIONS = [
   ['The working day', [
   ['today', 'Today', 'One page: what is next, and what needs you.',
    'Replaces the shared "Hello, {Name}!" template (audit finding 1: all three personas got the same home). A clinician needs a worklist: the next visit as an ink hero with <b>Open call preview</b> (the old file\'s best screen, kept alive), the day as rows, and a rail where a patient\'s honest "Requested" state from the patient app lands as <b>Needs your confirmation</b>: Confirm or Propose a time, no approval hourglass.', true],
+  ['newvisit', 'New visit composer', 'Availability is the interface; the visit lands honest.',
+   'Replaces the old "Make An Appointment" wizard — three numbered steps that labeled Max Well "Establish Patient" on one screen and "New Patient" on the next, made the clinician set a "$50 patient responsibility" mid-booking, and ended on a cartoon hourglass ("Scheduled! Please wait for approval"). Here <b>your open hours are the interface</b>: booked slots are grayed and say "booked", short days say why. The visit is real the moment you save — the row says <b>Unconfirmed</b> until the patient taps yes (descriptive, not a gate; June\'s call, July 23). A search with no match says so and offers <b>+ Add a patient</b> — the honest stub for the batch-3 screen. The at-home-draw tile hands off to the draw composer.', true],
   ['call', 'Call preview', 'Identity, consent and readiness before a single frame is sent.',
    'The old file\'s best-written screen, kept alive — its disclosure voice survives nearly verbatim in <b>Before you join</b>. Who you are about to see and what she shared (A1C flagged, meds, allergy, her booking note), your own camera and sound checked against a real preview ("This is what Maya will see"), and the waiting-room mirror: "In the waiting room · joined 8:56" is the provider side of the patient\'s "Dr. Anand has been told you are here."', true],
   ['incall', 'In-call, provider side', 'The screen the old file never had.',
@@ -22,6 +24,8 @@ const SECTIONS = [
   ['A visit', [
   ['visit', 'Visit detail & crew dispatch', 'The job card, rebuilt for the desk.',
    'The old Work Details IA, preserved and translated: status, patient (contactable), orders, where, instructions, one primary action. The work status machine stays but speaks plain language: Requested, Confirmed, Jennifer accepted, En route, Collected, Dropped at Quest. No <b>#WO1</b>, no "Pending Crew" anywhere.', true],
+  ['dispatch', 'Order a draw at her home', 'The "create work order" screen, retired.',
+   'The old "Make A Service Request" was where the work-order grammar was born: a WORK TYPE checklist priced per row, a crew marketplace sorted by price ("travel cost may differ"), an invoice-first preview quoting <b>$77.50–$100</b>, and a designed-in failure loop — "your patient has canceled this appointment due to the high cost of travel" → reschedule with a cheaper crew. Here: orders in clinical words (a lipid panel surfaces the fasting rule and trims the afternoon windows; removing it takes both away), and <b>Maya picks the window</b> from the ones you offer — her pick is the confirmation, no counter-proposal loop (June\'s call, July 23). The crew row is a preference, not an assignment; the lab and the requisition are dispatch-side facts, stated under Orders instead of asked. Entry points: <b>Order</b> on the wrap-up, the draw tile in the visit composer, <b>Order an at-home draw</b> in the patient preview and result panel, <b>+ Add an order</b> on the job card.', true],
   ]],
   ['Patients', [
   ['patients', 'Patients roster', 'A list that answers "who am I seeing, and when."',
@@ -42,15 +46,11 @@ const SECTIONS = [
 /* Not built yet — the honest list, same status grammar as the
    patient board (planned: next up; parked: deliberately out for R1). */
 const BACKLOG = [
-  ['The working day', [
-    ['New visit composer', 'planned'],
-  ]],
   ['Schedule', [
     ['Edit hours form', 'planned'],
     ['Out of office', 'planned'],
   ]],
   ['A visit', [
-    ['Dispatch composer (window + crew)', 'planned'],
     ['Cancel / reschedule a visit', 'planned'],
   ]],
   ['Patients', [
@@ -75,6 +75,10 @@ const FLOWS = [
    'Flagged in the inbox → the slide-over → message her, book the follow-up, or order the repeat draw.'],
   ['Managing the week', ['schedule'],
    'Week grid + availability; editing hours never touches existing bookings.'],
+  ['Booking a visit, provider-side', ['today', 'newvisit'],
+   '+ New visit → the composer: your open hours are the interface; it lands in the patient\'s app and stays Unconfirmed in yours until she says yes.'],
+  ['Ordering a draw, provider-side', ['wrap', 'dispatch', 'visit'],
+   'Wrap-up → the draw composer, prefilled from your note → the job card: Maya picks her window, a crew accepts, the tracker fills in.'],
   ['Knowing your panel', ['patients', 'preview', 'visit'],
    'Roster → preview → the visit or a new order.'],
 ];
